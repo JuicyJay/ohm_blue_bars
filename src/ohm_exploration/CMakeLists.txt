@@ -4,7 +4,11 @@ project(ohm_exploration)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+                    roscpp
+                    visualization_msgs
+                    tf
+                    )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -96,16 +100,19 @@ catkin_package(
 # )
 
 ## Declare a cpp executable
-# add_executable(ohm_exploration_node src/ohm_exploration_node.cpp)
+add_executable(exploration
+               src/exploration-node.cpp
+               src/SensorPublisher.cpp
+               )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ohm_exploration_node ohm_exploration_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(ohm_exploration_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(exploration
+                      ${catkin_LIBRARIES}
+                      )
 
 #############
 ## Install ##
@@ -122,11 +129,11 @@ catkin_package(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ohm_exploration ohm_exploration_node
+install(TARGETS exploration
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
