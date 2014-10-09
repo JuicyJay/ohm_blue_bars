@@ -6,8 +6,11 @@
 
 #include "Sensor.h"
 #include "SensorPublisher.h"
+#include "Grid.h"
 
 tf::StampedTransform _transform;
+nav_msgs::OccupancyGrid _map;
+Grid* _grid = 0;
 
 void callbackPose(const geometry_msgs::PoseStamped& pose)
 {
@@ -18,6 +21,14 @@ void callbackPose(const geometry_msgs::PoseStamped& pose)
                                           pose.pose.orientation.w));
 }
 
+void callbackMap(const nav_msgs::OccupancyGrid& map)
+{
+    _map = map;
+
+    if (!_grid)
+        _grid = new Grid(map.info.width / 4, map.info.height / 4, map.info.resolution * 4.0f);
+}
+
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "exploration");
@@ -26,16 +37,24 @@ int main(int argc, char** argv)
     SensorPublisher pubSensor(sensor, nh);
     ros::Rate rate(10);
     ros::Subscriber subPose(nh.subscribe("slam_out_pose", 1, callbackPose));
+    ros::Subscriber subMap(nh.subscribe("map", 1, callbackMap));
+
 //    tf::TransformListener listener;
 
-    tf::Quaternion quat;
-    quat.setEuler(M_PI * 0.0f, M_PI * 0.0f, M_PI * 0.0f);
-    _transform.setRotation(quat);
+
+    ros::Publisher pubGrid(nh.advertise<nav_msgs::GridCells>("grid", 2));
 
     while (ros::ok())
     {
 //        std::cout << "transform: " << _transform.getRotation() << std::endl;
         pubSensor.publish(_transform);
+
+        if (_grid)
+        {
+            pubGrid.publish(_grid->getGridCellMessage());
+            _grid->update(_map, sensor, _transform);
+        }
+
 //        if (listener.waitForTransform("laser", "map", ros::Time::now(), ros::Duration(0.1f)))
 //        try
 //        {
@@ -50,6 +69,8 @@ int main(int argc, char** argv)
         ros::spinOnce();
         rate.sleep();
     }
+
+    delete _grid;
 
     return 0;
 }

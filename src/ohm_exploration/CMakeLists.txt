@@ -7,11 +7,12 @@ project(ohm_exploration)
 find_package(catkin REQUIRED COMPONENTS
                     roscpp
                     visualization_msgs
+                    nav_msgs
                     tf
                     )
 
-## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
+find_package(Eigen REQUIRED)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -92,7 +93,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
+include_directories(${EIGEN_INCLUDE_DIRS})
 
 ## Declare a cpp library
 # add_library(ohm_exploration
@@ -103,6 +104,7 @@ catkin_package(
 add_executable(exploration
                src/exploration-node.cpp
                src/SensorPublisher.cpp
+               src/Grid.cpp
                )
 
 ## Add cmake target dependencies of the executable/library
