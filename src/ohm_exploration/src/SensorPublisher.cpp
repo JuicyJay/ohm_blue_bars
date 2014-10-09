@@ -31,10 +31,10 @@ void SensorPublisher::publish(const tf::Transform& pose)
     marker.pose.position.z = pose.getOrigin()[2];
 
     tf::Quaternion orientation(pose.getRotation());
-    marker.pose.orientation.x = orientation.getAxis()[0];
-    marker.pose.orientation.y = orientation.getAxis()[1];
-    marker.pose.orientation.z = orientation.getAxis()[2];
-    marker.pose.orientation.w = orientation.getAngle();
+    marker.pose.orientation.x = orientation.x();
+    marker.pose.orientation.y = orientation.y();
+    marker.pose.orientation.z = orientation.z();
+    marker.pose.orientation.w = orientation.w();
 
     marker.scale.x = 1.0f;
     marker.scale.y = 1.0f;

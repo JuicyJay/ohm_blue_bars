@@ -2,6 +2,8 @@
 #include <tf/tf.h>
 #include <tf/transform_listener.h>
 
+#include <ostream>
+
 #include "Sensor.h"
 #include "SensorPublisher.h"
 
@@ -26,9 +28,13 @@ int main(int argc, char** argv)
     ros::Subscriber subPose(nh.subscribe("slam_out_pose", 1, callbackPose));
 //    tf::TransformListener listener;
 
+    tf::Quaternion quat;
+    quat.setEuler(M_PI * 0.0f, M_PI * 0.0f, M_PI * 0.0f);
+    _transform.setRotation(quat);
+
     while (ros::ok())
     {
-
+//        std::cout << "transform: " << _transform.getRotation() << std::endl;
         pubSensor.publish(_transform);
 //        if (listener.waitForTransform("laser", "map", ros::Time::now(), ros::Duration(0.1f)))
 //        try
