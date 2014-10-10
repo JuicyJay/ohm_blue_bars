@@ -26,7 +26,7 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
     _map = map;
 
     if (!_grid)
-        _grid = new Grid(map.info.width / 4, map.info.height / 4, map.info.resolution * 4.0f);
+        _grid = new Grid(map);
 }
 
 int main(int argc, char** argv)
@@ -40,7 +40,7 @@ int main(int argc, char** argv)
     ros::Subscriber subMap(nh.subscribe("map", 1, callbackMap));
 
 //    tf::TransformListener listener;
-
+    _transform.setRotation(tf::Quaternion(0.0f, 0.0f, M_PI * 0.25f));
 
     ros::Publisher pubGrid(nh.advertise<nav_msgs::GridCells>("grid", 2));
 

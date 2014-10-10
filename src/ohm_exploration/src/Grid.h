@@ -13,7 +13,7 @@
 class Grid
 {
 public:
-    Grid(const unsigned int width, const unsigned int height, const float cellSize);
+    Grid(const nav_msgs::OccupancyGrid& map, const unsigned int fuseCells = 4);
 
     nav_msgs::GridCells getGridCellMessage(void) const;
     void update(const nav_msgs::OccupancyGrid& map, const Sensor& sensor, const tf::Transform& pose);
@@ -21,6 +21,7 @@ public:
 private:
     std::vector<std::vector<Cell> > _data;
     const float _cellSize;
+    const unsigned int _fuseCells;
 };
 
 #endif
