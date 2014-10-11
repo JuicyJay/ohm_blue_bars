@@ -16,6 +16,7 @@ public:
     Grid(const nav_msgs::OccupancyGrid& map, const unsigned int fuseCells = 4);
 
     nav_msgs::GridCells getGridCellMessage(void) const;
+    nav_msgs::GridCells getWallGridCells(void) const;
     void update(const nav_msgs::OccupancyGrid& map, const Sensor& sensor, const tf::Transform& pose);
 
 private:

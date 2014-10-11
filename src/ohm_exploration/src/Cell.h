@@ -3,9 +3,10 @@
 
 struct Cell
 {
-    Cell(void) : inspected(false) { }
+    Cell(void) : inspected(false), wall(false) { }
 
     bool inspected;
+    bool wall;
 };
 
 #endif

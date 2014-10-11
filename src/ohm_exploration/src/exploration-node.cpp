@@ -26,7 +26,7 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
     _map = map;
 
     if (!_grid)
-        _grid = new Grid(map);
+        _grid = new Grid(map, 8);
 }
 
 int main(int argc, char** argv)
@@ -36,13 +36,14 @@ int main(int argc, char** argv)
     Sensor sensor;
     SensorPublisher pubSensor(sensor, nh);
     ros::Rate rate(10);
-    ros::Subscriber subPose(nh.subscribe("slam_out_pose", 1, callbackPose));
+    ros::Subscriber subPose(nh.subscribe("pose", 1, callbackPose));
     ros::Subscriber subMap(nh.subscribe("map", 1, callbackMap));
 
 //    tf::TransformListener listener;
     _transform.setRotation(tf::Quaternion(0.0f, 0.0f, M_PI * 0.25f));
 
     ros::Publisher pubGrid(nh.advertise<nav_msgs::GridCells>("grid", 2));
+    ros::Publisher pubWall(nh.advertise<nav_msgs::GridCells>("walls", 2));
 
     while (ros::ok())
     {
@@ -52,6 +53,7 @@ int main(int argc, char** argv)
         if (_grid)
         {
             pubGrid.publish(_grid->getGridCellMessage());
+            pubWall.publish(_grid->getWallGridCells());
             _grid->update(_map, sensor, _transform);
         }
 

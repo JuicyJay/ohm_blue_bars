@@ -41,6 +41,36 @@ nav_msgs::GridCells Grid::getGridCellMessage(void) const
     return message;
 }
 
+nav_msgs::GridCells Grid::getWallGridCells(void) const
+{
+    const float offsetX = static_cast<float>(_data.size()) * 0.5f * _cellSize;
+    const float offsetY = static_cast<float>(_data.size() > 0 ? _data[0].size() : 0.0f) * 0.5f * _cellSize;
+    nav_msgs::GridCells message;
+
+    message.header.frame_id = "map";
+    message.header.stamp    = ros::Time::now();
+    message.cell_width      = _cellSize;
+    message.cell_height     = _cellSize;
+
+    for (unsigned int row = 0; row < _data.size(); ++row)
+    {
+        for (unsigned int col = 0; col < _data[row].size(); ++col)
+        {
+            if (!_data[row][col].wall)
+                continue;
+
+            geometry_msgs::Point point;
+
+            point.x = static_cast<float>(col) * _cellSize - offsetX;
+            point.y = static_cast<float>(row) * _cellSize - offsetY;
+            point.z = 0.0f;
+            message.cells.push_back(point);
+        }
+    }
+
+    return message;
+}
+
 void Grid::update(const nav_msgs::OccupancyGrid& map, const Sensor& sensor, const tf::Transform& pose)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -122,12 +152,14 @@ void Grid::update(const nav_msgs::OccupancyGrid& map, const Sensor& sensor, cons
                 for (unsigned int j = 0; j < _fuseCells; ++j)
                 {
                     if (map.data[(cellMap[1] + i) * map.info.width + cellMap[0] + j])
+                    {
                         stop = true;
+                        _data[cellGrid[1]][cellGrid[0]].wall = true;
+                    }
                 }
             }
 
-            if (!stop)
-                _data[cellGrid[1]][cellGrid[0]].inspected = true;
+            _data[cellGrid[1]][cellGrid[0]].inspected = true;
         }
     }
 
