@@ -107,6 +107,14 @@ add_executable(exploration
                src/Grid.cpp
                )
 
+add_executable(wall-finder
+               src/wall-finder-node.cpp
+               src/FindWalls.cpp
+               src/LeastSquare.cpp
+               src/Ransac.cpp
+               src/Wall.cpp
+               )
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ohm_exploration_node ohm_exploration_generate_messages_cpp)
@@ -116,6 +124,9 @@ target_link_libraries(exploration
                       ${catkin_LIBRARIES}
                       )
 
+target_link_libraries(wall-finder
+                      ${catkin_LIBRARIES}
+                      )
 #############
 ## Install ##
 #############
@@ -131,7 +142,7 @@ target_link_libraries(exploration
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS exploration
+install(TARGETS exploration wall-finder
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
