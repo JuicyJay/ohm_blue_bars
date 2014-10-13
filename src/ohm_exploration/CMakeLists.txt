@@ -109,7 +109,7 @@ add_executable(exploration
 
 add_executable(wall-finder
                src/wall-finder-node.cpp
-               src/FindWalls.cpp
+               src/FindWall.cpp
                src/LeastSquare.cpp
                src/Ransac.cpp
                src/Wall.cpp
