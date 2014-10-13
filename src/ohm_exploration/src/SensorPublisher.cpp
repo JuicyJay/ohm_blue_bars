@@ -20,7 +20,7 @@ void SensorPublisher::publish(const tf::Transform& pose)
     visualization_msgs::Marker marker;
 
     marker.header.frame_id = "map";
-    marker.header.stamp = ros::Time();
+    marker.header.stamp = ros::Time::now();
     marker.ns = "";
     marker.id = 0;
     marker.type = visualization_msgs::Marker::TRIANGLE_LIST;

@@ -8,6 +8,8 @@
 
 #include <Eigen/Core>
 
+#include <visualization_msgs/Marker.h>
+
 typedef std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i> > PointVector;
 
 class Wall
@@ -19,10 +21,27 @@ public:
 
     inline const Line& model(void) const { return _model; }
     inline const PointVector& points(void) const { return _points; }
+    inline unsigned int id(void) const { return _id; }
+    inline float resolution(void) const { return _resolution; }
+    inline void setResolution(const float res) { _resolution = res; }
+    inline void setOrigin(const geometry_msgs::Point& origin) { _origin = origin; }
+
+    visualization_msgs::Marker getMarkerMessage(void) const;
+
+    /* compare operator for std::sort */
+    bool operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const;
 
 private:
     Line _model;
     PointVector _points;
+    unsigned int _id;
+    Eigen::Vector2f _center;
+    float _resolution;
+    geometry_msgs::Point _origin;
+
+    static unsigned int s_id;
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 

@@ -18,13 +18,19 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 
 void FindWall::search(std::vector<Wall>& walls)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << "will work with " << _points.size() << " points." << std::endl;
+
     Wall wall;
 
     _ransac.setInputPoints(_points);
     _ransac.estimateWall(wall);
 
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     std::cout << wall << std::endl;
+
+    wall.setResolution(_mapMetaData.resolution);
+    wall.setOrigin(_mapMetaData.origin.position);
+    walls.push_back(wall);
 }
 
 void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map)

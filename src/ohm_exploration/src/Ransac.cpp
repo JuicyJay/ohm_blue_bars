@@ -116,7 +116,7 @@ bool Ransac::estimateWall(Wall& wall)
         return false;
     }
 
-    std::vector<Wall> walls;
+    std::vector<PointVector> points;
     int mostPoints = -1;
     unsigned int best = 0;
 
@@ -149,11 +149,12 @@ bool Ransac::estimateWall(Wall& wall)
             if (std::abs(static_cast<float>(point->x()) * m + t - static_cast<float>(point->y())) < _epsilon)
                 linePoints.push_back(*point);
 
-//        std::cout << "found " << linePoints.size() << " points." << std::endl;
+        std::cout << "found " << linePoints.size() << " points." << std::endl;
 
         if (linePoints.size() >= _minPoints)
         {
-            walls.push_back(Wall(linePoints));;
+//            walls.push_back(Wall(linePoints));;
+            points.push_back(linePoints);
 
             if (static_cast<int>(linePoints.size()) > mostPoints)
             {
@@ -166,7 +167,8 @@ bool Ransac::estimateWall(Wall& wall)
     if (mostPoints < 0)
         return false;
 
-    wall = walls[best];
+//    wall = walls[best];
+    wall = Wall(points[best]);
     return true;
 }
 
