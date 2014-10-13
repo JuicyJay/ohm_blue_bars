@@ -8,16 +8,27 @@
 #ifndef ISTATE_H_
 #define ISTATE_H_
 
+
+/**
+ * @namespace  autonohm
+ */
 namespace autonohm
 {
 
+/**
+ * @class   IState
+ * @author  Stefan May
+ * @date    2014-10-13
+ */
 class IState
 {
 public:
+  /**
+   * Default destructor
+   */
+  virtual ~IState(void){};
 
-  virtual ~IState(){};
-
-  virtual void process() = 0;
+  virtual void process(void) = 0;
 };
 
 } /* namespace autonohm */

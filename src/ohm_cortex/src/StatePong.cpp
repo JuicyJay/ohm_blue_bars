@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <ros/console.h>
 
+
+// ohm cortext includes
 #include "Context.h"
 #include "StatePong.h"
 #include "StatePing.h"
@@ -17,7 +19,7 @@ namespace autonohm
 
 StatePong::StatePong()
 {
-
+   ROS_INFO("Pong");
 
 }
 

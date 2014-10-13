@@ -16,8 +16,7 @@ namespace autonohm
 
 StatePing::StatePing()
 {
-
-
+   ROS_INFO("Ping");
 }
 
 StatePing::~StatePing()

@@ -13,20 +13,45 @@
 namespace autonohm
 {
 
+/**
+ * @class   Context
+ * @author  Stefan May
+ * @date    2014-10-13
+ *
+ * @brief   Context to manage state machine. Designed as singleton pattern
+ */
 class Context
 {
 public:
+   /**
+    * Function to get instance for singleton pattern
+    * @return
+    */
   static Context* getInstance();
-
-  virtual ~Context();
-
+  /**
+   * Default destructor
+   */
+  virtual ~Context(void);
+  /**
+   * Function to set state
+   * @param state
+   */
   void setState(IState* state);
-
-  void process();
+  /**
+   * Function for processing
+   */
+  void process(void);
 
 private:
-
+  /**
+   * Private constructor for singleton pattern
+   */
   Context();
+  /**
+   * Private copy constructor for singleton pattern
+   * @param c
+   */
+  Context(Context &c);
 
   autonohm::IState* _currentState;
 };
