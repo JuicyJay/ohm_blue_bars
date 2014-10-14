@@ -22,12 +22,20 @@ Wall::Wall(const PointVector& points)
     _center /= static_cast<float>(_points.size());
 
     std::sort(_points.begin(), _points.end(), *this);
+    PointVector::const_iterator pointEnd(_points.begin() + 1);
 
-//    for (unsigned int i = 0; i < _points.size(); ++i)
-//    {
-//        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
-//        std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;
-//    }
+    for (PointVector::const_iterator point(_points.begin()); pointEnd < _points.end(); ++point, ++pointEnd)
+        if ((*point - *pointEnd).cast<float>().norm() > 10)
+            break;
+
+    if (pointEnd != _points.end())
+        _points.resize(pointEnd - _points.begin());
+
+    for (unsigned int i = 0; i < _points.size(); ++i)
+    {
+        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
+        std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;
+    }
 }
 
 Wall::Wall(const Wall& wall)
@@ -44,19 +52,6 @@ Wall::Wall(const Wall& wall)
 bool Wall::operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const
 {
     return left.x() < right.x();
-
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
-    const Eigen::Vector2f diffLeft ( left.cast<float>() - _center);
-    const Eigen::Vector2f diffRight(right.cast<float>() - _center);
-
-    std::cout << "diffLeft:" << std::endl << diffLeft << std::endl;
-    std::cout << "diffRight:" << std::endl << diffRight << std::endl;
-    std::cout << "length left = " << (diffLeft.x() < 0.0f ? -diffLeft.norm() : diffLeft.norm()) << std::endl;
-    std::cout << "length right = " << (diffRight.x() < 0.0f ? -diffRight.norm() : diffRight.norm()) << std::endl;
-
-    return diffLeft.x() < 0.0f ? -diffLeft.norm() : diffLeft.norm() <
-        diffRight.x() < 0.0f ? -diffRight.norm() : diffRight.norm();
 }
 
 visualization_msgs::Marker Wall::getMarkerMessage(void) const
@@ -83,9 +78,9 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.pose.orientation.z = 0.0f;
     marker.pose.orientation.w = 1.0f;
 
-    marker.color.r = 0.8f;
-    marker.color.g = 0.8f;
-    marker.color.b = 0.8f;
+    marker.color.r = 0.5f;
+    marker.color.g = 0.0f;
+    marker.color.b = 0.0f;
     marker.color.a = 1.0f;
 
 

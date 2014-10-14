@@ -20,6 +20,7 @@ public:
 
 private:
     void exportPoints(const nav_msgs::OccupancyGrid& map);
+    void removePoints(const PointVector& points);
     void buildCluster(const nav_msgs::OccupancyGrid& map);
 
     PointVector _points;

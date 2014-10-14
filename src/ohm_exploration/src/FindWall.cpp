@@ -27,15 +27,18 @@ void FindWall::search(std::vector<Wall>& walls)
     std::cout << "will work with " << _points.size() << " points." << std::endl;
 
     Wall wall;
-
     _ransac.setInputPoints(_points);
-    _ransac.estimateWall(wall);
 
-    std::cout << wall << std::endl;
+    while (_ransac.estimateWall(wall))
+    {
+        wall.setResolution(_mapMetaData.resolution);
+        wall.setOrigin(_mapMetaData.origin.position);
+        walls.push_back(wall);
+        std::cout << wall << std::endl;
 
-    wall.setResolution(_mapMetaData.resolution);
-    wall.setOrigin(_mapMetaData.origin.position);
-    walls.push_back(wall);
+        this->removePoints(wall.points());
+        _ransac.setInputPoints(_points);
+    }
 }
 
 void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map)
@@ -48,6 +51,26 @@ void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map)
             if (map.data[offset + col] > 0)
                 _points.push_back(Eigen::Vector2i(col, row));
     }
+}
+
+void FindWall::removePoints(const PointVector& points)
+{
+    std::vector<bool> mask(_points.size(), true);
+    PointVector rest;
+
+    for (unsigned int i = 0; i < points.size(); ++i)
+    {
+        for (unsigned int j = 0; j < _points.size(); ++j)
+        {
+            mask[j] = mask[j] & (_points[j] != points[i]);
+        }
+    }
+
+    for (unsigned int i = 0; i < mask.size(); ++i)
+        if (mask[i])
+            rest.push_back(_points[i]);
+
+    _points = rest;
 }
 
 void FindWall::buildCluster(const nav_msgs::OccupancyGrid& map)

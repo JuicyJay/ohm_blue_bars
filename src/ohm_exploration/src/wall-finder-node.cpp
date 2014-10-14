@@ -17,7 +17,8 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
     _wallFinder.setMap(map);
     _wallFinder.search(_walls);
 
-    _pubWall.publish(_walls[0].getMarkerMessage());
+    for (unsigned int i = 0; i < _walls.size(); ++i)
+        _pubWall.publish(_walls[i].getMarkerMessage());
 }
 
 int main(int argc, char** argv)
