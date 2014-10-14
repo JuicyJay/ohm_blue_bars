@@ -6,8 +6,12 @@
  */
 
 #include "Waiting.h"
+
+#include "../Context.h"
+
 #include "Explore.h"
 #include "Approach.h"
+#include "Teleoperated.h"
 
 namespace autonohm {
 
@@ -26,17 +30,17 @@ void Waiting::process(void)
 
 
 
-   if(/*go back to explore*/) {
+   if(1/*go back to explore*/) {
       autonohm::Context::getInstance()->setState(new Explore());
       delete this;
    }
 
-   if(/*go closer to victim*/) {
+   if(1/*go closer to victim*/) {
       autonohm::Context::getInstance()->setState(new Approach());
       delete this;
    }
 
-   if(/*abort to teleop*/) {
+   if(1/*abort to teleop*/) {
       autonohm::Context::getInstance()->setState(new Teleoperated());
       delete this;
    }

@@ -7,8 +7,11 @@
 
 #include "Approach.h"
 
+#include "../Context.h"
+
 #include "Explore.h"
 #include "Inspect.h"
+#include "Teleoperated.h"
 
 namespace autonohm
 {
@@ -29,17 +32,17 @@ Approach::~Approach(void)
 void Approach::process(void)
 {
 
-   if(/*no victim found*/) {
+   if(1/*no victim found*/) {
       autonohm::Context::getInstance()->setState(new Explore());
       delete this;
    }
 
-   if(/*possible victim approached*/) {
+   if(1/*possible victim approached*/) {
       autonohm::Context::getInstance()->setState(new Inspect());
       delete this;
    }
 
-   if(/*abort to teleop*/) {
+   if(1/*abort to teleop*/) {
       autonohm::Context::getInstance()->setState(new Teleoperated());
       delete this;
    }
