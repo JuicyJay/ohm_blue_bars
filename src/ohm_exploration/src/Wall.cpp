@@ -164,11 +164,21 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.points.push_back(point);
     marker.points.push_back(marker.points[0]);
 
-    marker.points.push_back(marker.points[20]);
-    marker.points.push_back(marker.points[21]);
+    marker.points.push_back(marker.points[17]);
+    marker.points.push_back(marker.points[0]);
     point = marker.points[0];
     point.z = 0.9f;
     marker.points.push_back(point);
+
+
+    /* top stuff */
+    marker.points.push_back(marker.points[2]);
+    marker.points.push_back(marker.points[5]);
+    marker.points.push_back(marker.points[13]);
+
+    marker.points.push_back(marker.points[5]);
+    marker.points.push_back(marker.points[13]);
+    marker.points.push_back(marker.points[17]);
 
 
     return marker;
