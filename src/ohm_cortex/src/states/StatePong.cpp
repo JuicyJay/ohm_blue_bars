@@ -10,25 +10,27 @@
 
 
 // ohm cortext includes
-#include "Context.h"
+#include "../Context.h"
 #include "StatePong.h"
 #include "StatePing.h"
 
 namespace autonohm
 {
 
-StatePong::StatePong()
+StatePong::StatePong(void)
+: _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
+
    ROS_INFO("Pong");
 
 }
 
-StatePong::~StatePong()
+StatePong::~StatePong(void)
 {
-
+   // nothing to
 }
 
-void StatePong::process()
+void StatePong::process(void)
 {
   ROS_DEBUG_STREAM("Pong");
 

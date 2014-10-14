@@ -8,8 +8,13 @@
 #ifndef CONTEXT_H_
 #define CONTEXT_H_
 
-#include "IState.h"
 
+#include "IState.h"
+#include <ros/ros.h>
+
+/**
+ * @namespace autonohm
+ */
 namespace autonohm
 {
 
@@ -27,16 +32,41 @@ public:
     * Function to get instance for singleton pattern
     * @return
     */
-  static Context* getInstance();
+  static Context* getInstance(void);
   /**
    * Default destructor
    */
   virtual ~Context(void);
+
+
+  // SETTERS
   /**
    * Function to set state
    * @param state
    */
   void setState(IState* state);
+  /**
+   * Function to set node handle to context
+   * @param nh
+   */
+  void setNodeHandle(ros::NodeHandle* nh);
+
+
+  // GETTERS
+  /**
+   * Function to get current state
+   * @return
+   */
+  IState* getState(void) const;
+
+  /**
+   * Function to get node handle
+   * @return
+   */
+  ros::NodeHandle* getNodeHandle(void) const;
+
+
+  // PROCESSING
   /**
    * Function for processing
    */
@@ -46,14 +76,17 @@ private:
   /**
    * Private constructor for singleton pattern
    */
-  Context();
+  Context(void);
   /**
    * Private copy constructor for singleton pattern
    * @param c
    */
   Context(Context &c);
 
-  autonohm::IState* _currentState;
+  // MEMBERS
+  autonohm::IState*     _currentState;
+  ros::NodeHandle*      _nh;
+
 };
 
 } /* namespace autonohm */

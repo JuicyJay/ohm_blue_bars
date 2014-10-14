@@ -8,6 +8,7 @@
 #ifndef ISTATE_H_
 #define ISTATE_H_
 
+#include <ros/ros.h>
 
 /**
  * @namespace  autonohm
@@ -27,7 +28,9 @@ public:
    * Default destructor
    */
   virtual ~IState(void){};
-
+  /**
+   * Processing
+   */
   virtual void process(void) = 0;
 };
 

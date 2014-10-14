@@ -8,7 +8,7 @@
 #ifndef STATEPONG_H_
 #define STATEPONG_H_
 
-#include "IState.h"
+#include "../IState.h"
 
 namespace autonohm
 {
@@ -16,9 +16,12 @@ namespace autonohm
 class StatePong: public IState
 {
 public:
-  StatePong();
-  virtual ~StatePong();
-  void process();
+  StatePong(void);
+  virtual ~StatePong(void);
+  void process(void);
+private:
+   ros::NodeHandle* _nh;
+   ros::Publisher   _state_pub;
 };
 
 } /* namespace autonohm */

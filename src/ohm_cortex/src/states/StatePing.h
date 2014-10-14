@@ -8,17 +8,23 @@
 #ifndef STATEPING_H_
 #define STATEPING_H_
 
-#include "IState.h"
+#include "../IState.h"
 
-namespace autonohm
-{
+namespace autonohm {
+
 
 class StatePing: public IState
 {
 public:
-  StatePing();
-  virtual ~StatePing();
-  void process();
+
+   StatePing(void);
+   virtual ~StatePing(void);
+   void process(void);
+
+private:
+   ros::NodeHandle* _nh;
+
+   ros::Publisher   _state_pub;
 };
 
 } /* namespace autonohm */
