@@ -116,9 +116,8 @@ bool Ransac::estimateWall(Wall& wall)
         return false;
     }
 
-    std::vector<PointVector> points;
+    PointVector points;
     int mostPoints = -1;
-    unsigned int best = 0;
 
     for (unsigned int i = 0; i < _maxIterations; i++)
     {
@@ -137,11 +136,11 @@ bool Ransac::estimateWall(Wall& wall)
 
 
         /* debug output */
-        std::cout << "RANSAC iteration " << i << std::endl;
-        std::cout << "-----------------------" << std::endl;
-        std::cout << "Take point (" << model[0].x() << ", " << model[0].y() << ") and ("
-                  << model[1].x() << ", " << model[1].y() << ")" << std::endl;
-        std::cout << "Model parameter: m = " << m << " t = " << t << std::endl;
+//        std::cout << "RANSAC iteration " << i << std::endl;
+//        std::cout << "-----------------------" << std::endl;
+//        std::cout << "Take point (" << model[0].x() << ", " << model[0].y() << ") and ("
+//                  << model[1].x() << ", " << model[1].y() << ")" << std::endl;
+//        std::cout << "Model parameter: m = " << m << " t = " << t << std::endl;
 
         PointVector linePoints;
 
@@ -149,17 +148,14 @@ bool Ransac::estimateWall(Wall& wall)
             if (std::abs(static_cast<float>(point->x()) * m + t - static_cast<float>(point->y())) < _epsilon)
                 linePoints.push_back(*point);
 
-        std::cout << "found " << linePoints.size() << " points." << std::endl;
+//        std::cout << "found " << linePoints.size() << " points." << std::endl;
 
         if (linePoints.size() >= _minPoints)
         {
-//            walls.push_back(Wall(linePoints));;
-            points.push_back(linePoints);
-
             if (static_cast<int>(linePoints.size()) > mostPoints)
             {
                 mostPoints = linePoints.size();
-                best = i;
+                points = linePoints;
             }
         }
     }
@@ -167,8 +163,7 @@ bool Ransac::estimateWall(Wall& wall)
     if (mostPoints < 0)
         return false;
 
-//    wall = walls[best];
-    wall = Wall(points[best]);
+    wall = Wall(points);
     return true;
 }
 

@@ -1,6 +1,8 @@
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 
+#include <opencv2/opencv.hpp>
+
 #include "FindWall.h"
 
 FindWall _wallFinder;
@@ -24,6 +26,11 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     ros::Subscriber subMap(nh.subscribe("map", 1, callbackMap));
     _pubWall = nh.advertise<visualization_msgs::Marker>("walls", 2);
+    ros::Rate rate(100);
 
-    ros::spin();
+    while (ros::ok())
+    {
+        ros::spinOnce();
+        cv::waitKey(10);
+    }
 }

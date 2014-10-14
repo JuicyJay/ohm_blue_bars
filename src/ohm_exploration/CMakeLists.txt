@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 find_package(Eigen REQUIRED)
-
+find_package(OpenCV REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -93,7 +93,9 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(${EIGEN_INCLUDE_DIRS})
+include_directories(${EIGEN_INCLUDE_DIRS}
+                    ${OpenCV_INCLUDE_DIRS}
+                    )
 
 ## Declare a cpp library
 # add_library(ohm_exploration
@@ -126,6 +128,7 @@ target_link_libraries(exploration
 
 target_link_libraries(wall-finder
                       ${catkin_LIBRARIES}
+                      ${OpenCV_LIBRARIES}
                       )
 #############
 ## Install ##
