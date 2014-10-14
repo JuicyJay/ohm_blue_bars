@@ -95,8 +95,16 @@ catkin_package(
 ## Declare a cpp library
 add_library(ohm_cortex
   src/Context.cpp
-  src/StatePing.cpp
-  src/StatePong.cpp
+  src/states/StatePing.cpp
+  src/states/StatePong.cpp
+  src/states/Teleoperated.cpp
+  src/states/RejectVictim.cpp
+  src/states/ConfirmVictim.cpp
+  src/states/Waiting.cpp
+  src/states/Inspect.cpp
+  src/states/Approach.cpp
+  src/states/Explore.cpp
+  src/states/Init.cpp
 )
 
 ## Declare a cpp executable
