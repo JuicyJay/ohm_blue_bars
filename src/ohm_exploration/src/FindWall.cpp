@@ -8,7 +8,7 @@ FindWall::FindWall(void)
 {
     _ransac.setEpsilon(1.0f);
     _ransac.setMinimumPoints(30);
-    _ransac.setMaxIterations(100);
+    _ransac.setMaxIterations(10);
 
     cv::namedWindow("debug");
 }
@@ -24,13 +24,14 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 void FindWall::search(std::vector<Wall>& walls)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
-    std::cout << "will work with " << _points.size() << " points." << std::endl;
 
     Wall wall;
     _ransac.setInputPoints(_points);
 
     while (_ransac.estimateWall(wall))
+//    _ransac.estimateWall(wall);
     {
+        std::cout << "will work with " << _points.size() << " points." << std::endl;
         wall.setResolution(_mapMetaData.resolution);
         wall.setOrigin(_mapMetaData.origin.position);
         walls.push_back(wall);

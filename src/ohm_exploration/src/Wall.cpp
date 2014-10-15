@@ -14,6 +14,11 @@ Wall::Wall(const PointVector& points)
       _center(0.0f, 0.0f),
       _resolution(1.0f)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+
+    for (unsigned int i = 0; i < points.size(); ++i)
+        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
+
     LeastSquare::estimateLine(_points, _model);
 
     for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
@@ -25,17 +30,23 @@ Wall::Wall(const PointVector& points)
     PointVector::const_iterator pointEnd(_points.begin() + 1);
 
     for (PointVector::const_iterator point(_points.begin()); pointEnd < _points.end(); ++point, ++pointEnd)
+    {
+        std::cout << "(" << point->x() << ", " << point->y() << ") - (" << pointEnd->x() << ", " << pointEnd->y()
+                  << ") = " << (*point - *pointEnd).cast<float>().norm() << std::endl;
+
         if ((*point - *pointEnd).cast<float>().norm() > 10)
             break;
+    }
 
     if (pointEnd != _points.end())
         _points.resize(pointEnd - _points.begin());
 
     for (unsigned int i = 0; i < _points.size(); ++i)
     {
-        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
         std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;
     }
+
+    std::cout << std::endl;
 }
 
 Wall::Wall(const Wall& wall)
@@ -51,7 +62,10 @@ Wall::Wall(const Wall& wall)
 
 bool Wall::operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const
 {
-    return left.x() < right.x();
+    if (left.x() == right.x())
+        return left.y() < right.y();
+    else
+        return left.x() < right.x();
 }
 
 visualization_msgs::Marker Wall::getMarkerMessage(void) const
@@ -81,7 +95,7 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.color.r = 0.5f;
     marker.color.g = 0.0f;
     marker.color.b = 0.0f;
-    marker.color.a = 1.0f;
+    marker.color.a = 0.8f;
 
 
     Eigen::Vector2f thick((_points.front().cast<float>() - _center).normalized());
