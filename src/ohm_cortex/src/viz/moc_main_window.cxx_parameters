@@ -1,0 +1,12 @@
+-I/usr/include/qt4
+-I/usr/include/qt4/QtGui
+-I/usr/include/qt4/QtCore
+-I/home/chris/workspace/ros/ohm_autonomy/src/ohm_cortex
+-DROS_PACKAGE_NAME="ohm_cortex"
+-DROSCONSOLE_BACKEND_LOG4CXX
+-DQT_NO_DEBUG
+-DQT_GUI_LIB
+-DQT_CORE_LIB
+-o
+/home/chris/workspace/ros/ohm_autonomy/src/ohm_cortex/src/viz/moc_main_window.cxx
+/home/chris/workspace/ros/ohm_autonomy/src/ohm_cortex/src/viz/main_window.hpp

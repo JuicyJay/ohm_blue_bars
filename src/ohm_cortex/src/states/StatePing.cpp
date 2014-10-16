@@ -37,9 +37,9 @@ void StatePing::process(void)
 {
   ROS_DEBUG_STREAM("Ping");
 
-//  std_msgs::String msg;
-//  msg.data = "ping";
-//  _state_pub.publish(msg);
+  std_msgs::String msg;
+  msg.data = "ping";
+  _state_pub.publish(msg);
 
   if(rand()%100<10)
   {

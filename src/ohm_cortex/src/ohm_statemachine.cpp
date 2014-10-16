@@ -2,6 +2,7 @@
 
 #include "Context.h"
 #include "states/Init.h"
+#include "states/StatePing.h"
 
 int main(int argc, char** argv)
 {
@@ -12,7 +13,7 @@ int main(int argc, char** argv)
    context->setNodeHandle(&nh);
 
    // Set init state
-   context->setState(new autonohm::Init());
+   context->setState(new autonohm::StatePing());
 
    ros::Rate r(10.0);
 
