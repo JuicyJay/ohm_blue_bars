@@ -7,9 +7,8 @@
 #include <iostream>
 #include <unistd.h>
 
-//#include <Eigen/LU>
-//#include <Eigen/Geometry>
-#include <Eigen/Dense>
+#include <Eigen/LU>
+#include <Eigen/Geometry>
 
 Ransac::Ransac(void)
     : _maxIterations(100),
@@ -17,11 +16,6 @@ Ransac::Ransac(void)
       _minPoints(10)
 {
     std::srand(static_cast<unsigned int>(std::time(0)));
-
-    Eigen::Vector3f a;
-    Eigen::Vector3f b;
-
-    a.cross(b);
 }
 
 bool Ransac::estimateLines(std::vector<Line>& lines, const unsigned int maxNumberOfLines)
@@ -140,30 +134,30 @@ bool Ransac::estimateWall(Wall& wall)
         const float m = static_cast<float>(model[0].y() - model[1].y()) /
             static_cast<float>(model[0].x() - model[1].x());
         const float t = model[0].y() - m * model[0].x();
-        const Eigen::Vector2f v((model[0] - model[1]).cast<float>().norm());
+        const Eigen::Vector2f v((model[0] - model[1]).cast<float>().normalized());
         const Eigen::Vector2f n(v.y(), -v.x());
 
         /* debug output */
-        std::cout << "RANSAC iteration " << i << std::endl;
-        std::cout << "-----------------------" << std::endl;
-        std::cout << "Take point (" << model[0].x() << ", " << model[0].y() << ") and ("
-                  << model[1].x() << ", " << model[1].y() << ")" << std::endl;
-        std::cout << "Model parameter: m = " << m << " t = " << t << std::endl;
+//        std::cout << "RANSAC iteration " << i << std::endl;
+//        std::cout << "-----------------------" << std::endl;
+//        std::cout << "Take point (" << model[0].x() << ", " << model[0].y() << ") and ("
+//                  << model[1].x() << ", " << model[1].y() << ")" << std::endl;
+//        std::cout << "Model parameter: m = " << m << " t = " << t << std::endl;
 
         PointVector linePoints;
 
         for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
         {
-            const Eigen::Vector2f p(point->cast<float>() - model[0].cast<float>());
-//            const float d = (v.cross(p)).norm();
-            const float d = 0.0f;
+            const float d = std::abs(n.dot((*point - model[0]).cast<float>()));
 
             if (d < _epsilon)
-//            if (std::abs(static_cast<float>(point->x()) * m + t - static_cast<float>(point->y())) < _epsilon)
                 linePoints.push_back(*point);
+
+//            if (std::abs(static_cast<float>(point->x()) * m + t - static_cast<float>(point->y())) < _epsilon)
+//                linePoints.push_back(*point);
         }
 
-        std::cout << "found " << linePoints.size() << " points." << std::endl;
+//        std::cout << "found " << linePoints.size() << " points." << std::endl;
 
         if (linePoints.size() >= _minPoints)
         {

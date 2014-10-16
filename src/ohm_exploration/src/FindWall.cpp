@@ -6,9 +6,9 @@
 
 FindWall::FindWall(void)
 {
-    _ransac.setEpsilon(1.0f);
+    _ransac.setEpsilon(1.5f);
     _ransac.setMinimumPoints(30);
-    _ransac.setMaxIterations(10);
+    _ransac.setMaxIterations(100);
 
     cv::namedWindow("debug");
 }
@@ -16,6 +16,7 @@ FindWall::FindWall(void)
 void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 {
     _points.clear();
+    _featureMap.setMap(map);
     this->exportPoints(map);
     this->buildCluster(map);
     _mapMetaData = map.info;
@@ -49,7 +50,8 @@ void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map)
         const unsigned int offset = map.info.width * row;
 
         for (unsigned int col = 0; col < map.info.width; ++col)
-            if (map.data[offset + col] > 0)
+//            if (map.data[offset + col] > 0)
+            if (_featureMap(col, row).orientation == FeatureCell::Up && map.data[offset + col] > 0)
                 _points.push_back(Eigen::Vector2i(col, row));
     }
 }

@@ -115,6 +115,7 @@ add_executable(wall-finder
                src/LeastSquare.cpp
                src/Ransac.cpp
                src/Wall.cpp
+               src/FeatureMap.cpp
                )
 
 ## Add cmake target dependencies of the executable/library

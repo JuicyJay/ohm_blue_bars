@@ -14,10 +14,8 @@ Wall::Wall(const PointVector& points)
       _center(0.0f, 0.0f),
       _resolution(1.0f)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
-    for (unsigned int i = 0; i < points.size(); ++i)
-        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
+//    for (unsigned int i = 0; i < points.size(); ++i)
+//        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
 
     LeastSquare::estimateLine(_points, _model);
 
@@ -31,22 +29,22 @@ Wall::Wall(const PointVector& points)
 
     for (PointVector::const_iterator point(_points.begin()); pointEnd < _points.end(); ++point, ++pointEnd)
     {
-        std::cout << "(" << point->x() << ", " << point->y() << ") - (" << pointEnd->x() << ", " << pointEnd->y()
-                  << ") = " << (*point - *pointEnd).cast<float>().norm() << std::endl;
+//        std::cout << "(" << point->x() << ", " << point->y() << ") - (" << pointEnd->x() << ", " << pointEnd->y()
+//                  << ") = " << (*point - *pointEnd).cast<float>().norm() << std::endl;
 
-        if ((*point - *pointEnd).cast<float>().norm() > 10)
+        if ((*point - *pointEnd).cast<float>().norm() > 3)
             break;
     }
 
     if (pointEnd != _points.end())
         _points.resize(pointEnd - _points.begin());
 
-    for (unsigned int i = 0; i < _points.size(); ++i)
-    {
-        std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;
-    }
-
-    std::cout << std::endl;
+//    for (unsigned int i = 0; i < _points.size(); ++i)
+//    {
+//        std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;
+//    }
+//
+//    std::cout << std::endl;
 }
 
 Wall::Wall(const Wall& wall)
@@ -93,15 +91,15 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.pose.orientation.w = 1.0f;
 
     marker.color.r = 0.5f;
-    marker.color.g = 0.0f;
-    marker.color.b = 0.0f;
-    marker.color.a = 0.8f;
+    marker.color.g = 0.5f;
+    marker.color.b = 0.5f;
+    marker.color.a = 1.0f;
 
 
     Eigen::Vector2f thick((_points.front().cast<float>() - _center).normalized());
     Eigen::Rotation2Df rot(M_PI * 0.5f);
     thick = rot.matrix() * thick;
-    thick *= 0.05f;
+    thick *= 0.01f;
 
 
     /* front side part */

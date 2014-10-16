@@ -9,6 +9,7 @@
 
 #include "Wall.h"
 #include "Ransac.h"
+#include "FeatureMap.h"
 
 class FindWall
 {
@@ -26,6 +27,7 @@ private:
     PointVector _points;
     nav_msgs::MapMetaData _mapMetaData;
     Ransac _ransac;
+    FeatureMap _featureMap;
 };
 
 #endif
