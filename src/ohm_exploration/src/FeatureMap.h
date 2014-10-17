@@ -6,6 +6,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 
 #include "FeatureCell.h"
+#include "Wall.h"
 
 class FeatureMap
 {

@@ -1,5 +1,7 @@
 #include "FeatureMap.h"
 
+#include <iostream>
+
 FeatureMap::FeatureMap(void)
 {
 
@@ -21,9 +23,9 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
             const int8_t current = map.data[offset + col];
 
             if (!last && current > 0)
-                _data[row][col].orientation |= FeatureCell::Left;
+                _data[row][col].orientation |= Wall::Left;
             else if (last > 0 && !current)
-                _data[row][col].orientation |= FeatureCell::Right;
+                _data[row][col - 1].orientation |= Wall::Right;
         }
     }
 
@@ -37,9 +39,9 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
             const int8_t current = map.data[map.info.width * row + col];
 
             if (!last && current > 0)
-                _data[row][col].orientation |= FeatureCell::Up;
+                _data[row][col].orientation |= Wall::Up;
             else if (last > 0 && !current)
-                _data[row][col].orientation |= FeatureCell::Down;
+                _data[row - 1][col].orientation |= Wall::Down;
         }
     }
 }

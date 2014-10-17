@@ -194,7 +194,6 @@ void Ransac::getRandomlyPoints(PointVector& points, const unsigned int numberOf)
         }
     }
     while (!this->checkIfAllPointsDifferent(points));
-
 }
 
 bool Ransac::checkIfAllPointsDifferent(const PointVector& points)

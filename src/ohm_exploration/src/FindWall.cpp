@@ -5,20 +5,28 @@
 #include <opencv2/opencv.hpp>
 
 FindWall::FindWall(void)
+    : _points(4)
 {
-    _ransac.setEpsilon(1.5f);
+    _ransac.setEpsilon(1.0f);
     _ransac.setMinimumPoints(30);
-    _ransac.setMaxIterations(100);
+    _ransac.setMaxIterations(300);
 
-    cv::namedWindow("debug");
+    _orientations.push_back(Wall::Up);
+//    _orientations.push_back(Wall::Down);
+//    _orientations.push_back(Wall::Left);
+//    _orientations.push_back(Wall::Right);
+//    cv::namedWindow("debug");
 }
 
 void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 {
     _points.clear();
     _featureMap.setMap(map);
-    this->exportPoints(map);
-    this->buildCluster(map);
+
+    for (unsigned int i = 0; i < _orientations.size(); ++i)
+        this->exportPoints(map, _points[i], _orientations[i]);
+
+//    this->buildCluster(map);
     _mapMetaData = map.info;
 }
 
@@ -26,54 +34,65 @@ void FindWall::search(std::vector<Wall>& walls)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
 
-    Wall wall;
-    _ransac.setInputPoints(_points);
-
-    while (_ransac.estimateWall(wall))
-//    _ransac.estimateWall(wall);
+    for (unsigned int i = 0; i < _orientations.size(); ++i)
     {
-        std::cout << "will work with " << _points.size() << " points." << std::endl;
-        wall.setResolution(_mapMetaData.resolution);
-        wall.setOrigin(_mapMetaData.origin.position);
-        walls.push_back(wall);
-        std::cout << wall << std::endl;
+        Wall wall;
+        _ransac.setInputPoints(_points[i]);
 
-        this->removePoints(wall.points());
-        _ransac.setInputPoints(_points);
+        while (_ransac.estimateWall(wall))
+//    _ransac.estimateWall(wall);
+        {
+            std::cout << "will work with " << _points[i].size() << " points." << std::endl;
+            std::cout << wall << std::endl;
+
+            if (wall.valid())
+            {
+                wall.setResolution(_mapMetaData.resolution);
+                wall.setOrigin(_mapMetaData.origin.position);
+                wall.setOrientation(_orientations[i]);
+                walls.push_back(wall);
+            }
+
+            this->removePoints(wall.points(), _points[i]);
+            _ransac.setInputPoints(_points[i]);
+        }
     }
 }
 
-void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map)
+void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map,
+                            PointVector& points,
+                            const Wall::Orientation orientation)
 {
     for (unsigned int row = 0; row < map.info.height; ++row)
     {
         const unsigned int offset = map.info.width * row;
 
         for (unsigned int col = 0; col < map.info.width; ++col)
-//            if (map.data[offset + col] > 0)
-            if (_featureMap(col, row).orientation == FeatureCell::Up && map.data[offset + col] > 0)
-                _points.push_back(Eigen::Vector2i(col, row));
+        {
+            if (_featureMap(col, row).orientation & orientation)//  &&  map.data[offset + col] > 0)
+                points.push_back(Eigen::Vector2i(col, row));
+        }
     }
 }
 
-void FindWall::removePoints(const PointVector& points)
+ void FindWall::removePoints(const PointVector& remove, PointVector& points)
 {
-    std::vector<bool> mask(_points.size(), true);
+    std::vector<bool> mask(points.size(), true);
     PointVector rest;
 
-    for (unsigned int i = 0; i < points.size(); ++i)
+    for (unsigned int i = 0; i < remove.size(); ++i)
     {
-        for (unsigned int j = 0; j < _points.size(); ++j)
+        for (unsigned int j = 0; j < points.size(); ++j)
         {
-            mask[j] = mask[j] & (_points[j] != points[i]);
+            mask[j] = mask[j] & (points[j] != remove[i]);
         }
     }
 
     for (unsigned int i = 0; i < mask.size(); ++i)
         if (mask[i])
-            rest.push_back(_points[i]);
+            rest.push_back(points[i]);
 
-    _points = rest;
+    points = rest;
 }
 
 void FindWall::buildCluster(const nav_msgs::OccupancyGrid& map)

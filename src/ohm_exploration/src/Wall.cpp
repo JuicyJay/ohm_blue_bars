@@ -12,8 +12,12 @@ Wall::Wall(const PointVector& points)
     : _points(points),
       _id(++s_id),
       _center(0.0f, 0.0f),
-      _resolution(1.0f)
+      _resolution(1.0f),
+      _orientation(None)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    std::cout << "points = " << _points.size() << std::endl;
+
 //    for (unsigned int i = 0; i < points.size(); ++i)
 //        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
 
@@ -32,12 +36,17 @@ Wall::Wall(const PointVector& points)
 //        std::cout << "(" << point->x() << ", " << point->y() << ") - (" << pointEnd->x() << ", " << pointEnd->y()
 //                  << ") = " << (*point - *pointEnd).cast<float>().norm() << std::endl;
 
-        if ((*point - *pointEnd).cast<float>().norm() > 3)
+        if ((*point - *pointEnd).cast<float>().norm() > 5.0f)
             break;
     }
 
     if (pointEnd != _points.end())
         _points.resize(pointEnd - _points.begin());
+
+    std::cout << "points = " << _points.size() << std::endl;
+    _valid = _points.size() >= 30;
+    std::cout << "valid  = " << _valid << std::endl;
+    std::cout << std::endl;
 
 //    for (unsigned int i = 0; i < _points.size(); ++i)
 //    {
@@ -53,7 +62,9 @@ Wall::Wall(const Wall& wall)
       _id(wall._id),
       _center(wall._center),
       _resolution(wall._resolution),
-      _origin(wall._origin)
+      _origin(wall._origin),
+      _orientation(wall._orientation),
+      _valid(wall._valid)
 {
 
 }
@@ -90,9 +101,42 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.pose.orientation.z = 0.0f;
     marker.pose.orientation.w = 1.0f;
 
-    marker.color.r = 0.5f;
-    marker.color.g = 0.5f;
-    marker.color.b = 0.5f;
+//    std::cout << "id          = " << _id << std::endl;
+//    std::cout << "orientation = " << _orientation << std::endl;
+
+    switch (_orientation)
+    {
+    case Up:
+        marker.color.r = 198.0f / 256.0f;
+        marker.color.g = 0.0f;
+        marker.color.b = 0.0f;
+        break;
+
+    case Down:
+        marker.color.r =  63.0f / 256.0f;
+        marker.color.g = 202.0f / 256.0f;
+        marker.color.b =  58.0f / 256.0f;
+        break;
+
+    case Left:
+        marker.color.r =  63.0f / 256.0f;
+        marker.color.g =  84.0f / 256.0f;
+        marker.color.b = 221.0f / 256.0f;
+        break;
+
+    case Right:
+        marker.color.r = 180.0f / 256.0f;
+        marker.color.g =   0.0f / 256.0f;
+        marker.color.b = 175.0f / 256.0f;
+        break;
+
+    default:
+        marker.color.r = 0.8f;
+        marker.color.g = 0.8f;
+        marker.color.b = 0.8f;
+        break;
+    };
+
     marker.color.a = 1.0f;
 
 

@@ -15,6 +15,16 @@ typedef std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i> >
 class Wall
 {
 public:
+
+    enum Orientation {
+        None  = 0,
+        Up    = (1 << 0),
+        Down  = (1 << 1),
+        Left  = (1 << 2),
+        Right = (1 << 3),
+        All   = 0xff
+    };
+
     Wall(void) { }
     Wall(const PointVector& points);
     Wall(const Wall& wall);
@@ -23,8 +33,10 @@ public:
     inline const PointVector& points(void) const { return _points; }
     inline unsigned int id(void) const { return _id; }
     inline float resolution(void) const { return _resolution; }
+    inline bool valid(void) const { return _valid; }
     inline void setResolution(const float res) { _resolution = res; }
     inline void setOrigin(const geometry_msgs::Point& origin) { _origin = origin; }
+    inline void setOrientation(const Orientation orientation) { _orientation = orientation; }
 
     visualization_msgs::Marker getMarkerMessage(void) const;
 
@@ -38,6 +50,8 @@ private:
     Eigen::Vector2f _center;
     float _resolution;
     geometry_msgs::Point _origin;
+    Orientation _orientation;
+    bool _valid;
 
     static unsigned int s_id;
 
@@ -50,16 +64,7 @@ inline std::ostream& operator<<(std::ostream& os, const Wall& wall)
     os << "Wall:" << std::endl;
     os << "-----------------------------------" << std::endl;
     os << "Model: " << wall.model() << std::endl;
-//    os << "Points: " << std::endl;
-//
-//    for (std::vector<Eigen::Vector2i>::const_iterator point(wall.points().begin());
-//         point < wall.points().end();
-//         ++point)
-//    {
-//        os << *point;
-//    }
-//
-//    os << std::endl;
+    os << "Valid: " << wall.valid() << std::endl;
 
     return os;
 }
