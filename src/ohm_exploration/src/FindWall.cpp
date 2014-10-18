@@ -7,7 +7,7 @@
 FindWall::FindWall(void)
     : _points(4)
 {
-    _ransac.setEpsilon(1.0f);
+    _ransac.setEpsilon(3.0f);
     _ransac.setMinimumPoints(30);
     _ransac.setMaxIterations(300);
 

@@ -4,13 +4,13 @@
 struct FeatureCell
 {
     FeatureCell(void)
-    : outerFace(false),
+    : border(false),
       orientation(0)
     {
 
     }
 
-    bool outerFace;
+    bool border;
     uint8_t orientation;
 };
 

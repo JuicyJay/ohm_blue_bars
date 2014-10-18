@@ -23,14 +23,12 @@ public:
     void setMinimumPoints(const unsigned int points) { _minPoints = points; }
     void setMaxIterations(const unsigned int iterations) { _maxIterations = iterations; }
 
-    bool estimateLine(Line& line);
-    bool estimateLines(std::vector<Line>& line, const unsigned int maxNumberOfLines = 2);
     bool estimateWall(Wall& wall);
 
 private:
+    void getPointsByLine(const Line& line, PointVector& points);
     void getRandomlyPoints(PointVector& points, const unsigned int numberOf);
     bool checkIfAllPointsDifferent(const PointVector& points);
-    bool checkIfAllPointsFarEnough(const PointVector& points, const int distance);
 
     PointVector _points;
     unsigned int _maxIterations;

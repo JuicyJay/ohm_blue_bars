@@ -18,97 +18,6 @@ Ransac::Ransac(void)
     std::srand(static_cast<unsigned int>(std::time(0)));
 }
 
-bool Ransac::estimateLines(std::vector<Line>& lines, const unsigned int maxNumberOfLines)
-{
-    PointVector storage = _points;
-    Line line;
-
-    while (this->estimateLine(line))
-    {
-        lines.push_back(line);
-        PointVector outliers;
-
-        for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
-        {
-            if (std::abs(static_cast<float>(point->x()) * line.m + line.t - static_cast<float>(point->y())) >=
-                _epsilon)
-            {
-                outliers.push_back(*point);
-            }
-        }
-
-        if (lines.size() >= maxNumberOfLines)
-            break;
-
-        _points = outliers;
-    }
-
-    return lines.size() ? true : false;
-}
-
-bool Ransac::estimateLine(Line& line)
-{
-    if (_points.size() < 2)
-    {
-        std::cout << __PRETTY_FUNCTION__ << ": no input points set." << std::endl;
-        return false;
-    }
-
-    std::vector<Line> lines;
-    int mostPoints = -1;
-    unsigned int best = 0;
-
-    for (unsigned int i = 0; i < _maxIterations; i++)
-    {
-        PointVector model;
-        this->getRandomlyPoints(model, 2);
-
-        if (model.size() != 2)
-            return false;
-
-        if (model[0].x() == model[1].x())
-            continue;
-
-        const float m = static_cast<float>(model[0].y() - model[1].y()) /
-            static_cast<float>(model[0].x() - model[1].x());
-        const float t = model[0].y() - m * model[0].x();
-
-
-        /* debug output */
-//        std::cout << "RANSAC iteration " << i << std::endl;
-//        std::cout << "-----------------------" << std::endl;
-//        std::cout << "Take point " << model[0] << " and " << model[1] << std::endl;
-//        std::cout << "Model parameter: m = " << m << " t = " << t << std::endl;
-
-        PointVector linePoints;
-
-        for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
-            if (std::abs(static_cast<float>(point->x()) * m + t - static_cast<float>(point->y())) < _epsilon)
-                linePoints.push_back(*point);
-
-//        std::cout << "found " << linePoints.size() << " points." << std::endl;
-
-        if (linePoints.size() >= _minPoints)
-        {
-            Line line;
-            LeastSquare::estimateLine(linePoints, line);
-            lines.push_back(line);
-
-            if (static_cast<int>(linePoints.size()) > mostPoints)
-            {
-                mostPoints = linePoints.size();
-                best = i;
-            }
-        }
-    }
-
-    if (mostPoints < 0)
-        return false;
-
-    line = lines[best];
-    return true;
-}
-
 bool Ransac::estimateWall(Wall& wall)
 {
     if (_points.size() < 2)
@@ -122,42 +31,33 @@ bool Ransac::estimateWall(Wall& wall)
 
     for (unsigned int i = 0; i < _maxIterations; i++)
     {
-        PointVector model;
-        this->getRandomlyPoints(model, 2);
+        PointVector modelPoints;
+        this->getRandomlyPoints(modelPoints, 2);
 
-        if (model.size() != 2)
+        if (modelPoints.size() != 2)
             return false;
 
-        if (model[0].x() == model[1].x())
+        if (modelPoints[0].x() == modelPoints[1].x())
             continue;
 
-        const float m = static_cast<float>(model[0].y() - model[1].y()) /
-            static_cast<float>(model[0].x() - model[1].x());
-        const float t = model[0].y() - m * model[0].x();
-        const Eigen::Vector2f v((model[0] - model[1]).cast<float>().normalized());
-        const Eigen::Vector2f n(v.y(), -v.x());
+        Line model(modelPoints[0].cast<float>(), modelPoints[1].cast<float>());
 
         /* debug output */
 //        std::cout << "RANSAC iteration " << i << std::endl;
 //        std::cout << "-----------------------" << std::endl;
-//        std::cout << "Take point (" << model[0].x() << ", " << model[0].y() << ") and ("
-//                  << model[1].x() << ", " << model[1].y() << ")" << std::endl;
-//        std::cout << "Model parameter: m = " << m << " t = " << t << std::endl;
+//        std::cout << "Take point (" << model.p1().x() << ", " << model.p1().y() << ") and ("
+//                  << model.p2().x() << ", " << model.p2().y() << ")" << std::endl;
+//        std::cout << "Model parameter: " << model << std::endl;
 
         PointVector linePoints;
 
-        for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
-        {
-            const float d = std::abs(n.dot((*point - model[0]).cast<float>()));
-
-            if (d < _epsilon)
-                linePoints.push_back(*point);
-
-//            if (std::abs(static_cast<float>(point->x()) * m + t - static_cast<float>(point->y())) < _epsilon)
-//                linePoints.push_back(*point);
-        }
-
-//        std::cout << "found " << linePoints.size() << " points." << std::endl;
+        this->getPointsByLine(model, linePoints);
+        LeastSquare::estimateLine(linePoints, model);
+        linePoints.clear();
+        this->getPointsByLine(model, linePoints);
+        LeastSquare::estimateLine(linePoints, model);
+        linePoints.clear();
+        this->getPointsByLine(model, linePoints);
 
         if (linePoints.size() >= _minPoints)
         {
@@ -175,6 +75,14 @@ bool Ransac::estimateWall(Wall& wall)
     wall = Wall(points);
     return true;
 }
+
+void Ransac::getPointsByLine(const Line& line, PointVector& points)
+{
+    for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
+        if (line.distance(*point) < _epsilon)
+            points.push_back(*point);
+}
+
 
 void Ransac::getRandomlyPoints(PointVector& points, const unsigned int numberOf)
 {
@@ -206,23 +114,6 @@ bool Ransac::checkIfAllPointsDifferent(const PointVector& points)
                 continue;
 
             if (points[i] == points[j])
-                return false;
-        }
-    }
-
-    return true;
-}
-
-bool Ransac::checkIfAllPointsFarEnough(const PointVector& points, const int distance)
-{
-    for (unsigned int i = 0; i < points.size(); i++)
-    {
-        for (unsigned int j = 0; j < points.size(); j++)
-        {
-            if (i == j)
-                continue;
-
-            if (std::abs(points[i].x() - points[j].x()) < distance)
                 return false;
         }
     }
