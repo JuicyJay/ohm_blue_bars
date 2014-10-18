@@ -55,9 +55,6 @@ bool Ransac::estimateWall(Wall& wall)
         LeastSquare::estimateLine(linePoints, model);
         linePoints.clear();
         this->getPointsByLine(model, linePoints);
-        LeastSquare::estimateLine(linePoints, model);
-        linePoints.clear();
-        this->getPointsByLine(model, linePoints);
 
         if (linePoints.size() >= _minPoints)
         {

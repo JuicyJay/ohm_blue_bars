@@ -71,10 +71,8 @@ Wall::Wall(const Wall& wall)
 
 bool Wall::operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const
 {
-    if (left.x() == right.x())
-        return left.y() < right.y();
-    else
-        return left.x() < right.x();
+    return (left - Eigen::Vector2i(0, _model.t())).cast<float>().norm() <
+        (right - Eigen::Vector2i(0, _model.t())).cast<float>().norm();
 }
 
 visualization_msgs::Marker Wall::getMarkerMessage(void) const
@@ -83,6 +81,11 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
 
     if (_points.size() < 2)
         return marker;
+
+    Eigen::Vector2f thick((_points.front().cast<float>() - _center).normalized());
+    Eigen::Rotation2Df rot(M_PI * 0.5f);
+    thick = rot.matrix() * thick;
+    thick *= 0.01f;
 
     marker.header.frame_id = "map";
     marker.header.stamp    = ros::Time::now();
@@ -96,6 +99,8 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.scale.z = 1.0f;
 
     marker.pose.position = _origin;
+    marker.pose.position.x -= thick.x() * 0.5f;
+    marker.pose.position.y -= thick.y() * 0.5f;
     marker.pose.orientation.x = 0.0f;
     marker.pose.orientation.y = 0.0f;
     marker.pose.orientation.z = 0.0f;
@@ -140,23 +145,25 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.color.a = 1.0f;
 
 
-    Eigen::Vector2f thick((_points.front().cast<float>() - _center).normalized());
-    Eigen::Rotation2Df rot(M_PI * 0.5f);
-    thick = rot.matrix() * thick;
-    thick *= 0.01f;
 
 
     /* front side part */
     /* max */
+    Eigen::Vector2f min(_points.front().cast<float>() + _model.n() * _model.distance(_points.front()));
+    Eigen::Vector2f max(_points.back().cast<float>() + _model.n() * _model.distance(_points.back()));
     geometry_msgs::Point point;
-    point.x = _points.back().x() * _resolution;
-    point.y = _points.back().y() * _resolution;
+//    point.x = _points.back().x() * _resolution;
+//    point.y = _points.back().y() * _resolution;
+    point.x = max.x() * _resolution;
+    point.y = max.y() * _resolution;
     point.z = 0.0f;
     marker.points.push_back(point);
 
     /* min */
-    point.x = _points.front().x() * _resolution;
-    point.y = _points.front().y() * _resolution;
+//    point.x = _points.front().x() * _resolution;
+//    point.y = _points.front().y() * _resolution;
+    point.x = min.x() * _resolution;
+    point.y = min.y() * _resolution;
     point.z = 0.0f;
     marker.points.push_back(point);
 
@@ -177,7 +184,8 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     marker.points.push_back(marker.points[1]);
     marker.points.push_back(marker.points[2]);
 
-    Eigen::Vector2f dummy(_points.front().cast<float>() * _resolution + thick);
+//    Eigen::Vector2f dummy(_points.front().cast<float>() * _resolution + thick);
+    Eigen::Vector2f dummy(min * _resolution + thick);
     point.x = dummy.x();
     point.y = dummy.y();
     point.z = 0.0f;
