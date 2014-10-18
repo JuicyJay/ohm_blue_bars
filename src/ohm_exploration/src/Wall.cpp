@@ -36,7 +36,7 @@ Wall::Wall(const PointVector& points)
 //        std::cout << "(" << point->x() << ", " << point->y() << ") - (" << pointEnd->x() << ", " << pointEnd->y()
 //                  << ") = " << (*point - *pointEnd).cast<float>().norm() << std::endl;
 
-        if ((*point - *pointEnd).cast<float>().norm() > 5.0f)
+        if ((*point - *pointEnd).cast<float>().norm() > 10.0f)
             break;
     }
 

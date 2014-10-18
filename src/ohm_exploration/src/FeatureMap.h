@@ -18,6 +18,7 @@ public:
 
 private:
     std::vector<std::vector<FeatureCell> > _data;
+    unsigned int _wallDepth;
 };
 
 #endif

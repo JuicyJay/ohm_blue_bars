@@ -12,9 +12,9 @@ FindWall::FindWall(void)
     _ransac.setMaxIterations(300);
 
     _orientations.push_back(Wall::Up);
-//    _orientations.push_back(Wall::Down);
-//    _orientations.push_back(Wall::Left);
-//    _orientations.push_back(Wall::Right);
+    _orientations.push_back(Wall::Down);
+    _orientations.push_back(Wall::Left);
+    _orientations.push_back(Wall::Right);
 //    cv::namedWindow("debug");
 }
 
