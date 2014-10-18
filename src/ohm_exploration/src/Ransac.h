@@ -26,7 +26,7 @@ public:
     bool estimateWall(Wall& wall);
 
 private:
-    void getPointsByLine(const Line& line, PointVector& points);
+    void getPointsByLine(const Line& line, const float epsilon, PointVector& points);
     void getRandomlyPoints(PointVector& points, const unsigned int numberOf);
     bool checkIfAllPointsDifferent(const PointVector& points);
 

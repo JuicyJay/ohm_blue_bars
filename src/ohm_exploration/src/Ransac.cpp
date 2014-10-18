@@ -51,10 +51,10 @@ bool Ransac::estimateWall(Wall& wall)
 
         PointVector linePoints;
 
-        this->getPointsByLine(model, linePoints);
+        this->getPointsByLine(model, _epsilon, linePoints);
         LeastSquare::estimateLine(linePoints, model);
         linePoints.clear();
-        this->getPointsByLine(model, linePoints);
+        this->getPointsByLine(model, _epsilon, linePoints);
 
         if (linePoints.size() >= _minPoints)
         {
@@ -73,10 +73,10 @@ bool Ransac::estimateWall(Wall& wall)
     return true;
 }
 
-void Ransac::getPointsByLine(const Line& line, PointVector& points)
+void Ransac::getPointsByLine(const Line& line, const float epsilon, PointVector& points)
 {
     for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
-        if (line.distance(*point) < _epsilon)
+        if (line.distance(*point) < epsilon)
             points.push_back(*point);
 }
 
