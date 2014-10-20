@@ -118,6 +118,16 @@ add_executable(wall-finder
                src/FeatureMap.cpp
                )
 
+add_executable(goal-factory
+               src/goal-factory-node.cpp
+               src/FindWall.cpp
+               src/LeastSquare.cpp
+               src/Ransac.cpp
+               src/Wall.cpp
+               src/FeatureMap.cpp
+               )
+
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ohm_exploration_node ohm_exploration_generate_messages_cpp)
@@ -128,6 +138,11 @@ target_link_libraries(exploration
                       )
 
 target_link_libraries(wall-finder
+                      ${catkin_LIBRARIES}
+                      ${OpenCV_LIBRARIES}
+                      )
+
+target_link_libraries(goal-factory
                       ${catkin_LIBRARIES}
                       ${OpenCV_LIBRARIES}
                       )
@@ -146,7 +161,7 @@ target_link_libraries(wall-finder
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS exploration wall-finder
+install(TARGETS exploration wall-finder goal-factory
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

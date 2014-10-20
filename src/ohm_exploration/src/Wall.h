@@ -32,11 +32,14 @@ public:
     inline const Line& model(void) const { return _model; }
     inline const PointVector& points(void) const { return _points; }
     inline unsigned int id(void) const { return _id; }
+    inline const Eigen::Vector2f& center(void) const { return _center; }
+    inline Eigen::Vector3f origin(void) const { return Eigen::Vector3f(_origin.x, _origin.y, _origin.z); }
     inline float resolution(void) const { return _resolution; }
     inline bool valid(void) const { return _valid; }
     inline void setResolution(const float res) { _resolution = res; }
     inline void setOrigin(const geometry_msgs::Point& origin) { _origin = origin; }
     inline void setOrientation(const Orientation orientation) { _orientation = orientation; }
+    inline Orientation orientation(void) const { return _orientation; }
 
     visualization_msgs::Marker getMarkerMessage(void) const;
 
@@ -52,6 +55,7 @@ private:
     geometry_msgs::Point _origin;
     Orientation _orientation;
     bool _valid;
+    float _length;
 
     static unsigned int s_id;
 

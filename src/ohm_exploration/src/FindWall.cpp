@@ -40,7 +40,6 @@ void FindWall::search(std::vector<Wall>& walls)
         _ransac.setInputPoints(_points[i]);
 
         while (_ransac.estimateWall(wall))
-//    _ransac.estimateWall(wall);
         {
             std::cout << "will work with " << _points[i].size() << " points." << std::endl;
             std::cout << wall << std::endl;

@@ -23,11 +23,6 @@ Wall::Wall(const PointVector& points)
 
     LeastSquare::estimateLine(_points, _model);
 
-    for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
-        _center += point->cast<float>();
-
-    _center /= static_cast<float>(_points.size());
-
     std::sort(_points.begin(), _points.end(), *this);
     PointVector::const_iterator pointEnd(_points.begin() + 1);
 
@@ -42,9 +37,16 @@ Wall::Wall(const PointVector& points)
 
     std::cout << "points = " << _points.size() << std::endl;
     _valid = _points.size() >= 30;
+
+    for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
+        _center += point->cast<float>();
+
+    _center /= static_cast<float>(_points.size());
+
     std::cout << "valid  = " << _valid << std::endl;
     std::cout << std::endl;
 
+    _length = (_points.back() - _points.front()).cast<float>().norm();
 //    for (unsigned int i = 0; i < _points.size(); ++i)
 //    {
 //        std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;
@@ -61,7 +63,8 @@ Wall::Wall(const Wall& wall)
       _resolution(wall._resolution),
       _origin(wall._origin),
       _orientation(wall._orientation),
-      _valid(wall._valid)
+      _valid(wall._valid),
+      _length(wall._length)
 {
 
 }
