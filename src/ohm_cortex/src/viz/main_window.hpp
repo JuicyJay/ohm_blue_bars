@@ -17,6 +17,8 @@
 #include <std_msgs/String.h>
 #include "Node.h"
 
+#include "StateViz.h"
+
 
 namespace Ui{
    class MainWindow;
@@ -34,19 +36,21 @@ public:
    void stateCallback(std_msgs::String::ConstPtr msg);
 
 private slots:
-   void tick(void);
+   void slot_tick(void);
+   void slot_update(void);
+   void slot_force(QString state);
 
 private:
-   ros::Subscriber _state_sub;
+   ros::Subscriber      _state_sub;
+   ros::ServiceClient   _state_force_clt;
 
    Ui::MainWindow*      _ui;
    QGraphicsScene*      _scene;
 
    ros::NodeHandle      _nh;
 
-   Node* node1;
-   Node* node2;
-
+   QVector<Node*>       _nodes;
+   QList<StateViz>      _states;
 
    QTimer _timer;
 };

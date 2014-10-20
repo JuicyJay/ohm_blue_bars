@@ -8,6 +8,9 @@
 #include "Context.h"
 #include <cstddef>
 
+#include <std_srvs/Empty.h>
+
+
 namespace autonohm
 {
 
@@ -59,6 +62,7 @@ void Context::setState(IState* state)
 void Context::setNodeHandle(ros::NodeHandle* nh)
 {
    _nh = nh;
+
 }
 
 
@@ -67,5 +71,7 @@ void Context::process(void)
 {
   if(_currentState) _currentState->process();
 }
+
+
 
 } /* namespace autonohm */

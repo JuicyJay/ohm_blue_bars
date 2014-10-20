@@ -12,6 +12,9 @@
 #include "IState.h"
 #include <ros/ros.h>
 
+#include <std_srvs/Empty.h>
+
+
 /**
  * @namespace autonohm
  */
@@ -49,6 +52,7 @@ public:
    * Function to set node handle to context
    * @param nh
    */
+
   void setNodeHandle(ros::NodeHandle* nh);
 
 
@@ -86,6 +90,7 @@ private:
   // MEMBERS
   autonohm::IState*     _currentState;
   ros::NodeHandle*      _nh;
+
 
 };
 

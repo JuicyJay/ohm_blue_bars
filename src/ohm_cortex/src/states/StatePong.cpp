@@ -29,7 +29,7 @@ StatePong::StatePong(void)
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
 
    std_msgs::String msg;
-   msg.data = "init";
+   msg.data = "StatePong";
    _state_pub.publish(msg);
 
 }
@@ -42,10 +42,6 @@ StatePong::~StatePong(void)
 void StatePong::process(void)
 {
   ROS_DEBUG_STREAM("Pong");
-
-  std_msgs::String msg;
-  msg.data = "pong";
-  _state_pub.publish(msg);
 
   if(rand()%100<10)
   {

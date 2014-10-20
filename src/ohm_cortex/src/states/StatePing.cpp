@@ -24,7 +24,7 @@ StatePing::StatePing(void)
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
 
    std_msgs::String msg;
-   msg.data = "init";
+   msg.data = "StatePing";
    _state_pub.publish(msg);
 }
 
@@ -36,10 +36,6 @@ StatePing::~StatePing(void)
 void StatePing::process(void)
 {
   ROS_DEBUG_STREAM("Ping");
-
-  std_msgs::String msg;
-  msg.data = "ping";
-  _state_pub.publish(msg);
 
   if(rand()%100<10)
   {

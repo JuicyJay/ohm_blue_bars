@@ -10,6 +10,9 @@
 
 #include "../IState.h"
 
+#include <ros/ros.h>
+#include <std_msgs/String.h>
+
 /**
  * @namespace  autonohm
  */
@@ -37,7 +40,8 @@ public:
    void process(void);
 
 private:
-
+   ros::NodeHandle*  _nh;
+   ros::Publisher    _state_pub;
 };
 
 } /* namespace autonohm */

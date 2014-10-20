@@ -15,8 +15,15 @@
 namespace autonohm {
 
 ConfirmVictim::ConfirmVictim(void)
+: _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
+   ROS_INFO("Ping");
 
+   _state_pub = _nh->advertise<std_msgs::String>("state", 1);
+
+   std_msgs::String msg;
+   msg.data = "confirmvictim";
+   _state_pub.publish(msg);
 }
 
 ConfirmVictim::~ConfirmVictim(void)

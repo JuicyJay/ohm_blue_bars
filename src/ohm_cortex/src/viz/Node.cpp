@@ -19,7 +19,7 @@
 #include <QApplication>
 #include <QGraphicsEllipseItem>
 
-#include <QInputDialog>
+#include <QMessageBox>
 #include <QGraphicsSceneMouseEvent>
 
 #include <QDebug>
@@ -52,7 +52,7 @@ QPainterPath Node::shape() const
 
     QPainterPath path;
     path.addRoundRect(rect, roundness(rect.width()),
-                      roundness(rect.height()));
+                            roundness(rect.height()));
     return path;
 }
 
@@ -74,6 +74,41 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
 
     painter->setPen(_textColor);
     painter->drawText(rect, Qt::AlignCenter, _name);
+
+//    // Sum up all forces pushing this item away
+//    qreal xvel = 0;
+//    qreal yvel = 0;
+//    Q_FOREACH (QGraphicsItem *item, scene()->items()) {
+//        Node *node = qgraphicsitem_cast<Node *>(item);
+//        if (!node)
+//            continue;
+//
+//        QLineF line(mapFromItem(node, 0, 0), QPointF(0, 0));
+//        qreal dx = line.dx();
+//        qreal dy = line.dy();
+//        double l = 2.0 * (dx * dx + dy * dy);
+//        if (l > 0) {
+//            xvel += (dx * 150.0) / l;
+//            yvel += (dy * 150.0) / l;
+//        }
+//    }
+//
+//    // Now subtract all forces pulling items together
+//    double weight = (_links.size() + 1) * 10;
+//    Q_FOREACH(Link *link, _links) {
+//        QPointF pos;
+//        if (link->fromNode() == this)  pos = mapFromItem(link->toNode(), 0, 0);
+//        else                           pos = mapFromItem(link->fromNode(), 0, 0);
+//        xvel += pos.x() / weight * 3.3;
+//        yvel += pos.y() / weight * 3.3;
+//    }
+//
+//    if (qAbs(xvel) < 0.1 && qAbs(yvel) < 0.1) xvel = yvel = 0;
+//
+//    QRectF sceneRect = scene()->sceneRect();
+//    newPos = pos() + QPointF(xvel, yvel);
+//    newPos.setX(qMin(qMax(newPos.x(), sceneRect.left() + 10), sceneRect.right() - 10));
+//    newPos.setY(qMin(qMax(newPos.y(), sceneRect.top() + 10), sceneRect.bottom() - 10));
 }
 
 
@@ -115,11 +150,14 @@ QVariant Node::itemChange(GraphicsItemChange change,
 void Node::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
    update();
-    QString text = QInputDialog::getText(event->widget(),
-                                         tr("Edit Text"), tr("Enter new text:"),
-                                         QLineEdit::Normal, _name);
-    if (!text.isEmpty())
-        setText(text);
+   QMessageBox msgBox;
+   msgBox.setWindowTitle("Force State");
+   msgBox.setText("You want to force the state " + _name);
+   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+   msgBox.setDefaultButton(QMessageBox::No);
+
+   if(msgBox.exec() == QMessageBox::Yes)
+      emit force(_name);
 }
 
 
@@ -132,17 +170,17 @@ void Node::mouseMoveEvent(QMouseEvent* event)
 }
 
 
-void Node::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
-{
-   _backgroundColor = Qt::red;
-   update();
-}
-
-void Node::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-   _backgroundColor = Qt::white;
-   update();
-}
+//void Node::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
+//{
+//   _backgroundColor = Qt::red;
+//   update();
+//}
+//
+//void Node::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+//{
+//   _backgroundColor = Qt::white;
+//   update();
+//}
 
 
 /* PRIVATE*/

@@ -10,6 +10,11 @@
 #include <ros/console.h>
 #include <stdlib.h>
 
+#include "../Context.h"
+
+
+#include "Explore.h"
+
 
 namespace autonohm {
 
@@ -25,7 +30,12 @@ Teleoperated::~Teleoperated()
 
 void Teleoperated::process(void)
 {
-
+   // go to next state->explore
+   if(1)
+   {
+      autonohm::Context::getInstance()->setState(new Explore());
+      delete this;
+   }
 }
 
 } /* namespace autonohm */

@@ -35,6 +35,8 @@ public:
 
    void removeLink(Link *link);
 
+   QString getText(void) const { return _name; }
+
 
    // SETTERS
    void setText(const QString& text);
@@ -45,13 +47,17 @@ public:
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
-
-    void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+//    void hoverEnterEvent(QGraphicsSceneHoverEvent* event);
+//    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
     void mouseMoveEvent(QMouseEvent* event);
 
+
+
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+
+signals:
+   void force(QString state);
 
 private:
 

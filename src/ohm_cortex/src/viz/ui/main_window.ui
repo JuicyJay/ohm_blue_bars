@@ -29,8 +29,20 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuStateMachine">
+    <property name="title">
+     <string>StateMachine</string>
+    </property>
+    <addaction name="actionUpdate"/>
+   </widget>
+   <addaction name="menuStateMachine"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionUpdate">
+   <property name="text">
+    <string>update</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

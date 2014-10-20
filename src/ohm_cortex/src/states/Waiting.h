@@ -8,6 +8,8 @@
 #ifndef OHM_CORTEX_SRC_STATES_WAINTING_H_
 #define OHM_CORTEX_SRC_STATES_WAINTING_H_
 
+#include <ros/ros.h>
+
 #include "../IState.h"
 
 
@@ -38,6 +40,10 @@ public:
    void process(void);
 
 private:
+
+   ros::NodeHandle* _nh;
+   ros::Publisher   _state_pub;
+
 
 };
 

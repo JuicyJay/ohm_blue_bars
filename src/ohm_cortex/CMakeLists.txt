@@ -4,7 +4,7 @@ project(ohm_cortex)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp)
+find_package(catkin REQUIRED COMPONENTS roscpp message_generation)
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
  
  
@@ -23,6 +23,7 @@ set(QT_FORMS   src/viz/ui/main_window.ui
 set(QT_SOURCES src/viz/main_window.cpp
                src/viz/Node.cpp
                src/viz/Link.cpp
+               src/viz/StateViz.cpp
                 )
 
 QT4_WRAP_CPP(QT_MOC_HPP ${QT_HEADERS}
@@ -31,7 +32,14 @@ QT4_WRAP_CPP(QT_MOC_HPP ${QT_HEADERS}
 QT4_WRAP_UI( QT_FORMS_HPP ${QT_FORMS}
                 )
 
-                  
+add_service_files(
+    FILES
+    Force.srv
+)
+
+    
+
+generate_messages()
 
 ## Declare a cpp library    
 add_library(ohm_cortex
@@ -65,3 +73,9 @@ target_link_libraries(ohm_statemachine_node
 
 target_link_libraries(viz ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
+
+install(TARGETS ohm_statemachine_node
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)

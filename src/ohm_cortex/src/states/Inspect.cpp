@@ -16,8 +16,15 @@
 namespace autonohm {
 
 Inspect::Inspect(void)
+: _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
+   ROS_INFO("Ping");
 
+   _state_pub = _nh->advertise<std_msgs::String>("state", 1);
+
+   std_msgs::String msg;
+   msg.data = "inspect";
+   _state_pub.publish(msg);
 }
 
 Inspect::~Inspect(void)
