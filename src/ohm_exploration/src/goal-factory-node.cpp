@@ -34,16 +34,19 @@ void sendGoals(void)
 
     for (std::vector<Wall>::const_iterator wall(_walls.begin()); wall < _walls.end(); ++wall)
     {
+        Eigen::Vector3f n(wall->model().n().x(), wall->model().n().y(), 0.0f);
         Eigen::Vector3f position(wall->center().x(), wall->center().y(), 0.0f);
         position *= wall->resolution();
         position += wall->origin();
         position.z() = 0.45f;
 
-        Eigen::Vector2f n(wall->model().n());
-        Eigen::Quaternionf orientation;
-
-        if (wall->orientation() & Wall::Up || wall->orientation() & Wall::Right)
+        // hack!!!
+        if (wall->orientation() & Wall::Down || wall->orientation() & Wall::Left)
             n *= -1.0f;
+
+        position += n * 0.35f;
+
+        Eigen::Quaternionf orientation;
 
         orientation.setFromTwoVectors(Eigen::Vector3f(1.0f, 0.0f, 0.0f), Eigen::Vector3f(n.x(), n.y(), 0.0f));
         orientation = orientation * Eigen::Quaternionf(Eigen::AngleAxisf(M_PI, Eigen::Vector3f::UnitZ()));

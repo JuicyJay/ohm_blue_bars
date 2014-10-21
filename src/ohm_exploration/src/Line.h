@@ -52,6 +52,7 @@ public:
     inline float m(void) const { return _m; }
     inline float t(void) const { return _t; }
     inline const Eigen::Vector2f& n(void) const { return _n; }
+//    inline Eigen::Vector2f n(const Eigen::Vector2i p) const
     inline const Eigen::Vector2f& r(void) const { return _r; }
     inline const Eigen::Vector2f& p1(void) const { return _p1; }
     inline const Eigen::Vector2f& p2(void) const { return _p2; }
