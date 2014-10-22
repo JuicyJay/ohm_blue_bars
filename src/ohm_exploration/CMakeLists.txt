@@ -125,6 +125,7 @@ add_executable(goal-factory
                src/Ransac.cpp
                src/Wall.cpp
                src/FeatureMap.cpp
+               src/Map.cpp
                )
 
 
