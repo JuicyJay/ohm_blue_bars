@@ -128,6 +128,10 @@ add_executable(goal-factory
                src/Map.cpp
                )
 
+add_executable(map-roi
+               src/map-roi-node.cpp
+               src/Map.cpp
+               )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -147,6 +151,11 @@ target_link_libraries(goal-factory
                       ${catkin_LIBRARIES}
                       ${OpenCV_LIBRARIES}
                       )
+
+target_link_libraries(map-roi
+                      ${catkin_LIBRARIES}
+                      )
+
 #############
 ## Install ##
 #############
@@ -162,7 +171,7 @@ target_link_libraries(goal-factory
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS exploration wall-finder goal-factory
+install(TARGETS exploration wall-finder goal-factory map-roi
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

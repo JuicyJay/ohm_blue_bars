@@ -17,7 +17,7 @@ public:
 
     }
 
-    Rect(const Eigen::Vector2u& leftTop, const Eigen::Vector2u& rightBottom)
+    Rect(const Eigen::Vector2i& leftTop, const Eigen::Vector2i& rightBottom)
         : _x(leftTop.x()),
           _y(leftTop.y()),
           _width(rightBottom.x() - _x),
@@ -31,8 +31,8 @@ public:
     inline unsigned int y(void) const { return _y; }
     inline unsigned int width(void) const { return _width; }
     inline unsigned int height(void) const { return _height; }
-    inline Eigen::Vector2u pointLeftTop(void) const { return Eigen::Vector2u(_x, _y); }
-    inline Eigen::Vector2u pointRightBottom(void) const { return Eigen::Vector2u(_x + _width, _y + _height); }
+    inline Eigen::Vector2i pointLeftTop(void) const { return Eigen::Vector2i(_x, _y); }
+    inline Eigen::Vector2i pointRightBottom(void) const { return Eigen::Vector2i(_x + _width, _y + _height); }
 
 private:
     unsigned int _x;
