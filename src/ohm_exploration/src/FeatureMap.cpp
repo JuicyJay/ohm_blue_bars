@@ -3,7 +3,9 @@
 #include <iostream>
 
 FeatureMap::FeatureMap(void)
-    : _wallDepth(5)
+    : _wallDepth(5),
+      _width(0),
+      _height(0)
 {
 
 }
@@ -19,6 +21,8 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
     }
 
     _data.resize(map.info.height);
+    _width = map.info.width;
+    _height = map.info.height;
     _data.front().resize(map.info.width);
     _data.back().resize(map.info.width);
 
@@ -177,3 +181,21 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
 
     }
 }
+
+void FeatureMap::exportPoints(PointVector& points, const Wall::Orientation orientation)
+{
+    for (unsigned int y = 0; y < _height; ++y)
+        for (unsigned int x = 0; x < _width; ++x)
+            if (_data[y][x].orientation & orientation)
+                points.push_back(Eigen::Vector2i(x, y));
+}
+
+void FeatureMap::paintImage(cv::Mat& image, const FeatureCell must)
+{
+    image.create(_height, _width, CV_8UC1);
+
+    for (unsigned int row = 0; row < image.rows; ++row)
+        for (unsigned int col = 0; col < image.cols; ++col)
+            image.at<uint8_t>(row, col) = _data[row][col] == must ? 0xff : 0x00;
+}
+

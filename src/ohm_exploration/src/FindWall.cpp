@@ -15,7 +15,7 @@ FindWall::FindWall(void)
     _orientations.push_back(Wall::Down);
     _orientations.push_back(Wall::Left);
     _orientations.push_back(Wall::Right);
-//    cv::namedWindow("debug");
+    cv::namedWindow("debug");
 }
 
 void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
@@ -24,10 +24,15 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
     _featureMap.setMap(map);
 
     for (unsigned int i = 0; i < _orientations.size(); ++i)
-        this->exportPoints(map, _points[i], _orientations[i]);
+        _featureMap.exportPoints(_points[i], _orientations[i]);
 
-//    this->buildCluster(map);
     _mapMetaData = map.info;
+    cv::Mat image;
+    FeatureCell must;
+    must.saw = true;
+
+    _featureMap.paintImage(image, must);
+    cv::imshow("debug", image);
 }
 
 void FindWall::search(std::vector<Wall>& walls)

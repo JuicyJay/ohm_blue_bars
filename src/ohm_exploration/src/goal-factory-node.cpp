@@ -93,5 +93,14 @@ int main(int argc, char** argv)
     para.param<std::string>("goal_topic", topic, "/goals");
     _pubGoals = nh.advertise<geometry_msgs::PoseArray>(topic, 2);
 
-    ros::spin();
+//    ros::spin();
+
+    ros::Rate rate(100);
+
+    while (ros::ok())
+    {
+        cv::waitKey(1);
+        ros::spinOnce();
+        rate.sleep();
+    }
 }
