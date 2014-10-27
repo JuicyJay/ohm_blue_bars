@@ -36,9 +36,11 @@ public:
     inline Eigen::Vector3f origin(void) const { return Eigen::Vector3f(_origin.x, _origin.y, _origin.z); }
     inline float resolution(void) const { return _resolution; }
     inline bool valid(void) const { return _valid; }
+    inline float length(void) const { return _length; }
+
     inline void setResolution(const float res) { _resolution = res; }
     inline void setOrigin(const geometry_msgs::Point& origin) { _origin = origin; }
-    inline void setOrientation(const Orientation orientation) { _orientation = orientation; }
+    void setOrientation(const Orientation orientation);
     inline Orientation orientation(void) const { return _orientation; }
 
     visualization_msgs::Marker getMarkerMessage(void) const;

@@ -15,24 +15,20 @@ FindWall::FindWall(void)
     _orientations.push_back(Wall::Down);
     _orientations.push_back(Wall::Left);
     _orientations.push_back(Wall::Right);
-    cv::namedWindow("debug");
+//    cv::namedWindow("debug");
 }
 
 void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 {
-    _points.clear();
-    _featureMap.setMap(map);
+    if (_featureMap.isNull())
+        _featureMap.setMap(map);
+    else
+        _featureMap.updateMap(map);
 
     for (unsigned int i = 0; i < _orientations.size(); ++i)
         _featureMap.exportPoints(_points[i], _orientations[i]);
 
     _mapMetaData = map.info;
-    cv::Mat image;
-    FeatureCell must;
-    must.saw = true;
-
-    _featureMap.paintImage(image, must);
-    cv::imshow("debug", image);
 }
 
 void FindWall::search(std::vector<Wall>& walls)
@@ -61,6 +57,18 @@ void FindWall::search(std::vector<Wall>& walls)
             _ransac.setInputPoints(_points[i]);
         }
     }
+
+    _featureMap.markWalls(walls);
+    /*
+    FeatureCell cell;
+    cell.orientation = Wall::Up;
+    cell.saw = Wall::Up;
+
+    cv::Mat image;
+
+    _featureMap.paintImage(image, cell);
+    cv::imshow("debug", image);
+    */
 }
 
 void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map,

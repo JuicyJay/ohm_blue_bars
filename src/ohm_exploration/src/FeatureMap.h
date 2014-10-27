@@ -16,12 +16,17 @@ public:
     FeatureMap(void);
 
     void setMap(const nav_msgs::OccupancyGrid& map);
-    inline const FeatureCell& operator()(const unsigned int x, const unsigned int y) const { return _data[y][x]; }
+    void updateMap(const nav_msgs::OccupancyGrid& map);
+
     void exportPoints(PointVector& points, const Wall::Orientation orientation = Wall::All);
+    void markWalls(const std::vector<Wall>& walls);
+
     void paintImage(cv::Mat& image, const FeatureCell must);
 
     inline unsigned int width(void) const { return _width; }
     inline unsigned int height(void) const { return _height; }
+    inline bool isNull(void) const { return !_data.size(); }
+    inline const FeatureCell& operator()(const unsigned int x, const unsigned int y) const { return _data[y][x]; }
 
 private:
     std::vector<std::vector<FeatureCell> > _data;

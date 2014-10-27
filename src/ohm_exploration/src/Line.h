@@ -70,6 +70,8 @@ public:
         _n = line._n;
         _p1 = line._p1;
         _p2 = line._p2;
+
+        return *this;
     }
 
 private:

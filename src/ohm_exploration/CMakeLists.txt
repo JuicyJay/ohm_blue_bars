@@ -91,6 +91,8 @@ catkin_package(
 ## Build ##
 ###########
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -DNDEBUG")
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(${EIGEN_INCLUDE_DIRS}
@@ -116,6 +118,7 @@ add_executable(wall-finder
                src/Ransac.cpp
                src/Wall.cpp
                src/FeatureMap.cpp
+               src/Ray.cpp
                )
 
 add_executable(goal-factory
@@ -126,6 +129,7 @@ add_executable(goal-factory
                src/Wall.cpp
                src/FeatureMap.cpp
                src/Map.cpp
+               src/Ray.cpp
                )
 
 add_executable(map-roi

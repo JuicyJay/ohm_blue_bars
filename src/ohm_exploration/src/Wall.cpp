@@ -28,7 +28,7 @@ Wall::Wall(const PointVector& points)
 
     for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point, ++pointEnd)
     {
-        if ((*point - *pointEnd).cast<float>().norm() > 10.0f)
+        if ((*point - *pointEnd).cast<float>().norm() > 5.0f)
             break;
     }
 
@@ -37,6 +37,9 @@ Wall::Wall(const PointVector& points)
 
     std::cout << "points = " << _points.size() << std::endl;
     _valid = _points.size() >= 30;
+
+    if (!_valid)
+        return;
 
     for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
         _center += point->cast<float>();
@@ -47,6 +50,7 @@ Wall::Wall(const PointVector& points)
     std::cout << std::endl;
 
     _length = (_points.back() - _points.front()).cast<float>().norm();
+    _valid &= _length >= 30;
 //    for (unsigned int i = 0; i < _points.size(); ++i)
 //    {
 //        std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;
@@ -73,6 +77,13 @@ bool Wall::operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right)
 {
     return (left - Eigen::Vector2i(0, _model.t())).cast<float>().norm() <
         (right - Eigen::Vector2i(0, _model.t())).cast<float>().norm();
+}
+
+void Wall::setOrientation(const Orientation orientation)
+{
+    _orientation = orientation;
+
+    // to do: correct normal if they is in wrong direction.
 }
 
 visualization_msgs::Marker Wall::getMarkerMessage(void) const

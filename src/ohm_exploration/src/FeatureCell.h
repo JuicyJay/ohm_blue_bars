@@ -7,7 +7,7 @@ struct FeatureCell
 {
     FeatureCell(void)
     : border(false),
-      saw(false),
+      saw(0),
       orientation(0)
     {
 
@@ -23,11 +23,11 @@ struct FeatureCell
 
     inline bool operator==(const FeatureCell& cell) const
     {
-        return border == cell.border && saw == cell.saw && orientation & cell.orientation;
+        return border == cell.border  &&  saw & cell.saw  &&  orientation & cell.orientation;
     }
 
     bool border;
-    bool saw;
+    uint8_t saw;
     uint8_t orientation;
 };
 

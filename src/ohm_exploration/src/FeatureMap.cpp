@@ -1,4 +1,5 @@
 #include "FeatureMap.h"
+#include "Ray.h"
 
 #include <iostream>
 
@@ -12,8 +13,6 @@ FeatureMap::FeatureMap(void)
 
 void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
     if (!map.info.width || !map.info.height)
     {
         std::cout << "FeatureMap::setMap(): map isn't valid. Width and height must not 0." << std::endl;
@@ -23,13 +22,18 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
     _data.resize(map.info.height);
     _width = map.info.width;
     _height = map.info.height;
-    _data.front().resize(map.info.width);
-    _data.back().resize(map.info.width);
 
-    /* Check the changeovers in the map in positive x direction. Also resize the inner vectors. */
+    for (unsigned int row = 0; row < _data.size(); ++row)
+        _data[row].resize(map.info.width);
+
+    this->updateMap(map);
+}
+
+void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
+{
+    /* Check the changeovers in the map in positive x direction. */
     for (unsigned int row = 1; row < _data.size() - 1; ++row)
     {
-        _data[row].resize(map.info.width);
         const unsigned int offset = map.info.width * row;
         bool changeover = false;
         unsigned int depth = 0;
@@ -186,16 +190,38 @@ void FeatureMap::exportPoints(PointVector& points, const Wall::Orientation orien
 {
     for (unsigned int y = 0; y < _height; ++y)
         for (unsigned int x = 0; x < _width; ++x)
-            if (_data[y][x].orientation & orientation)
+            if (_data[y][x].orientation & orientation  && !(_data[y][x].saw & orientation))
                 points.push_back(Eigen::Vector2i(x, y));
+}
+
+void FeatureMap::markWalls(const std::vector<Wall>& walls)
+{
+    for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
+    {
+        const float thickness = 0.2f / wall->resolution();
+        Eigen::Vector2f start(wall->center() - wall->model().r() * wall->length() * 0.5f);
+
+        for (Ray x(start - wall->model().n() * thickness, wall->model().r(), wall->length()); x.next();)
+        {
+            for (Ray y(x.position().cast<float>(), wall->model().n(), thickness * 2.0f); y.next();)
+            {
+                _data[y.position().y()][y.position().x()].saw |= wall->orientation();
+            }
+        }
+    }
 }
 
 void FeatureMap::paintImage(cv::Mat& image, const FeatureCell must)
 {
     image.create(_height, _width, CV_8UC1);
 
-    for (unsigned int row = 0; row < image.rows; ++row)
-        for (unsigned int col = 0; col < image.cols; ++col)
+    for (int row = 0; row < image.rows; ++row)
+        for (int col = 0; col < image.cols; ++col)
+        {
             image.at<uint8_t>(row, col) = _data[row][col] == must ? 0xff : 0x00;
+//            image.at<uint8_t>(row, col) = _data[row][col].saw > 0 ? 0xff : 0x00;
+//            std::cout << static_cast<int>(_data[row][col].saw) << " ";
+        }
+    std::cout << std::endl;
 }
 
