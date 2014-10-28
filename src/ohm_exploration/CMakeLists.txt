@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 find_package(Eigen REQUIRED)
-
+find_package(OpenCV REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -91,9 +91,13 @@ catkin_package(
 ## Build ##
 ###########
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -DNDEBUG")
+
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(${EIGEN_INCLUDE_DIRS})
+include_directories(${EIGEN_INCLUDE_DIRS}
+                    ${OpenCV_INCLUDE_DIRS}
+                    )
 
 ## Declare a cpp library
 # add_library(ohm_exploration
@@ -107,12 +111,52 @@ add_executable(exploration
                src/Grid.cpp
                )
 
+add_executable(wall-finder
+               src/wall-finder-node.cpp
+               src/FindWall.cpp
+               src/LeastSquare.cpp
+               src/Ransac.cpp
+               src/Wall.cpp
+               src/FeatureMap.cpp
+               src/Ray.cpp
+               )
+
+add_executable(goal-factory
+               src/goal-factory-node.cpp
+               src/FindWall.cpp
+               src/LeastSquare.cpp
+               src/Ransac.cpp
+               src/Wall.cpp
+               src/FeatureMap.cpp
+               src/Map.cpp
+               src/Ray.cpp
+               )
+
+add_executable(map-roi
+               src/map-roi-node.cpp
+               src/Map.cpp
+               )
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ohm_exploration_node ohm_exploration_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(exploration
+                      ${catkin_LIBRARIES}
+                      )
+
+target_link_libraries(wall-finder
+                      ${catkin_LIBRARIES}
+                      ${OpenCV_LIBRARIES}
+                      )
+
+target_link_libraries(goal-factory
+                      ${catkin_LIBRARIES}
+                      ${OpenCV_LIBRARIES}
+                      )
+
+target_link_libraries(map-roi
                       ${catkin_LIBRARIES}
                       )
 
@@ -131,7 +175,7 @@ target_link_libraries(exploration
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS exploration
+install(TARGETS wall-finder
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -145,11 +189,10 @@ install(TARGETS exploration
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+        launch/wall-finder.launch
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
 
 #############
 ## Testing ##
