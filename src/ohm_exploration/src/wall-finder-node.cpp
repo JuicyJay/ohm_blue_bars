@@ -4,10 +4,12 @@
 #include <std_srvs/Empty.h>
 
 #include "FindWall.h"
+#include "ohm_exploration/WallArray.h"
 
 FindWall _wallFinder;
 std::vector<Wall> _walls;
 ros::Publisher _pubWallMarkers;
+ros::Publisher _pubWalls;
 bool _armed = false;
 
 bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
@@ -22,9 +24,19 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
     if (!_armed)
         return;
 
+    std::vector<Wall> walls;
     _armed = false;
     _wallFinder.setMap(map);
-    _wallFinder.search(_walls);
+    _wallFinder.search(walls);
+    _walls.insert(_walls.end(), walls.begin(), walls.end());
+
+    /* send walls */
+    ohm_exploration::WallArray msgWalls;
+
+    for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
+        msgWalls.walls.push_back(wall->getWallMessage());
+
+    _pubWalls.publish(msgWalls);
 
     visualization_msgs::MarkerArray msg;
 
@@ -47,6 +59,8 @@ int main(int argc, char** argv)
     ros::ServiceServer srvTrigger(nh.advertiseService(topic, callbackTrigger));
     para.param<std::string>("topic_markers", topic, "exploration/wall_markers");
     _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>(topic, 2);
+    para.param<std::string>("topic_walls", topic, "exploration/walls");
+    _pubWalls = nh.advertise<ohm_exploration::WallArray>(topic, 2);
 
     ros::spin();
 }

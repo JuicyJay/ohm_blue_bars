@@ -15,6 +15,8 @@ class Line
 {
 public:
 
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     Line(const Eigen::Vector2f& start, const Eigen::Vector2f& end)
         : _m((end.x() - start.x()) / (end.y() - start.y())),
           _t(start.y() - _m * start.x()),
@@ -81,8 +83,6 @@ private:
     Eigen::Vector2f _n;
     Eigen::Vector2f _p1;
     Eigen::Vector2f _p2;
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 inline std::ostream& operator<<(std::ostream& os, const Line& line)

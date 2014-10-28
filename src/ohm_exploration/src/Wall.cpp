@@ -39,7 +39,11 @@ Wall::Wall(const PointVector& points)
     _valid = _points.size() >= 30;
 
     if (!_valid)
+    {
+        std::cout << "und raus..." << std::endl;
+        std::cout << std::endl;
         return;
+    }
 
     for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
         _center += point->cast<float>();
@@ -47,7 +51,6 @@ Wall::Wall(const PointVector& points)
     _center /= static_cast<float>(_points.size());
 
     std::cout << "valid  = " << _valid << std::endl;
-    std::cout << std::endl;
 
     _length = (_points.back() - _points.front()).cast<float>().norm();
     _valid &= _length >= 30;
@@ -57,6 +60,8 @@ Wall::Wall(const PointVector& points)
 //    }
 //
 //    std::cout << std::endl;
+    std::cout << "und raus..." << std::endl;
+    std::cout << std::endl;
 }
 
 Wall::Wall(const Wall& wall)
@@ -245,4 +250,24 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
 
 
     return marker;
+}
+
+ohm_exploration::Wall Wall::getWallMessage(void) const
+{
+    ohm_exploration::Wall msg;
+
+    msg.id          = _id;
+    msg.orientation = _orientation;
+
+    msg.center.x = _center.x() / _resolution;
+    msg.center.y = _center.y() / _resolution;
+    msg.center.z = 0.0f;
+
+    msg.v.x = _model.r().x();
+    msg.v.y = _model.r().y();
+    msg.v.z = 0.0f;
+
+    msg.length = _length / _resolution;
+
+    return msg;
 }

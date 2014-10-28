@@ -207,7 +207,24 @@ void FeatureMap::markWalls(const std::vector<Wall>& walls)
         {
             for (Ray y(x.position().cast<float>(), wall->model().n(), thickness * 2.0f); y.next();)
             {
-                _data[y.position().y()][y.position().x()].saw |= wall->orientation();
+                if (y.position().x() >= _width || y.position().y() >= _height)
+                {
+                    std::cout << "out of range: x = " << y.position().x()
+                              << " y = " << y.position().y() << std::endl;
+                    std::cout << "start: x = " << start.x() << " y = " << start.y() << std::endl;
+                    std::cout << "center: x = " << wall->center().x() << " y = " << wall->center().y() << std::endl;
+                    std::cout << "model: " << wall->model() << std::endl;
+                    std::cout << "points:" << std::endl;
+
+                    for (unsigned int i = 0; i < wall->points().size(); ++i)
+                        std::cout << "(" << wall->points()[i].x() << " " << wall->points()[i].y() << ")" << std::endl;
+                    break;
+//                    return;
+                }
+                else
+                {
+                    _data[y.position().y()][y.position().x()].saw |= wall->orientation();
+                }
             }
         }
     }

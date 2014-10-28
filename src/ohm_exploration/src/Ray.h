@@ -6,6 +6,9 @@
 class Ray
 {
 public:
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
     Ray(const Eigen::Vector2f origin, const Eigen::Vector2f v, const float length);
 
     bool next(void);
@@ -20,8 +23,6 @@ private:
     Eigen::Vector2f _delta;
     Eigen::Vector2i _step;
     Eigen::Vector2f _sideDistance;
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 #endif

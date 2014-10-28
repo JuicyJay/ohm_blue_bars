@@ -9,12 +9,15 @@
 #include <Eigen/Core>
 
 #include <visualization_msgs/Marker.h>
+#include "ohm_exploration/Wall.h"
 
 typedef std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i> > PointVector;
 
 class Wall
 {
 public:
+
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     enum Orientation {
         None  = 0,
@@ -44,6 +47,7 @@ public:
     inline Orientation orientation(void) const { return _orientation; }
 
     visualization_msgs::Marker getMarkerMessage(void) const;
+    ohm_exploration::Wall getWallMessage(void) const;
 
     /* compare operator for std::sort */
     bool operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const;
@@ -60,8 +64,6 @@ private:
     float _length;
 
     static unsigned int s_id;
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 

@@ -47,8 +47,13 @@ bool Ray::next(void)
         _position.y() += _step.y();
     }
 
-//    std::cout << "origin   = " << _origin.x() << " " << _origin.y() << std::endl;
-//    std::cout << "position = " << _position.x() << " " << _position.y() << std::endl;
-//    std::cout << "length   = " << _length << std::endl;
+//    if (std::abs(_position.x()) >= 4000 || std::abs(_position.y()) >= 4000)
+//    {
+//        std::cout << "origin   = " << _origin.x() << " " << _origin.y() << std::endl;
+//        std::cout << "position = " << _position.x() << " " << _position.y() << std::endl;
+//        std::cout << "length   = " << _length << std::endl;
+//        return false;
+//    }
+
     return (_position.cast<float>() - _origin).norm() < _length;
 }

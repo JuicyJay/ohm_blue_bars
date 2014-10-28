@@ -7,7 +7,7 @@
 
 void LeastSquare::estimateLine(const PointVector& points, Line& line)
 {
-    if (!points.size())
+    if (points.size() < 2)
     {
         line = Line();
         return;
