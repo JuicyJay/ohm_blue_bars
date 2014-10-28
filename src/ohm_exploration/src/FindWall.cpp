@@ -2,8 +2,6 @@
 
 #include <ostream>
 
-#include <opencv2/opencv.hpp>
-
 FindWall::FindWall(void)
     : _points(4)
 {
@@ -15,7 +13,6 @@ FindWall::FindWall(void)
     _orientations.push_back(Wall::Down);
     _orientations.push_back(Wall::Left);
     _orientations.push_back(Wall::Right);
-//    cv::namedWindow("debug");
 }
 
 void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
@@ -33,7 +30,7 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 
 void FindWall::search(std::vector<Wall>& walls)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+//    std::cout << __PRETTY_FUNCTION__ << std::endl;
 
     for (unsigned int i = 0; i < _orientations.size(); ++i)
     {
@@ -42,8 +39,8 @@ void FindWall::search(std::vector<Wall>& walls)
 
         while (_ransac.estimateWall(wall))
         {
-            std::cout << "will work with " << _points[i].size() << " points." << std::endl;
-            std::cout << wall << std::endl;
+//            std::cout << "will work with " << _points[i].size() << " points." << std::endl;
+//            std::cout << wall << std::endl;
 
             if (wall.valid())
             {
@@ -59,35 +56,9 @@ void FindWall::search(std::vector<Wall>& walls)
     }
 
     _featureMap.markWalls(walls);
-    /*
-    FeatureCell cell;
-    cell.orientation = Wall::Up;
-    cell.saw = Wall::Up;
-
-    cv::Mat image;
-
-    _featureMap.paintImage(image, cell);
-    cv::imshow("debug", image);
-    */
 }
 
-void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map,
-                            PointVector& points,
-                            const Wall::Orientation orientation)
-{
-    for (unsigned int row = 0; row < map.info.height; ++row)
-    {
-        const unsigned int offset = map.info.width * row;
-
-        for (unsigned int col = 0; col < map.info.width; ++col)
-        {
-            if (_featureMap(col, row).orientation & orientation)//  &&  map.data[offset + col] > 0)
-                points.push_back(Eigen::Vector2i(col, row));
-        }
-    }
-}
-
- void FindWall::removePoints(const PointVector& remove, PointVector& points)
+void FindWall::removePoints(const PointVector& remove, PointVector& points)
 {
     std::vector<bool> mask(points.size(), true);
     PointVector rest;
@@ -105,29 +76,4 @@ void FindWall::exportPoints(const nav_msgs::OccupancyGrid& map,
             rest.push_back(points[i]);
 
     points = rest;
-}
-
-void FindWall::buildCluster(const nav_msgs::OccupancyGrid& map)
-{
-    cv::Mat mask(map.info.height, map.info.width, CV_8UC1);
-
-    for (unsigned int row = 0; row < map.info.height; ++row)
-    {
-        const unsigned int offset = map.info.width * row;
-
-        for (unsigned int col = 0; col < map.info.width; ++col)
-        {
-            mask.at<uint8_t>(row, col) = map.data[offset + col] > 0 ? 0xff : 0x00;
-        }
-    }
-
-    std::vector<std::vector<cv::Point> > contours;
-    cv::findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-    cv::Mat image(mask.rows, mask.cols, CV_8UC3);
-    image = cv::Scalar(0x00);
-
-    for (unsigned int i = 0; i < contours.size(); ++i)
-        cv::drawContours(image, contours, i, cv::Scalar(0x00, 0x00, 0xff));
-
-    cv::imshow("debug", image);
 }

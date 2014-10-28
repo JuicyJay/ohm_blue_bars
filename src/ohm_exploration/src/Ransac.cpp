@@ -10,6 +10,8 @@
 #include <Eigen/LU>
 #include <Eigen/Geometry>
 
+#include <ros/console.h>
+
 Ransac::Ransac(void)
     : _maxIterations(100),
       _epsilon(10),
@@ -22,7 +24,7 @@ bool Ransac::estimateWall(Wall& wall)
 {
     if (_points.size() < 2)
     {
-        std::cout << __PRETTY_FUNCTION__ << ": no input points set." << std::endl;
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": no input points set.");
         return false;
     }
 
@@ -85,7 +87,7 @@ void Ransac::getRandomlyPoints(PointVector& points, const unsigned int numberOf)
 {
     if (!_points.size())
     {
-        std::cout << __PRETTY_FUNCTION__ << ": no input points set." << std::endl;
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": no input points set.");
         return;
     }
 

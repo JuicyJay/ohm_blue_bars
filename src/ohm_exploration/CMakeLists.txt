@@ -175,7 +175,7 @@ target_link_libraries(map-roi
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS exploration wall-finder goal-factory map-roi
+install(TARGETS wall-finder
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -189,11 +189,10 @@ install(TARGETS exploration wall-finder goal-factory map-roi
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-# install(FILES
-#   # myfile1
-#   # myfile2
-#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-# )
+install(FILES
+        launch/wall-finder.launch
+        DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+        )
 
 #############
 ## Testing ##

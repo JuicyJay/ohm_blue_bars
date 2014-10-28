@@ -20,11 +20,7 @@ public:
     void search(std::vector<Wall>& walls);
 
 private:
-    void exportPoints(const nav_msgs::OccupancyGrid& map,
-                      PointVector& points,
-                      const Wall::Orientation orientation = Wall::All);
     void removePoints(const PointVector& remove, PointVector& points);
-    void buildCluster(const nav_msgs::OccupancyGrid& map);
 
     std::vector<PointVector> _points;
     std::vector<Wall::Orientation> _orientations;

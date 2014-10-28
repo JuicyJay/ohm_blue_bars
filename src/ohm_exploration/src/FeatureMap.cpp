@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include <ros/console.h>
+
 FeatureMap::FeatureMap(void)
     : _wallDepth(5),
       _width(0),
@@ -15,7 +17,7 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
 {
     if (!map.info.width || !map.info.height)
     {
-        std::cout << "FeatureMap::setMap(): map isn't valid. Width and height must not 0." << std::endl;
+        ROS_ERROR_STREAM("FeatureMap::setMap(): map isn't valid. Width and height must not 0.");
         return;
     }
 
@@ -218,8 +220,8 @@ void FeatureMap::paintImage(cv::Mat& image, const FeatureCell must)
     for (int row = 0; row < image.rows; ++row)
         for (int col = 0; col < image.cols; ++col)
         {
-            image.at<uint8_t>(row, col) = _data[row][col] == must ? 0xff : 0x00;
-//            image.at<uint8_t>(row, col) = _data[row][col].saw > 0 ? 0xff : 0x00;
+//            image.at<uint8_t>(row, col) = _data[row][col] == must ? 0xff : 0x00;
+            image.at<uint8_t>(row, col) = _data[row][col].saw > 0 ? 0xff : 0x00;
 //            std::cout << static_cast<int>(_data[row][col].saw) << " ";
         }
     std::cout << std::endl;

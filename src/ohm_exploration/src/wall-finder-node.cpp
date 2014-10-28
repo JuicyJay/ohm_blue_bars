@@ -37,10 +37,16 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "wall_finder");
+    ros::NodeHandle para("~");
     ros::NodeHandle nh;
-    ros::Subscriber subMap(nh.subscribe("map", 1, callbackMap));
-    ros::ServiceServer srvTrigger(nh.advertiseService("exploration/wall_finder/trigger", callbackTrigger));
-    _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>("exploration/wall_markers", 2);
+    std::string topic;
+
+    para.param<std::string>("topic_map", topic, "/map");
+    ros::Subscriber subMap(nh.subscribe(topic, 1, callbackMap));
+    para.param<std::string>("service_trigger", topic, "exploration/wall_finder/trigger");
+    ros::ServiceServer srvTrigger(nh.advertiseService(topic, callbackTrigger));
+    para.param<std::string>("topic_markers", topic, "exploration/wall_markers");
+    _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>(topic, 2);
 
     ros::spin();
 }
