@@ -15,8 +15,8 @@ Wall::Wall(const PointVector& points)
       _resolution(1.0f),
       _orientation(None)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    std::cout << "points = " << _points.size() << std::endl;
+//    std::cout << __PRETTY_FUNCTION__ << std::endl;
+//    std::cout << "points = " << _points.size() << std::endl;
 
 //    for (unsigned int i = 0; i < points.size(); ++i)
 //        std::cout << "(" << points[i].x() << ", " << points[i].y() << ")   ";
@@ -26,7 +26,7 @@ Wall::Wall(const PointVector& points)
     std::sort(_points.begin(), _points.end(), *this);
     PointVector::const_iterator pointEnd(_points.begin() + 1);
 
-    for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point, ++pointEnd)
+    for (PointVector::const_iterator point(_points.begin()); pointEnd < _points.end(); ++point, ++pointEnd)
     {
         if ((*point - *pointEnd).cast<float>().norm() > 5.0f)
             break;
@@ -35,22 +35,18 @@ Wall::Wall(const PointVector& points)
     if (pointEnd != _points.end())
         _points.resize(pointEnd - _points.begin());
 
-    std::cout << "points = " << _points.size() << std::endl;
+//    std::cout << "points = " << _points.size() << std::endl;
     _valid = _points.size() >= 30;
 
     if (!_valid)
-    {
-        std::cout << "und raus..." << std::endl;
-        std::cout << std::endl;
         return;
-    }
 
     for (PointVector::const_iterator point(_points.begin()); point < _points.end(); ++point)
         _center += point->cast<float>();
 
     _center /= static_cast<float>(_points.size());
 
-    std::cout << "valid  = " << _valid << std::endl;
+//    std::cout << "valid  = " << _valid << std::endl;
 
     _length = (_points.back() - _points.front()).cast<float>().norm();
     _valid &= _length >= 30;
@@ -60,8 +56,6 @@ Wall::Wall(const PointVector& points)
 //    }
 //
 //    std::cout << std::endl;
-    std::cout << "und raus..." << std::endl;
-    std::cout << std::endl;
 }
 
 Wall::Wall(const Wall& wall)

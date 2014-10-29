@@ -218,8 +218,8 @@ void FeatureMap::markWalls(const std::vector<Wall>& walls)
 
                     for (unsigned int i = 0; i < wall->points().size(); ++i)
                         std::cout << "(" << wall->points()[i].x() << " " << wall->points()[i].y() << ")" << std::endl;
-                    break;
-//                    return;
+//                    break;
+                    return;
                 }
                 else
                 {

@@ -2,6 +2,8 @@
 
 #include <ostream>
 
+#include <ros/console.h>
+
 FindWall::FindWall(void)
     : _points(4)
 {
@@ -30,7 +32,7 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 
 void FindWall::search(std::vector<Wall>& walls)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
+//    std::cout << __PRETTY_FUNCTION__ << std::endl;
 
     for (unsigned int i = 0; i < _orientations.size(); ++i)
     {
@@ -44,6 +46,8 @@ void FindWall::search(std::vector<Wall>& walls)
 
             if (wall.valid())
             {
+                ROS_INFO_STREAM("Found wall: " << wall);
+
                 wall.setResolution(_mapMetaData.resolution);
                 wall.setOrigin(_mapMetaData.origin.position);
                 wall.setOrientation(_orientations[i]);
@@ -55,9 +59,9 @@ void FindWall::search(std::vector<Wall>& walls)
         }
     }
 
-    std::cout << "before mark walls." << std::endl;
+//    std::cout << "before mark walls." << std::endl;
     _featureMap.markWalls(walls);
-    std::cout << "will exit from method search." << std::endl;
+//    std::cout << "will exit from method search." << std::endl;
 }
 
 void FindWall::removePoints(const PointVector& remove, PointVector& points)
