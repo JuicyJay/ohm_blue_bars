@@ -10,6 +10,8 @@
 
 #include <vector>
 #include <Eigen/Dense>
+//#define EIGEN_USE_NEW_STDVECTOR
+//#include <Eigen/StdVector>
 
 using namespace Eigen;
 
@@ -24,6 +26,7 @@ typedef struct {
 typedef struct {
    Vector3d position;
    Vector3d orientation;
+   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } pose;
 
 class PathAnalyser_base
@@ -32,12 +35,12 @@ public:
    /**
     * @brief constructor
     */
-   PathAnalyser_base() {};
+   PathAnalyser_base() : _currentPose_index(0) {};
 
    /**
     * @brief destructor
     */
-   virtual ~PathAnalyser_base();
+   virtual ~PathAnalyser_base() {}
 
    /**
     * @brief set new path
@@ -46,12 +49,12 @@ public:
     *
     * @return void
     */
-   void setPath(std::vector<analyser::pose> path) : _path(path) { }
+   void setPath(std::vector<analyser::pose> path) { _path = std::vector<analyser::pose>(path); _currentPose_index = 0;}
 
    /**
     * @param void
     *
-    * @return diffcale whitch have to be controled after
+    * @return diffscale whitch have to be controled after
     */
    virtual analyser::diff_scale analyse(analyser::pose current_pose) = 0;
 
@@ -65,9 +68,18 @@ protected: //dataelements
    std::vector<analyser::pose> _path;  ///< current path to analyse
 
 protected:  //functions
-   inline Vector3d currentTarget() { return _path[0]; }
-   inline void clearCurrentTarget() { _path.erase(_path.begin()); }
+   inline analyser::pose currentTarget() { return _path[_currentPose_index]; }
+   inline void nextTarget() { if(_currentPose_index < _path.size() - 1) _currentPose_index++; }
+   inline unsigned int getCurrentPoseIndex() { return _currentPose_index; }
+   inline bool isLastPose() { return _currentPose_index == _path.size() - 1 ? true : false; }
+   inline bool isFirstPose() { return _currentPose_index == 0 ? true : false; }
 
+private:
+   unsigned int _currentPose_index;
+
+   //for eigen
+//public:
+   //EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 };
 
 } /* namespace analyser */

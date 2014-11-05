@@ -9,6 +9,9 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   roscpp
 )
+find_package(cmake_modules REQUIRED)
+
+find_package(Eigen REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -95,6 +98,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -102,17 +106,23 @@ include_directories(
 #   src/${PROJECT_NAME}/ohm_path_control.cpp
 # )
 
+file(GLOB source_files "src/*.cpp"
+                       "src/Controller/*.cpp"
+                       "src/PathAnalyser/*.cpp"
+                        )
+
 ## Declare a cpp executable
-# add_executable(ohm_path_control_node src/ohm_path_control_node.cpp)
+add_executable(ohm_path_control_node ${source_files})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ohm_path_control_node ohm_path_control_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(ohm_path_control_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(ohm_path_control_node
+  tinyxml2
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##

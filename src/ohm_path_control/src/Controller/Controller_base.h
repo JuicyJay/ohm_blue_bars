@@ -20,9 +20,9 @@ class Controller_base
 {
 public:
    Controller_base() {}
-   virtual ~Controller_base();
+   virtual ~Controller_base() {}
 
-   controller::velocity control(double linear, double angular) = 0;
+   virtual controller::velocity control(double linear, double angular) = 0;
 
 };
 

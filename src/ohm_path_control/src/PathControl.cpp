@@ -1,33 +1,37 @@
 
 #include "PathControl.h"
 #include "PathAnalyser/SimpleAnalyser.h"
-
+#include "Controller/ParabolaTransfere.h"
 
 PathControl::PathControl() : _rate(0)
 {
     _loopRate = 0;
-
 
     //rosParam
     ros::NodeHandle privNh("~");
     std::string pub_name_cmd_vel;
     std::string sub_name_path;
     std::string sub_name_pose;
+    std::string config_file_controller;
+    std::string config_file_analyser;
     
-    privNh.param("pub_name_cmd_vel",pub_name_cmd_vel,std::string("robot0/cmd_vel"));
-    privNh.param("sub_name_path",sub_name_path,std::string("path"));
-    privNh.param("sub_name_pose",sub_name_pose,std::string("robot0/pose"));
+    privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("robot0/cmd_vel"));
+    privNh.param("sub_name_path",          sub_name_path,          std::string("path"));
+    privNh.param("sub_name_pose",          sub_name_pose,          std::string("robot0/pose"));
+    privNh.param("config_file_controller", config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
+    privNh.param("config_file_analyser",   config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
 
     //init publisher
     _pub_cmd_vel = _nh.advertise<geometry_msgs::Twist>(pub_name_cmd_vel,1);
 
     //inti subscriber
-    _sub_path = _nh.subscribe("" , 1, &PathControl::subPath_callback, this);
-    _sub_pose = _nh.subscribe("" , 1, &PathControl::subPose_callback, this);
+    _sub_path = _nh.subscribe(sub_name_path , 1, &PathControl::subPath_callback, this);
+    _sub_pose = _nh.subscribe(sub_name_pose , 1, &PathControl::subPose_callback, this);
 
-    _pathAnalyser = new analyser::SimpleAnalyser();
-    _controller = NULL;
+    _pathAnalyser = new analyser::SimpleAnalyser(config_file_analyser);
+    _controller = new controller::ParabolaTransfere(config_file_controller);
 
+    _enable_analyse = false;
 }
 
 PathControl::~PathControl()
@@ -62,32 +66,37 @@ void PathControl::run()
 //    }
 }
 
-void PathControl::subPose_callback(geometry_msgs::Pose& msg)
+void PathControl::subPose_callback(const geometry_msgs::PoseStamped& msg)
 {
+   if(!_enable_analyse)
+   {
+      return;
+   }
+
    analyser::pose pose;
-   pose.position = Vector3d(msg.position.x, msg.position.y, 0);
-   Quaternion<double> tmp_q(msg.orientation.w,
-                            msg.orientation.x,
-                            msg.orientation.y,
-                            msg.orientation.z);
+   pose.position = Vector3d(msg.pose.position.x, msg.pose.position.y, 0);
+   Quaternion<double> tmp_q(msg.pose.orientation.w,
+                            msg.pose.orientation.x,
+                            msg.pose.orientation.y,
+                            msg.pose.orientation.z);
    pose.orientation = analyser::PathAnalyser_base::quaternion_to_orientationVec(tmp_q);
 
    //get diff scale
    analyser::diff_scale diff_scale = _pathAnalyser->analyse(pose);
 
    //controll diffscale
-   ///@todo
+   controller::velocity vel = _controller->control(diff_scale.linear, diff_scale.angular);
 
    //set twist msg
    geometry_msgs::Twist msgTwist;
 
-   msgTwist.angular = diff_scale.angular > 1 ? 1 : diff_scale.angular;
-
+   msgTwist.angular.z = vel.angular;
+   msgTwist.linear.x = vel.linear;
    //publish Twist:
    _pub_cmd_vel.publish(msgTwist);
 }
 
-void PathControl::subPath_callback(nav_msgs::Path& msg)
+void PathControl::subPath_callback(const nav_msgs::Path& msg)
 {
    std::vector<analyser::pose> path;
 
@@ -108,4 +117,5 @@ void PathControl::subPath_callback(nav_msgs::Path& msg)
       path.push_back(tmp_pose);
    }
    _pathAnalyser->setPath(path);
+   _enable_analyse = true;
 }

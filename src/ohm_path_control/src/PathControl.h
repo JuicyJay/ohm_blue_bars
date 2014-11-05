@@ -5,9 +5,10 @@
 #include <ros/ros.h>
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/Twist.h>
-#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/PoseStamped.h>
 //#include <tf/tf.h>
 
+#include <string>
 #include <vector>
 #include <Eigen/Dense>
 
@@ -34,6 +35,8 @@ private:    //dataelements
 
     analyser::PathAnalyser_base* _pathAnalyser;
     controller::Controller_base* _controller;
+
+    bool _enable_analyse;
 
 public:
     PathControl();
@@ -70,14 +73,14 @@ private:    //functions
      *
      * @param msg -> ros msg
      */
-    void subPose_callback(geometry_msgs::Pose& msg);
+    void subPose_callback(const geometry_msgs::PoseStamped& msg);
 
     /**
      * @brief callback for next path
      *
      * @param msg -> ros msg
      */
-    void subPath_callback(nav_msgs::Path& msg);
+    void subPath_callback(const nav_msgs::Path& msg);
 };
 
 #endif /* TEMPLATE_H_ */

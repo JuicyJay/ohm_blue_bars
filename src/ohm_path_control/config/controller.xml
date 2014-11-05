@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config>
+   <vel_max_lin>1</vel_max_lin>
+   <vel_max_ang>2</vel_max_ang>
+   <parabola_lin_fac>1</parabola_lin_fac>
+   <parabola_ang_fac>40</parabola_ang_fac>
+</config>
