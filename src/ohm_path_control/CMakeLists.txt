@@ -106,7 +106,7 @@ include_directories(
 #   src/${PROJECT_NAME}/ohm_path_control.cpp
 # )
 
-file(GLOB source_files "src/*.cpp"
+file(GLOB source_files "src/*.cpp" 
                        "src/Controller/*.cpp"
                        "src/PathAnalyser/*.cpp"
                         )

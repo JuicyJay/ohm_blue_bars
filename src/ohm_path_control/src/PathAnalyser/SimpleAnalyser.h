@@ -41,7 +41,7 @@ private: //functions
 
    int getDirection(Vector3d p, Vector3d ori);
 
-   double getLinFactor_dist(Vector3d p);
+   double getLinFactor_dist(double distance);
 
    double getLinScaleFactor_ang_first(double angDiff_scale);
 
@@ -50,12 +50,13 @@ private: //functions
 private: //dataelements
    //analyser parameter
    double _target_radius;
-   double _target_ratius_last;
+   double _target_radius_last;
    unsigned int _cos_pwr_first;
    double _cos_fac_first;
    unsigned int _cos_pwr_n;
    double _cos_fac_n;
    double _ang_reached_range;
+   double _end_approach;
 
 };
 

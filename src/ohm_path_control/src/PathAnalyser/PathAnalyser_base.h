@@ -29,18 +29,26 @@ typedef struct {
    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 } pose;
 
+typedef struct {
+   double path_length;
+   double path_length_remaining;
+   unsigned int num_goals;
+   unsigned int current_goal_id;
+   bool reached_final_goal;
+} info;
+
 class PathAnalyser_base
 {
 public:
    /**
     * @brief constructor
     */
-   PathAnalyser_base() : _currentPose_index(0) {};
+   PathAnalyser_base();
 
    /**
     * @brief destructor
     */
-   virtual ~PathAnalyser_base() {}
+   virtual ~PathAnalyser_base() { }
 
    /**
     * @brief set new path
@@ -49,7 +57,7 @@ public:
     *
     * @return void
     */
-   void setPath(std::vector<analyser::pose> path) { _path = std::vector<analyser::pose>(path); _currentPose_index = 0;}
+   void setPath(std::vector<analyser::pose> path);
 
    /**
     * @param void
@@ -57,6 +65,8 @@ public:
     * @return diffscale whitch have to be controled after
     */
    virtual analyser::diff_scale analyse(analyser::pose current_pose) = 0;
+
+   analyser::info getInfo();
 
    /**
     * @todo write func
@@ -68,15 +78,24 @@ protected: //dataelements
    std::vector<analyser::pose> _path;  ///< current path to analyse
 
 protected:  //functions
-   inline analyser::pose currentTarget() { return _path[_currentPose_index]; }
-   inline void nextTarget() { if(_currentPose_index < _path.size() - 1) _currentPose_index++; }
-   inline unsigned int getCurrentPoseIndex() { return _currentPose_index; }
-   inline bool isLastPose() { return _currentPose_index == _path.size() - 1 ? true : false; }
-   inline bool isFirstPose() { return _currentPose_index == 0 ? true : false; }
+   inline analyser::pose currentGoal() { return _path[_currentGoal_index]; }
+   void nextGoal();
+   inline unsigned int getCurrentGoalIndex() { return _currentGoal_index; }
+   inline bool isLastGoal() { return _currentGoal_index == _path.size() - 1 ? true : false; }
+   inline bool isFirstGoal() { return _currentGoal_index == 0 ? true : false; }
+
+   double getDistToCurrentGoal() const { return _dist_to_current_goal; }
+   void setDistToCurrentGoal(double distToCurrentPose) { _dist_to_current_goal = distToCurrentPose; }
+   bool isReachedFinalGoal() const { return _reached_final_goal; }
+   void setReachedFinalGoal(bool reachedFinalGoal) { _reached_final_goal = reachedFinalGoal; }
+   double getPathLengthRest() const { return _path_lenth_rest; }
 
 private:
-   unsigned int _currentPose_index;
-
+   unsigned int _currentGoal_index;
+   double _dist_to_current_goal;       ///< must set in analyse() by user of this baseclass
+   double _path_lenth;
+   double _path_lenth_rest;
+   bool _reached_final_goal;           ///< must set in analyse() by user of this baseclass
    //for eigen
 //public:
    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW

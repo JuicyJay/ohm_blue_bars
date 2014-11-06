@@ -10,7 +10,7 @@
 namespace analyser
 {
 
-SimpleAnalyser::SimpleAnalyser(std::string config_file)
+SimpleAnalyser::SimpleAnalyser(std::string config_file) : PathAnalyser_base()
 {
    tinyxml2::XMLDocument config;
    config.LoadFile(config_file.c_str());
@@ -21,12 +21,13 @@ SimpleAnalyser::SimpleAnalyser(std::string config_file)
    }
    try {
       _target_radius      = boost::lexical_cast<double>(config.FirstChildElement("config")->FirstChildElement("target_radius")->GetText());
-      _target_ratius_last = boost::lexical_cast<double>(config.FirstChildElement("config")->FirstChildElement("target_ratius_last")->GetText());
+      _target_radius_last = boost::lexical_cast<double>(config.FirstChildElement("config")->FirstChildElement("target_radius_last")->GetText());
       _cos_pwr_first      = boost::lexical_cast<unsigned int>(config.FirstChildElement("config")->FirstChildElement("cos_pwr_first")->GetText());
       _cos_fac_first      = boost::lexical_cast<double>(config.FirstChildElement("config")->FirstChildElement("cos_fac_first")->GetText());
       _cos_pwr_n          = boost::lexical_cast<unsigned int>(config.FirstChildElement("config")->FirstChildElement("cos_pwr_n")->GetText());
       _cos_fac_n          = boost::lexical_cast<double>(config.FirstChildElement("config")->FirstChildElement("cos_fac_n")->GetText());
-      _ang_reached_range = 0.1;
+      _ang_reached_range  = boost::lexical_cast<double>(config.FirstChildElement("config")->FirstChildElement("ang_reached_range")->GetText());
+      _end_approach       = boost::lexical_cast<double>(config.FirstChildElement("config")->FirstChildElement("end_approach")->GetText());
    } catch (boost::bad_lexical_cast& e)
    {
       std::cerr << "Error at parsing XML config file" << config_file << " : " << e.what() << std::endl;
@@ -43,26 +44,37 @@ SimpleAnalyser::~SimpleAnalyser()
 analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
 {
    analyser::diff_scale diff_scale;
+   diff_scale.angular = 0;
+   diff_scale.linear = 0;
+   if(this->isReachedFinalGoal())
+      return diff_scale;
 
    Vector3d ori = current_pose.orientation;
    Vector3d pos = current_pose.position;
    //set z to 0, its just a 2d analyser
    pos(2) = 0;
 
-   Vector3d p = this->currentTarget().position - pos;   //get target Vector from pos
+   Vector3d p = this->currentGoal().position - pos;   //get target Vector from pos
 
    bool reachedLastPose = false;
 
    //prove Target reached
-   if(p.norm() < _target_radius)
+   double target_radius = 0;
+   if(this->isLastGoal())
+      target_radius = _target_radius_last;
+   else
+      target_radius = _target_radius;
+
+   if(p.norm() < target_radius)
    {
       //std::cout << "Reached " << this->getCurrentPoseIndex() << ". target" << std::endl;
-      this->nextTarget();
-      p = this->currentTarget().position - pos;
-      if(this->isLastPose())
+      this->nextGoal();
+      p = this->currentGoal().position - pos;
+      if(this->isLastGoal())
       {
          reachedLastPose = true;
-         p = this->currentTarget().orientation;
+         //set new target (to get corregt target orientation)
+         p = this->currentGoal().orientation;
       }
    }
 
@@ -71,12 +83,14 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    //get scalfactor angular
    double diff_max = M_PI_2;
    double tmp_diff = ::acos(ori.dot(p) / (ori.norm() * p.norm()));
+   //reached last pose if arrived last goal
    if(reachedLastPose && std::abs(tmp_diff) < _ang_reached_range)
+   {
       diff_scale.angular = 0;
+      this->setReachedFinalGoal(true);
+   }
    else
       diff_scale.angular = (tmp_diff / diff_max) * direction; //scale between -1..1
-
-
 
    //scale factor depending on angle
    double lin_scale_angle = 0;
@@ -87,20 +101,22 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    if(reachedLastPose)
    {
       diff_scale.linear = 0;
+      this->setDistToCurrentGoal(0);
    }
    else
    {
-      if(this->isFirstPose())
+      if(this->isFirstGoal())
          lin_scale_angle = this->getLinScaleFactor_ang_first(diff_scale.angular);
       else
          lin_scale_angle = this->getLinScaleFactor_ang_n(diff_scale.angular);
 
-      if(this->isLastPose())
-         lin_scale_dist = this->getLinFactor_dist(p);
+      if(this->getPathLengthRest() < _end_approach)
+         lin_scale_dist = this->getLinFactor_dist(this->getPathLengthRest() + p.norm());
       else
          lin_scale_dist = 1;
 
       diff_scale.linear = lin_scale_dist * lin_scale_angle;
+      this->setDistToCurrentGoal(p.norm());
    }
 
    return diff_scale;
@@ -139,12 +155,10 @@ int SimpleAnalyser::getDirection(Vector3d p, Vector3d ori)
       return -1;
 }
 
-double SimpleAnalyser::getLinFactor_dist(Vector3d p)
+double SimpleAnalyser::getLinFactor_dist(double distance)
 {
-   //get scalefactor linear
-   double dist_target = p.norm();
    //scale factor depending of target distance
-   return dist_target > 1 ? 1 : dist_target;
+   return distance > 1 ? 1 : distance;
 }
 
 double SimpleAnalyser::getLinScaleFactor_ang_first(double angDiff_scale)
