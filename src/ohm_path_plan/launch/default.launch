@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<launch>
+   <node name="ohm_path_plan_node" pkg="ohm_path_plan" type="ohm_path_control_node">
+      <param name="pub_name_path"  type="string" value="path" />
+      <param name="sub_name_map"   type="string" value="map" />
+      <param name="action_name"    type="string" value="move_to" />
+      <param name="frame_id"       type="string" value="map" />
+      <param name="robot_radius"   type="double" value="0.3" />
+   </node>
+</launch>

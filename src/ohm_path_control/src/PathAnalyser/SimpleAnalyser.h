@@ -58,6 +58,8 @@ private: //dataelements
    double _ang_reached_range;
    double _end_approach;
 
+   analyser::diff_scale _oldDiff;
+
 };
 
 } /* namespace controller */

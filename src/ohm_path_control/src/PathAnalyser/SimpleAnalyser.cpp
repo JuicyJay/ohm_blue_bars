@@ -65,16 +65,17 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    else
       target_radius = _target_radius;
 
-   if(p.norm() < target_radius)
+   while(p.norm() < target_radius)
    {
-      //std::cout << "Reached " << this->getCurrentPoseIndex() << ". target" << std::endl;
       this->nextGoal();
       p = this->currentGoal().position - pos;
+
       if(this->isLastGoal())
       {
          reachedLastPose = true;
          //set new target (to get corregt target orientation)
          p = this->currentGoal().orientation;
+         break;
       }
    }
 
@@ -111,14 +112,17 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
          lin_scale_angle = this->getLinScaleFactor_ang_n(diff_scale.angular);
 
       if(this->getPathLengthRest() < _end_approach)
-         lin_scale_dist = this->getLinFactor_dist(this->getPathLengthRest() + p.norm());
+      {
+         double tmp = this->getPathLengthRest() + p.norm();
+         lin_scale_dist = this->getLinFactor_dist(tmp < 0 ? 0 : tmp);
+      }
       else
          lin_scale_dist = 1;
 
       diff_scale.linear = lin_scale_dist * lin_scale_angle;
       this->setDistToCurrentGoal(p.norm());
    }
-
+   _oldDiff = diff_scale;
    return diff_scale;
 }
 

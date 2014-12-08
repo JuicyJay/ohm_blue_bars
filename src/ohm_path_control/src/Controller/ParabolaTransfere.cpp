@@ -50,7 +50,8 @@ double ParabolaTransfere::parabola(double scale, double value, double max_value)
 {
    max_value = std::abs(max_value);
    int sng = value > 0 ? 1 : -1;
-   double tmp = scale * std::abs(value) * value;
+   double tmp = 0;
+   tmp = scale * value;
    return std::abs(tmp) > max_value ? (max_value * sng) : tmp;
 }
 

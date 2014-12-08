@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+   <node name="ohm_path_plan_node" pkg="ohm_path_plan" type="ohm_path_plan_node" output = "screen">
+      <param name="pub_name_path"  type="string" value="path" />
+      <param name="sub_name_map"   type="string" value="me/map" />
+      <param name="action_name"    type="string" value="move_to" />
+      <param name="frame_id"       type="string" value="map" />
+      <param name="robot_radius"   type="double" value="0.1" />
+   </node>
+
+   <node name="ohm_path_control_node" pkg="ohm_path_control" type="ohm_path_control_node" output = "screen">
+      <param name="pub_name_cmd_vel"       type="string" value="georg/vel/teleop" />
+      <param name="sub_name_path"          type="string" value="path" />
+      <param name="sub_name_pose"          type="string" value="georg/pose" />
+      <param name="config_file_controller" type="string" value="/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"/>
+      <param name="config_file_analyser"   type="string" value="/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"/>
+   </node>
+   
+   <node name="ohm_semiautonom_node" pkg="ohm_path_plan" type="ohm_semiautonom_node" output = "screen">
+      <param name="sub_name_goal"   type="string" value="/move_base_simple/goal" />
+      <param name="sub_name_pose"   type="string" value="georg/pose" />
+      <param name="action_name"     type="string" value="move_to" />
+   </node>
+   
+</launch>

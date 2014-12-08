@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <config>
-   <vel_max_lin>0.5</vel_max_lin>
-   <vel_max_ang>1.5</vel_max_ang>
-   <parabola_lin_fac>3</parabola_lin_fac>
-   <parabola_ang_fac>20</parabola_ang_fac>
+   <vel_max_lin>0.2</vel_max_lin>
+   <vel_max_ang>1</vel_max_ang>
+   <parabola_lin_fac>2</parabola_lin_fac>
+   <parabola_ang_fac>4</parabola_ang_fac>
 </config>

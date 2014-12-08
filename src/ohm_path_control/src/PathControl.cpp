@@ -15,9 +15,9 @@ PathControl::PathControl() : _rate(0)
     std::string config_file_controller;
     std::string config_file_analyser;
     
-    privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("robot0/cmd_vel"));
+    privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("vel/teleop"));
     privNh.param("sub_name_path",          sub_name_path,          std::string("path"));
-    privNh.param("sub_name_pose",          sub_name_pose,          std::string("robot0/pose"));
+    privNh.param("sub_name_pose",          sub_name_pose,          std::string("pose"));
     privNh.param("config_file_controller", config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
     privNh.param("config_file_analyser",   config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
 

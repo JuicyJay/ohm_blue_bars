@@ -1,0 +1,14 @@
+#goal
+geometry_msgs/PoseStamped start
+geometry_msgs/PoseStamped end
+---
+#result
+uint8 succes
+---
+#feedback
+uint8 isPlaning
+uint8 isMoving
+float64 pathLenght
+float64 pathLenght_remaining
+uint32 numWaypoints
+uint32 currentWaypoint
