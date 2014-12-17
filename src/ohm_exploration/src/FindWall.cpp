@@ -46,12 +46,12 @@ void FindWall::search(std::vector<Wall>& walls)
 
             if (wall.valid())
             {
-                ROS_INFO_STREAM("Found wall: " << wall);
-
                 wall.setResolution(_mapMetaData.resolution);
                 wall.setOrigin(_mapMetaData.origin.position);
                 wall.setOrientation(_orientations[i]);
                 walls.push_back(wall);
+
+                ROS_INFO_STREAM("Found " << wall);
             }
 
             this->removePoints(wall.points(), _points[i]);

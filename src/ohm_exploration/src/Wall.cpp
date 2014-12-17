@@ -58,6 +58,17 @@ Wall::Wall(const PointVector& points)
 //    std::cout << std::endl;
 }
 
+Wall::Wall(const ohm_exploration::Wall& wall)
+    : _id(wall.id),
+      _center(Eigen::Vector2f(wall.center.x, wall.center.y)),
+      _resolution(1.0f),
+      _orientation(static_cast<Orientation>(wall.orientation)),
+      _valid(true),
+      _length(wall.length)
+{
+
+}
+
 Wall::Wall(const Wall& wall)
     : _model(wall._model),
       _points(wall._points),
@@ -253,15 +264,15 @@ ohm_exploration::Wall Wall::getWallMessage(void) const
     msg.id          = _id;
     msg.orientation = _orientation;
 
-    msg.center.x = _center.x() / _resolution;
-    msg.center.y = _center.y() / _resolution;
+    msg.center.x = _center.x() * _resolution;
+    msg.center.y = _center.y() * _resolution;
     msg.center.z = 0.0f;
 
     msg.v.x = _model.r().x();
     msg.v.y = _model.r().y();
     msg.v.z = 0.0f;
 
-    msg.length = _length / _resolution;
+    msg.length = _length * _resolution;
 
     return msg;
 }

@@ -55,11 +55,11 @@ add_message_files(
    )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+   FILES
+   GetTarget.srv
+   MarkTarget.srv
+   )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -141,9 +141,17 @@ add_executable(map-roi
                src/Map.cpp
                )
 
+add_executable(target-stack
+               src/Wall.cpp
+               src/LeastSquare.cpp
+               src/Target.cpp
+               src/target-stack-node.cpp
+               )
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(wall-finder ohm_exploration_generate_messages_cpp)
+add_dependencies(target-stack ohm_exploration_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(exploration
@@ -164,6 +172,10 @@ target_link_libraries(map-roi
                       ${catkin_LIBRARIES}
                       )
 
+target_link_libraries(target-stack
+                      ${catkin_LIBRARIES}
+                      )
+
 #############
 ## Install ##
 #############
@@ -179,7 +191,7 @@ target_link_libraries(map-roi
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS wall-finder
+install(TARGETS wall-finder target-stack
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

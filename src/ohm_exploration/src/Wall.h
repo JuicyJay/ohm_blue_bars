@@ -30,6 +30,7 @@ public:
 
     Wall(void) { }
     Wall(const PointVector& points);
+    Wall(const ohm_exploration::Wall& wall);
     Wall(const Wall& wall);
 
     inline const Line& model(void) const { return _model; }
@@ -71,8 +72,12 @@ inline std::ostream& operator<<(std::ostream& os, const Wall& wall)
 {
     os << "Wall:" << std::endl;
     os << "-----------------------------------" << std::endl;
-    os << "Model: " << wall.model() << std::endl;
-    os << "Valid: " << wall.valid() << std::endl;
+    os << "ID        : " << wall.id() << std::endl;
+    os << "Model     : " << wall.model() << std::endl;
+    os << "Center    : " << wall.center().x() << ", " << wall.center().y() << std::endl;
+    os << "Length    : " << wall.length() << std::endl;
+    os << "Resolution: " << wall.resolution() << std::endl;
+    os << "Valid     : " << wall.valid() << std::endl;
 
     return os;
 }
