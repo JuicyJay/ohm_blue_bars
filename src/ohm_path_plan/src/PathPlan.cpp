@@ -29,6 +29,7 @@ PathPlan::PathPlan() :
 
     //inti subscriber
     _subMap = _nh.subscribe(sub_name_map, 1, &PathPlan::subCallback_map, this);
+    _subState = _nh.subscribe("/path_control/state", 1, &PathPlan::subReached_callback, this);
 
     //init action
     _actionMoveTo = new actionlib::SimpleActionServer<ohm_path_plan::MoveToAction>(_nh, action_name, false);

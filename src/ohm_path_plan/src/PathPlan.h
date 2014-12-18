@@ -25,6 +25,7 @@ private:    //dataelements
 
     ros::Publisher _pubPath;
     ros::Subscriber _subMap;
+    ros::Subscriber _subState;
 
     //action stuff
     actionlib::SimpleActionServer<ohm_path_plan::MoveToAction>* _actionMoveTo;
