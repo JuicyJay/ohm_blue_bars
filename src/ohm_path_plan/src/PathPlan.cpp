@@ -70,6 +70,12 @@ void PathPlan::run()
 
 void PathPlan::goalCallback()
 {
+   //measure Time:
+   boost::posix_time::ptime start_t;
+   boost::posix_time::ptime end_t;
+   boost::posix_time::time_duration dur;
+   start_t = boost::posix_time::microsec_clock::local_time();
+
    ROS_INFO("Received goal");
    ohm_path_plan::MoveToGoalConstPtr goal = _actionMoveTo->acceptNewGoal();
 
@@ -91,36 +97,64 @@ void PathPlan::goalCallback()
 
    obvious::AStarMap* map = obvious::AStarMap::create(data, cellSize, width, height);
 
+   //debug
+   unsigned char* buffer = new unsigned char[width * height * 3];
+   map->convertToImage(buffer);
+   obvious::serializePPM("/tmp/sim_map_raw.ppm",buffer, width, height, false);
+
    ROS_INFO("inflate map ...");
    map->inflate(_robotRadius);
 
-   //get path
-   unsigned int xStart = (unsigned int)((_pathStart.pose.position.x - _map.info.origin.position.x) / cellSize + 0.555);
-   unsigned int yStart = (unsigned int)((_pathStart.pose.position.y - _map.info.origin.position.y) / cellSize + 0.555);
-   unsigned int xEnd   = (unsigned int)((_pathEnd.pose.position.x   - _map.info.origin.position.x) / cellSize + 0.555);
-   unsigned int yEnd   = (unsigned int)((_pathEnd.pose.position.y   - _map.info.origin.position.y) / cellSize + 0.555);
+   //debug
+   map->convertToImage(buffer);
+   obvious::serializePPM("/tmp/sim_map_inf.ppm",buffer, width, height, false);
 
-   printf("start: (%d,%d), end: (%d,%d)\n", xStart, yStart, xEnd, yEnd);
+   //get path
+   obvious::Point2D start;
+   obvious::Point2D target;
+   start.x  = (_pathStart.pose.position.x - _map.info.origin.position.x) - _map.info.width * _map.info.resolution * 0.5;
+   start.y  = (_pathStart.pose.position.y - _map.info.origin.position.y) - _map.info.height * _map.info.resolution * 0.5;
+   target.x = (_pathEnd.pose.position.x   - _map.info.origin.position.x) - _map.info.width * _map.info.resolution * 0.5;
+   target.y = (_pathEnd.pose.position.y   - _map.info.origin.position.y) - _map.info.height * _map.info.resolution * 0.5;
+
+   printf("start: (%f,%f), end: (%f,%f)\n", start.x, start.y, target.x, target.y);
 
    ROS_INFO("now planing path....");
-   std::vector<unsigned int> path_raw = obvious::AStar::pathFind(map, xStart, yStart, xEnd, yEnd);
+   std::vector<unsigned int> path_raw = obvious::AStar::pathFind(map, start, target);
    ROS_INFO("Found %d wps",(int)path_raw.size());
    if(path_raw.size() == 0)
    {
+      end_t = boost::posix_time::microsec_clock::local_time();
+      dur = start_t - end_t;
+      ROS_INFO("Duration: %ds, %dms",(int) dur.total_milliseconds() / 1000, (int)dur.total_milliseconds() % 1000);
       _actionMoveTo_result.succes = false;
       _actionMoveTo->setAborted(_actionMoveTo_result);
       return;
    }
    //convert path
-   std::vector<obvious::AStarCoord> path = map->translatePathToCoords(path_raw, xStart, yStart);
+   std::vector<obvious::Point2D> path = map->translatePathToCoords(path_raw, start);
+
+   //debug
+   std::vector<unsigned int> mapIdx = map->translatePathToMapIndices(path_raw, start);
+
+   for(std::vector<unsigned int>::iterator it=mapIdx.begin(); it!=mapIdx.end(); ++it)
+   {
+     buffer[3*(*it)] = 0;
+     buffer[3*(*it)+1] = 0;
+     buffer[3*(*it)+2] = 0;
+   }
+
+   obvious::serializePPM("/tmp/sim_path.ppm", buffer, width, height, false);
+   delete[] buffer;
+
 
    nav_msgs::Path msgPath;
    msgPath.header.frame_id = _frame_id;
    for (unsigned int i = 0; i < path.size(); ++i)
    {
       geometry_msgs::PoseStamped tmp;
-      tmp.pose.position.x = path[i].x + _map.info.origin.position.x;
-      tmp.pose.position.y = path[i].y + _map.info.origin.position.y;
+      tmp.pose.position.x = path[i].x + _map.info.origin.position.x + _map.info.width * _map.info.resolution * 0.5;
+      tmp.pose.position.y = path[i].y + _map.info.origin.position.y + _map.info.height * _map.info.resolution * 0.5;
       tmp.pose.position.z = 0;
       tmp.pose.orientation.w = 0;
       tmp.pose.orientation.x = 0;
@@ -148,6 +182,10 @@ void PathPlan::goalCallback()
    //receive feedback from pathcontroller
    _actionMoveTo_result.succes = true;
    _actionMoveTo->setSucceeded(_actionMoveTo_result);
+
+   end_t = boost::posix_time::microsec_clock::local_time();
+   dur = start_t - end_t;
+   ROS_INFO("Duration: %ds, %dms", (int)dur.total_milliseconds() / 1000,(int) dur.total_milliseconds() % 1000);
 }
 
 void PathPlan::subCallback_map(const nav_msgs::OccupancyGrid& msg)

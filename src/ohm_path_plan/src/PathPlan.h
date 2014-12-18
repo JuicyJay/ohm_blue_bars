@@ -2,6 +2,7 @@
 #ifndef TEMPLATE_H_
 #define TEMPLATE_H_
 
+#include <boost/timer.hpp>
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <ohm_path_plan/MoveToAction.h>

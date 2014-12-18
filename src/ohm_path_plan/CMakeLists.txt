@@ -135,11 +135,13 @@ target_link_libraries(ohm_path_plan_node
   ${catkin_LIBRARIES}
   obvision
   obcore
+  ${Boost_LIBRARIES} 
 )
 target_link_libraries(ohm_semiautonom_node
   ${catkin_LIBRARIES}
   obvision
   obcore
+  ${Boost_LIBRARIES} 
 )
 
 #############
