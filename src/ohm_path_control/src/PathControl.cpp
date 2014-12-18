@@ -26,6 +26,7 @@ PathControl::PathControl() : _rate(0)
     //init publisher
     _pub_cmd_vel = _nh.advertise<geometry_msgs::Twist>(pub_name_cmd_vel,1);
     _pubState = _nh.advertise<std_msgs::Bool>(pub_name_state,1);
+    _pubTarget = _nh.advertise<geometry_msgs::PoseStamped>("/georg/targetPose",1);
 
     //inti subscriber
     _sub_path = _nh.subscribe(sub_name_path , 1, &PathControl::subPath_callback, this);
@@ -107,6 +108,8 @@ void PathControl::subPose_callback(const geometry_msgs::PoseStamped& msg)
 void PathControl::subPath_callback(const nav_msgs::Path& msg)
 {
    std::vector<analyser::pose> path;
+
+   _targetPose = msg.poses[msg.poses.size() - 1];
 
    //set path
    for(unsigned int i=0; i<msg.poses.size(); i++)
