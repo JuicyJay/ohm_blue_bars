@@ -16,6 +16,7 @@
 #include "../Context.h"
 #include "TargetStack.h"
 #include "Init.h"
+#include "Drive.h"
 
 namespace autonohm {
 
@@ -108,8 +109,8 @@ void Explore::process(void)
     }
 
     ROS_INFO("Leave state Explore.");
-    sleep(1);
-    Context::getInstance()->setState(new Explore);
+    //    sleep(1);
+    Context::getInstance()->setState(new Drive(target.pose));
     delete this;
 }
 
