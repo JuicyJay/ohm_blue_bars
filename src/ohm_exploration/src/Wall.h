@@ -72,12 +72,13 @@ inline std::ostream& operator<<(std::ostream& os, const Wall& wall)
 {
     os << "Wall:" << std::endl;
     os << "-----------------------------------" << std::endl;
-    os << "ID        : " << wall.id() << std::endl;
-    os << "Model     : " << wall.model() << std::endl;
-    os << "Center    : " << wall.center().x() << ", " << wall.center().y() << std::endl;
-    os << "Length    : " << wall.length() << std::endl;
-    os << "Resolution: " << wall.resolution() << std::endl;
-    os << "Valid     : " << wall.valid() << std::endl;
+    os << "ID         : " << wall.id() << std::endl;
+    os << "Model      : " << wall.model() << std::endl;
+    os << "Orientation: " << static_cast<int>(wall.orientation()) << std::endl;
+    os << "Center     : " << wall.center().x() << ", " << wall.center().y() << std::endl;
+    os << "Length     : " << wall.length() << std::endl;
+    os << "Resolution : " << wall.resolution() << std::endl;
+    os << "Valid      : " << wall.valid() << std::endl;
 
     return os;
 }
