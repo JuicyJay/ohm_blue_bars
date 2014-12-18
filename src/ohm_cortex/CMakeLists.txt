@@ -4,7 +4,14 @@ project(ohm_cortex)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp message_generation)
+find_package(catkin REQUIRED COMPONENTS 
+    roscpp 
+    message_generation
+    std_msgs
+    genmsg
+    actionlib_msgs
+    actionlib
+    )
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
 
 
@@ -56,6 +63,7 @@ add_library(ohm_cortex
   src/states/Inspect.cpp
   src/states/Approach.cpp
   src/states/Explore.cpp
+  src/states/Drive.cpp
   src/states/Init.cpp
   src/states/TargetStack.cpp
 )
@@ -74,6 +82,7 @@ add_executable(statemachine
                src/states/Inspect.cpp
                src/states/Approach.cpp
                src/states/Explore.cpp
+               src/states/Drive.cpp
                src/states/Init.cpp
                src/states/TargetStack.cpp
                )
@@ -82,11 +91,12 @@ add_executable(viz                   src/viz/viz_node.cpp           ${QT_SOURCES
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(statemachine ohm_statemachine_generate_messages_cpp)
+add_dependencies(statemachine ohm_statemachine_generate_messages_cpp ohm_path_plan)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(statemachine
    ${catkin_LIBRARIES}
+   #ohm_path_plan
 #   ohm_cortex
 )
 

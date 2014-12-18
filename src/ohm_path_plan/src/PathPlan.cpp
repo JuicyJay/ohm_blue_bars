@@ -180,12 +180,21 @@ void PathPlan::goalCallback()
 
    //todo
    //receive feedback from pathcontroller
-   _actionMoveTo_result.succes = true;
-   _actionMoveTo->setSucceeded(_actionMoveTo_result);
+
 
    end_t = boost::posix_time::microsec_clock::local_time();
    dur = start_t - end_t;
    ROS_INFO("Duration: %ds, %dms", (int)dur.total_milliseconds() / 1000,(int) dur.total_milliseconds() % 1000);
+}
+
+void PathPlan::subReached_callback(const std_msgs::Bool& msg)
+{
+   if(msg.data)
+   {
+      ROS_INFO("PathPlan -> Reched target");
+      _actionMoveTo_result.succes = true;
+      _actionMoveTo->setSucceeded(_actionMoveTo_result);
+   }
 }
 
 void PathPlan::subCallback_map(const nav_msgs::OccupancyGrid& msg)

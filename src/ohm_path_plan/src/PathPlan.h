@@ -9,6 +9,7 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Path.h>
 #include <nav_msgs/OccupancyGrid.h>
+#include <std_msgs/Bool.h>
 
 #include <obvision/planning/AStar.h>
 #include <obcore/base/tools.h>
@@ -70,6 +71,8 @@ private:    //functions
     void run();
 
     void goalCallback();
+
+    void subReached_callback(const std_msgs::Bool& msg);
 
     void subCallback_map(const nav_msgs::OccupancyGrid& msg);
 };

@@ -10,12 +10,14 @@ PathControl::PathControl() : _rate(0)
     //rosParam
     ros::NodeHandle privNh("~");
     std::string pub_name_cmd_vel;
+    std::string pub_name_state;
     std::string sub_name_path;
     std::string sub_name_pose;
     std::string config_file_controller;
     std::string config_file_analyser;
     
     privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("vel/teleop"));
+    privNh.param("pub_name_state",         pub_name_state,       std::string("path_control/state"));
     privNh.param("sub_name_path",          sub_name_path,          std::string("path"));
     privNh.param("sub_name_pose",          sub_name_pose,          std::string("pose"));
     privNh.param("config_file_controller", config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
@@ -23,6 +25,7 @@ PathControl::PathControl() : _rate(0)
 
     //init publisher
     _pub_cmd_vel = _nh.advertise<geometry_msgs::Twist>(pub_name_cmd_vel,1);
+    _pubState = _nh.advertise<std_msgs::Bool>(pub_name_state,1);
 
     //inti subscriber
     _sub_path = _nh.subscribe(sub_name_path , 1, &PathControl::subPath_callback, this);
@@ -93,6 +96,11 @@ void PathControl::subPose_callback(const geometry_msgs::PoseStamped& msg)
    msgTwist.angular.z = vel.angular;
    msgTwist.linear.x = vel.linear;
    //publish Twist:
+   analyser::info pathInfo = _pathAnalyser->getInfo();
+   std_msgs::Bool reachedTarget;
+   reachedTarget.data = pathInfo.reached_final_goal;
+
+   _pubState.publish(reachedTarget);
    _pub_cmd_vel.publish(msgTwist);
 }
 

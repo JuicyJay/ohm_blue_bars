@@ -6,6 +6,7 @@
 #include <nav_msgs/Path.h>
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <std_msgs/Bool.h>
 //#include <tf/tf.h>
 
 #include <string>
@@ -28,6 +29,7 @@ private:    //dataelements
     ros::Publisher _pub_cmd_vel;
     ros::Subscriber _sub_path;
     ros::Subscriber _sub_pose;
+    ros::Publisher _pubState;
 
     //path
     //std::vector<Vector3d> _path;
