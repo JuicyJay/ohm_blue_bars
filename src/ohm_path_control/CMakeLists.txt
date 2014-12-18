@@ -139,11 +139,11 @@ target_link_libraries(ohm_path_control_node
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS ohm_path_control ohm_path_control_node
+ install(TARGETS ohm_path_control ohm_path_control_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-# )
+   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 ## Mark cpp header files for installation
 # install(DIRECTORY include/${PROJECT_NAME}/
