@@ -18,7 +18,7 @@ Target::Target(const Wall& wall)
     const Eigen::Vector3f n(Eigen::Vector3f(wall.model().n().x(), wall.model().n().y(), 0.0f));
     const Eigen::Vector3f v(Eigen::Vector3f(wall.model().r().x(), wall.model().r().y(), 0.0f));
 
-    _poses.push_back(Pose(center, -n));
+    _poses.push_back(Pose(center + n * POSE_DISTANCE, -n));
 
     for (unsigned int i = 1; i < poses; ++i)
     {
