@@ -3,6 +3,7 @@
  *
  *  Created on: 14.10.2014
  *      Author: chris
+ *    Modified: Knueppl (Christian Merkl)
  */
 
 #ifndef OHM_CORTEX_SRC_STATES_EXPLORE_H_
@@ -43,6 +44,10 @@ public:
 private:
    ros::NodeHandle*  _nh;
    ros::Publisher    _state_pub;
+    ros::ServiceClient _srvGetTarget;
+    ros::ServiceClient _srvMarkTarget;
+    ros::ServiceClient _srvTrigger;
+    ros::Publisher _pubTarget;
 };
 
 } /* namespace autonohm */

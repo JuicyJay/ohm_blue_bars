@@ -8,6 +8,7 @@
 #include "Init.h"
 
 #include "../Context.h"
+#include "Explore.h"
 
 // ros includes
 #include <std_msgs/String.h>
@@ -18,7 +19,7 @@ namespace autonohm {
 Init::Init(void)
 : _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
-   ROS_INFO("Init");
+   ROS_INFO("New state is Init.");
 
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
 
@@ -35,13 +36,8 @@ Init::~Init(void)
 
 void Init::process(void)
 {
-   ROS_DEBUG_STREAM("Init");
-
-   if(rand()%100<10)
-   {
-     autonohm::Context::getInstance()->setState(new StatePing());
-     delete this;
-   }
+    Context::getInstance()->setState(new Explore);
+    delete this;
 }
 
 } /* namespace autonohm */

@@ -49,6 +49,7 @@ bool callbackGetTarget(ohm_exploration::GetTarget::Request& req, ohm_exploration
         _targets.push_back(_haveToInspect.front());
         _haveToInspect.pop_front();
         res.poses.resize(_targets.back().poses().size());
+        res.id = _targets.back().id();
 
         for (unsigned int i = 0; i < _targets.back().poses().size(); ++i)
             res.poses[i] = _targets.back().poses()[i].toRos();

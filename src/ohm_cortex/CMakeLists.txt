@@ -6,16 +6,19 @@ project(ohm_cortex)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS roscpp message_generation)
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
- 
- 
+
+
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}) 
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${CMAKE_CURRENT_BINARY_DIR}
+                    )
 
 set(QT_HEADERS src/viz/main_window.hpp
                src/viz/Node.h
                src/viz/Link.h
-                )                
+                )
 
 set(QT_FORMS   src/viz/ui/main_window.ui
                 )
@@ -28,7 +31,7 @@ set(QT_SOURCES src/viz/main_window.cpp
 
 QT4_WRAP_CPP(QT_MOC_HPP ${QT_HEADERS}
                 )
-                
+
 QT4_WRAP_UI( QT_FORMS_HPP ${QT_FORMS}
                 )
 
@@ -37,11 +40,11 @@ add_service_files(
     Force.srv
 )
 
-    
+
 
 generate_messages()
 
-## Declare a cpp library    
+## Declare a cpp library
 add_library(ohm_cortex
   src/Context.cpp
   src/states/StatePing.cpp
@@ -54,27 +57,43 @@ add_library(ohm_cortex
   src/states/Approach.cpp
   src/states/Explore.cpp
   src/states/Init.cpp
+  src/states/TargetStack.cpp
 )
 
 
 ## Declare a cpp executable
-add_executable(ohm_statemachine_node src/ohm_statemachine.cpp)
+add_executable(statemachine
+               src/ohm_statemachine.cpp
+               src/Context.cpp
+               src/states/StatePing.cpp
+               src/states/StatePong.cpp
+               src/states/Teleoperated.cpp
+               src/states/RejectVictim.cpp
+               src/states/ConfirmVictim.cpp
+               src/states/Waiting.cpp
+               src/states/Inspect.cpp
+               src/states/Approach.cpp
+               src/states/Explore.cpp
+               src/states/Init.cpp
+               src/states/TargetStack.cpp
+               )
+
 add_executable(viz                   src/viz/viz_node.cpp           ${QT_SOURCES} ${QT_MOC_HPP} ${QT_FORMS_HPP})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(ohm_statemachine_node ohm_statemachine_generate_messages_cpp)
+add_dependencies(statemachine ohm_statemachine_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ohm_statemachine_node
+target_link_libraries(statemachine
    ${catkin_LIBRARIES}
-   ohm_cortex
+#   ohm_cortex
 )
 
 target_link_libraries(viz ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
 
-install(TARGETS ohm_statemachine_node
+install(TARGETS statemachine
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

@@ -10,5 +10,6 @@ uint32 id
 uint8 orientation
 geometry_msgs/Point center
 geometry_msgs/Point v
+geometry_msgs/Point n
 float32 length
 

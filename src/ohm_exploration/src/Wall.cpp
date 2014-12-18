@@ -59,7 +59,8 @@ Wall::Wall(const PointVector& points)
 }
 
 Wall::Wall(const ohm_exploration::Wall& wall)
-    : _id(wall.id),
+    : _model(Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(wall.v.x, wall.v.y)),
+      _id(wall.id),
       _center(Eigen::Vector2f(wall.center.x, wall.center.y)),
       _resolution(1.0f),
       _orientation(static_cast<Orientation>(wall.orientation)),
@@ -264,13 +265,17 @@ ohm_exploration::Wall Wall::getWallMessage(void) const
     msg.id          = _id;
     msg.orientation = _orientation;
 
-    msg.center.x = _center.x() * _resolution;
-    msg.center.y = _center.y() * _resolution;
-    msg.center.z = 0.0f;
+    msg.center.x = _center.x() * _resolution + _origin.x;
+    msg.center.y = _center.y() * _resolution + _origin.y;
+    msg.center.z = _origin.z;
 
     msg.v.x = _model.r().x();
     msg.v.y = _model.r().y();
     msg.v.z = 0.0f;
+
+    msg.n.x = _model.n().x();
+    msg.n.y = _model.n().y();
+    msg.n.z = 0.0f;
 
     msg.length = _length * _resolution;
 

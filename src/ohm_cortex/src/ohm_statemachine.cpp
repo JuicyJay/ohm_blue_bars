@@ -27,7 +27,7 @@ autonohm::Context*    context;
 
 int main(int argc, char** argv)
 {
-   ros::init(argc, argv, "ohm_statemachine_node");
+   ros::init(argc, argv, "statemachine_node");
    ros::NodeHandle nh("~");
 
    context = autonohm::Context::getInstance();
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
    _state_srv = nh.advertiseService("force_state", force);
 
    // Set init state
-   context->setState(new autonohm::StatePing());
+   context->setState(new autonohm::Init);
 
    ros::Rate r(10.0);
 
