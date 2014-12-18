@@ -58,6 +58,7 @@ public:
     inline const Eigen::Vector2f& r(void) const { return _r; }
     inline const Eigen::Vector2f& p1(void) const { return _p1; }
     inline const Eigen::Vector2f& p2(void) const { return _p2; }
+    inline void flipNormal(void) { _n *= -1.0f; }
 
     inline float distance(const Eigen::Vector2i& p) const { return std::abs(_n.dot(p.cast<float>() - _p1)); }
     inline float distance(const Eigen::Vector2f& p) const { return std::abs(_n.dot(p - _p1)); }
@@ -88,7 +89,7 @@ private:
 inline std::ostream& operator<<(std::ostream& os, const Line& line)
 {
     os << "Line(m = " << line.m() << ", t = " << line.t() << ", r = (" << line.r().x() << " " << line.r().y()
-       << "))";
+       << "), n = (" << line.n().x() << " " << line.n().y() << "))";
 
     return os;
 }

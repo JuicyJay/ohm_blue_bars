@@ -63,11 +63,11 @@ Wall::Wall(const ohm_exploration::Wall& wall)
       _id(wall.id),
       _center(Eigen::Vector2f(wall.center.x, wall.center.y)),
       _resolution(1.0f),
-      _orientation(static_cast<Orientation>(wall.orientation)),
+//      _orientation(static_cast<Orientation>(wall.orientation)),
       _valid(true),
       _length(wall.length)
 {
-
+    this->setOrientation(static_cast<Orientation>(wall.orientation));
 }
 
 Wall::Wall(const Wall& wall)
@@ -95,6 +95,20 @@ void Wall::setOrientation(const Orientation orientation)
     _orientation = orientation;
 
     // to do: correct normal if they is in wrong direction.
+    switch (orientation)
+    {
+    case Up:
+    case Right:
+        break;
+
+    case Down:
+    case Left:
+        _model.flipNormal();
+        break;
+
+    default:
+        break;
+    }
 }
 
 visualization_msgs::Marker Wall::getMarkerMessage(void) const
@@ -131,24 +145,28 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     switch (_orientation)
     {
     case Up:
+        /* red */
         marker.color.r = 198.0f / 256.0f;
         marker.color.g = 0.0f;
         marker.color.b = 0.0f;
         break;
 
     case Down:
+        /* green */
         marker.color.r =  63.0f / 256.0f;
         marker.color.g = 202.0f / 256.0f;
         marker.color.b =  58.0f / 256.0f;
         break;
 
     case Left:
+        /* blue */
         marker.color.r =  63.0f / 256.0f;
         marker.color.g =  84.0f / 256.0f;
         marker.color.b = 221.0f / 256.0f;
         break;
 
     case Right:
+        /* purple */
         marker.color.r = 180.0f / 256.0f;
         marker.color.g =   0.0f / 256.0f;
         marker.color.b = 175.0f / 256.0f;
