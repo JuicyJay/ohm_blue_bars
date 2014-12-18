@@ -77,6 +77,8 @@ void PathControl::subPose_callback(const geometry_msgs::PoseStamped& msg)
       return;
    }
 
+   _pubTarget.publish(_targetPose);
+
    analyser::pose pose;
    pose.position = Vector3d(msg.pose.position.x, msg.pose.position.y, 0);
    Quaternion<double> tmp_q(msg.pose.orientation.w,
