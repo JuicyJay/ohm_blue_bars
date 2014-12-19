@@ -89,6 +89,8 @@ void PathPlan::goalCallback()
    _pathStart = goal->start;
    _pathEnd   = goal->end;
 
+   //debug : hack
+   _pathEnd.header.frame_id = _frame_id;
    _pubTarget.publish(_pathEnd);
 
 
