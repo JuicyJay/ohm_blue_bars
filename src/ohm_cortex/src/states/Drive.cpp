@@ -12,12 +12,21 @@ Drive::Drive(const geometry_msgs::Pose& target)
     : _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
    ROS_INFO("New state is Drive.");
+
+   /* Publish current state for debugging. */
+   _state_pub = _nh->advertise<std_msgs::String>("state", 1);
+
+   std_msgs::String msg;
+   msg.data = "drive";
+   _state_pub.publish(msg);
+
    //add subscriber:
    _subPose = _nh->subscribe("/georg/pose", 1, &Drive::subPose_callback, this);
    _ac = new actionlib::SimpleActionClient<ohm_path_plan::MoveToAction>("move_to", true);
    _pose_rdy = false;
 
    _targetPose.pose = target;
+   std::cout << "target = (" << target.position.x << ", " << target.position.y << std::endl;
 }
 
 Drive::~Drive(void)

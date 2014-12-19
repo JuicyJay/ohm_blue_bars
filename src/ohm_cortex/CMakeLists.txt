@@ -51,6 +51,8 @@ add_service_files(
 
 generate_messages()
 
+catkin_package()
+
 ## Declare a cpp library
 add_library(ohm_cortex
   src/Context.cpp
