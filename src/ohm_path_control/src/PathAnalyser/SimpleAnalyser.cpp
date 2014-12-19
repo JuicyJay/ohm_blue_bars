@@ -65,7 +65,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    else
       target_radius = _target_radius;
 
-   while(p.norm() < target_radius)
+   while((p.norm() < target_radius) && !reachedLastPose)
    {
       this->nextGoal();
       p = this->currentGoal().position - pos;
