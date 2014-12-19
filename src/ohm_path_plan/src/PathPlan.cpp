@@ -26,6 +26,8 @@ PathPlan::PathPlan() :
     _frame_id = frame_id;
     //init publisher
     _pubPath = _nh.advertise<nav_msgs::Path>(pub_name_path,1);
+    _pubTarget = _nh.advertise<geometry_msgs::PoseStamped>("/georg/targetPose",1);
+
 
     //inti subscriber
     _subMap = _nh.subscribe(sub_name_map, 1, &PathPlan::subCallback_map, this);
@@ -82,8 +84,13 @@ void PathPlan::goalCallback()
    ROS_INFO("Received goal");
    ohm_path_plan::MoveToGoalConstPtr goal = _actionMoveTo->acceptNewGoal();
 
+
+
    _pathStart = goal->start;
    _pathEnd   = goal->end;
+
+   _pubTarget.publish(_pathEnd);
+
 
    //send feedback
    _actionMoveTo_feedback.isPlaning = true;

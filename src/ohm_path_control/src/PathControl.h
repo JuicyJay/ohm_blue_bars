@@ -28,7 +28,6 @@ private:    //dataelements
 
     ros::Publisher _pub_cmd_vel;
     ros::Publisher _pubState;
-    ros::Publisher _pubTarget;
     ros::Subscriber _sub_path;
     ros::Subscriber _sub_pose;
 
@@ -39,7 +38,6 @@ private:    //dataelements
     analyser::PathAnalyser_base* _pathAnalyser;
     controller::Controller_base* _controller;
 
-    geometry_msgs::PoseStamped _targetPose;
 
     bool _enable_analyse;
 

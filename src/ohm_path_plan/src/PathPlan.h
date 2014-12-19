@@ -24,6 +24,8 @@ private:    //dataelements
     ros::NodeHandle _nh;
 
     ros::Publisher _pubPath;
+    ros::Publisher _pubTarget;
+
     ros::Subscriber _subMap;
     ros::Subscriber _subState;
 
