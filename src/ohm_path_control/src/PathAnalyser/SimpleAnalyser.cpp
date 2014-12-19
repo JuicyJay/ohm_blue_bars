@@ -73,10 +73,14 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       if(this->isLastGoal())
       {
          reachedLastPose = true;
-         //set new target (to get corregt target orientation)
-         p = this->currentGoal().orientation;
          break;
       }
+   }
+
+   if(reachedLastPose)
+   {
+      //set new target (to get corregt target orientation)
+      p = this->currentGoal().orientation;
    }
 
    int direction = this->getDirection(p, ori);
