@@ -37,7 +37,7 @@ private:    //dataelements
 
     nav_msgs::OccupancyGrid _map;
 
-
+    bool _msgRdy_old;
     double _robotRadius;
     std::string _frame_id;
 

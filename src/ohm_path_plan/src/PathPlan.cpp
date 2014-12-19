@@ -34,6 +34,8 @@ PathPlan::PathPlan() :
     //init action
     _actionMoveTo = new actionlib::SimpleActionServer<ohm_path_plan::MoveToAction>(_nh, action_name, false);
     _actionMoveTo->registerGoalCallback(boost::bind(&PathPlan::goalCallback,this));
+
+    _msgRdy_old = false;
 }
 
 PathPlan::~PathPlan()
@@ -190,12 +192,14 @@ void PathPlan::goalCallback()
 
 void PathPlan::subReached_callback(const std_msgs::Bool& msg)
 {
-   if(msg.data)
+   //only once
+   if(!_msgRdy_old && msg.data)
    {
       ROS_INFO("PathPlan -> Reched target");
       _actionMoveTo_result.succes = true;
       _actionMoveTo->setSucceeded(_actionMoveTo_result);
    }
+   _msgRdy_old = msg.data;
 }
 
 void PathPlan::subCallback_map(const nav_msgs::OccupancyGrid& msg)

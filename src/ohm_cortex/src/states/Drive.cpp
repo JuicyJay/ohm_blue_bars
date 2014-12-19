@@ -48,7 +48,9 @@ void Drive::process(void)
 
       _ac->sendGoal(goal);
 
-      bool succes = _ac->waitForResult(ros::Duration(200));
+      ROS_INFO("Waiting for Result");
+      bool succes = _ac->waitForResult(ros::Duration(200.0));
+      ROS_INFO("Received Result");
 
       if(succes)
       {
