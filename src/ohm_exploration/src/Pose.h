@@ -10,6 +10,7 @@ struct Pose
 {
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
+    Pose(void) { }
     Pose(const Eigen::Vector3f& pos, const Eigen::Vector3f& orient) : position(pos), orientation(orient) { }
 
     geometry_msgs::Pose toRos(void) const
