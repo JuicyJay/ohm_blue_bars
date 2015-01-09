@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <config>
-   <target_radius>0.2</target_radius>
+   <target_radius>0.3</target_radius>
    <target_radius_last>0.1</target_radius_last>
    <cos_pwr_first>4</cos_pwr_first>
    <cos_fac_first>8.0</cos_fac_first>
    <cos_pwr_n>4</cos_pwr_n>
-   <cos_fac_n>0.8</cos_fac_n>
+   <cos_fac_n>3.0</cos_fac_n>
    <ang_reached_range>0.1</ang_reached_range>
    <end_approach>1.0</end_approach>
 </config>

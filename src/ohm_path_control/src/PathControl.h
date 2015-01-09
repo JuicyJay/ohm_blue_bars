@@ -7,7 +7,7 @@
 #include <geometry_msgs/Twist.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_msgs/Bool.h>
-//#include <tf/tf.h>
+#include <tf/transform_listener.h>
 
 #include <string>
 #include <vector>
@@ -31,6 +31,8 @@ private:    //dataelements
     ros::Subscriber _sub_path;
     ros::Subscriber _sub_pose;
 
+    tf::TransformListener _tf_listnener;
+
     //path
     //std::vector<Vector3d> _path;
     //Vector3d _pose;
@@ -40,6 +42,9 @@ private:    //dataelements
 
 
     bool _enable_analyse;
+
+    std::string _tf_target_frame;
+    std::string _tf_source_frame;
 
 public:
     PathControl();
@@ -56,7 +61,7 @@ public:
      *
      * @return  void
      */
-    void start(const unsigned int rate = 10);
+    void start(const unsigned int rate = 100);
 
 private:    //functions
 
@@ -72,11 +77,11 @@ private:    //functions
     void run();
 
     /**
-     * @brief callback for current robot pose
+     * @brief working loop for computing twist
      *
      * @param msg -> ros msg
      */
-    void subPose_callback(const geometry_msgs::PoseStamped& msg);
+    void doPathControl(void);
 
     /**
      * @brief callback for next path

@@ -15,13 +15,20 @@ PathControl::PathControl() : _rate(0)
     std::string sub_name_pose;
     std::string config_file_controller;
     std::string config_file_analyser;
+    std::string tf_target_frame;
+    std::string tf_source_frame;
     
     privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("vel/teleop"));
-    privNh.param("pub_name_state",         pub_name_state,       std::string("path_control/state"));
+    privNh.param("pub_name_state",         pub_name_state,         std::string("path_control/state"));
     privNh.param("sub_name_path",          sub_name_path,          std::string("path"));
     privNh.param("sub_name_pose",          sub_name_pose,          std::string("pose"));
     privNh.param("config_file_controller", config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
     privNh.param("config_file_analyser",   config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
+    privNh.param("tf_target_frame",        tf_target_frame,        std::string("base_footprint"));
+    privNh.param("tf_source_frame",        tf_source_frame,        std::string("map"));
+
+    _tf_target_frame = tf_target_frame;
+    _tf_source_frame = tf_source_frame;
 
     //init publisher
     _pub_cmd_vel = _nh.advertise<geometry_msgs::Twist>(pub_name_cmd_vel,1);
@@ -29,7 +36,7 @@ PathControl::PathControl() : _rate(0)
 
     //inti subscriber
     _sub_path = _nh.subscribe(sub_name_path , 1, &PathControl::subPath_callback, this);
-    _sub_pose = _nh.subscribe(sub_name_pose , 1, &PathControl::subPose_callback, this);
+    //_sub_pose = _nh.subscribe(sub_name_pose , 1, &PathControl::subPose_callback, this);
 
     _pathAnalyser = new analyser::SimpleAnalyser(config_file_analyser);
     _controller = new controller::ParabolaTransfere(config_file_controller);
@@ -55,34 +62,44 @@ void PathControl::run()
     unsigned int cnt = 0;
 
     //only subscriber
-    ros::spin();
 
-//    while(ros::ok())
-//    {
-//        //do stuff;
-//
-//        //publish data;
-//        //_pub.publish(msg);
-//
-//        ros::spinOnce();
-//        _rate->sleep();
-//    }
+    while(ros::ok())
+    {
+        //do stuff;
+
+       this->doPathControl();
+
+        ros::spinOnce();
+        _rate->sleep();
+    }
 }
 
-void PathControl::subPose_callback(const geometry_msgs::PoseStamped& msg)
+void PathControl::doPathControl(void)
 {
    if(!_enable_analyse)
    {
       return;
    }
 
+   //get tf
+   tf::StampedTransform tf;
+   try {
+      ros::Time time = ros::Time::now();
+      _tf_listnener.waitForTransform(_tf_target_frame, _tf_source_frame, time, ros::Duration(1));
+      _tf_listnener.lookupTransform(_tf_target_frame, _tf_source_frame, time, tf);
+
+   } catch (tf::TransformException& e)
+   {
+      ROS_ERROR("ohm_path_control -> Exeption at tf: %s", e.what());
+      return;
+   }
 
    analyser::pose pose;
-   pose.position = Vector3d(msg.pose.position.x, msg.pose.position.y, 0);
-   Quaternion<double> tmp_q(msg.pose.orientation.w,
-                            msg.pose.orientation.x,
-                            msg.pose.orientation.y,
-                            msg.pose.orientation.z);
+   pose.position = Vector3d( tf.getOrigin().x(), tf.getOrigin().y(), 0);
+   Quaternion<double> tmp_q(tf.getRotation().w(),
+                            tf.getRotation().x(),
+                            tf.getRotation().y(),
+                            tf.getRotation().z() );
    pose.orientation = analyser::PathAnalyser_base::quaternion_to_orientationVec(tmp_q);
 
    //get diff scale

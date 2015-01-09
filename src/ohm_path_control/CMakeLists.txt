@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   nav_msgs
   roscpp
+  tf
 )
 find_package(cmake_modules REQUIRED)
 
