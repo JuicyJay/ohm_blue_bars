@@ -11,6 +11,7 @@
 #include "PathAnalyser_base.h"
 #include <cmath>
 #include <iostream>
+#include <stdio.h>
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <tinyxml2.h>

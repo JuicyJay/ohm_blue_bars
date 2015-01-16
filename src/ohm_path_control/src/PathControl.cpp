@@ -102,6 +102,9 @@ void PathControl::doPathControl(void)
                             tf.getRotation().z() );
    pose.orientation = analyser::PathAnalyser_base::quaternion_to_orientationVec(tmp_q);
 
+   ROS_INFO("pos: (%f, %f, %f)", pose.position.x(),pose.position.y(),pose.position.z());
+   ROS_INFO("ori: (%f, %f, %f)", pose.orientation.x(),pose.orientation.y(),pose.orientation.z());
+
    //get diff scale
    analyser::diff_scale diff_scale = _pathAnalyser->analyse(pose);
 
