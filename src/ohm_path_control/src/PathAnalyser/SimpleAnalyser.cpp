@@ -65,7 +65,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    else
       target_radius = _target_radius;
 
-   while((p.norm() < target_radius) && !_reachedLastPose)
+   while(!_reachedLastPose && (p.norm() < target_radius))
    {
       this->nextGoal();
       p = this->currentGoal().position - pos;
@@ -80,7 +80,10 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    if(_reachedLastPose)
    {
       //set new target (to get corregt target orientation)
+      std::cout << "reached last Pose" << std::endl;
       p = this->currentGoal().orientation;
+
+      printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.x());
 
    }
 
