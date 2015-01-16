@@ -56,7 +56,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    pos(2) = 0;
 
    Vector3d p = this->currentGoal().position - pos;   //get target Vector from pos
-
+   p.z() = 0;
 
    //prove Target reached
    double target_radius = 0;
@@ -70,7 +70,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       this->nextGoal();
       printf("new goal: (%f, %f, %f)\n", this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.x());
       p = this->currentGoal().position - pos;
-
+      p.z() = 0;
       if(this->isLastGoal())
       {
          _reachedLastPose = true;
@@ -83,6 +83,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       //set new target (to get corregt target orientation)
       std::cout << "reached last Pose" << std::endl;
       p = this->currentGoal().orientation;
+      p.z() = 0;
 
       printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.x());
 
