@@ -132,7 +132,7 @@ void PathPlan::goalCallback()
    printf("start: (%f,%f), end: (%f,%f)\n", start.x, start.y, target.x, target.y);
 
    ROS_INFO("now planing path....");
-   std::vector<unsigned int> path_raw = obvious::AStar::pathFind(map, start, target);
+   std::vector<unsigned int> path_raw = obvious::AStar::pathFind(map, start, target, true);
    ROS_INFO("Found %d wps",(int)path_raw.size());
    if(path_raw.size() == 0)
    {
