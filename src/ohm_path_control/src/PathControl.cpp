@@ -85,8 +85,8 @@ void PathControl::doPathControl(void)
    tf::StampedTransform tf;
    try {
       ros::Time time = ros::Time::now();
-      _tf_listnener.waitForTransform(_tf_target_frame, _tf_source_frame, time, ros::Duration(1));
-      _tf_listnener.lookupTransform(_tf_target_frame, _tf_source_frame, time, tf);
+      _tf_listnener.waitForTransform(_tf_source_frame, _tf_target_frame, time, ros::Duration(1));
+      _tf_listnener.lookupTransform(_tf_source_frame, _tf_target_frame, time, tf);
 
    } catch (tf::TransformException& e)
    {
