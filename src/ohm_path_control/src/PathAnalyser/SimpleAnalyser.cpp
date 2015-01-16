@@ -68,6 +68,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    while(!_reachedLastPose && (p.norm() < target_radius))
    {
       this->nextGoal();
+      printf("new goal: (%f, %f, %f)\n", this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.x());
       p = this->currentGoal().position - pos;
 
       if(this->isLastGoal())
@@ -86,9 +87,12 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.x());
 
    }
+   printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.x());
+
+
 
    int direction = this->getDirection(p, ori);
-
+   std::cout << "direction: " << direction << std::endl;
    //get scalfactor angular
    double diff_max = M_PI_2;
    double tmp_diff = ::acos(ori.dot(p) / (ori.norm() * p.norm()));
