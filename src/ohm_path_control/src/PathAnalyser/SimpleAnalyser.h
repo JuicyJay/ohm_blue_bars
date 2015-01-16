@@ -52,6 +52,7 @@ private: //dataelements
    //analyser parameter
    double _target_radius;
    double _target_radius_last;
+   double _curr_target_radius;
    unsigned int _cos_pwr_first;
    double _cos_fac_first;
    unsigned int _cos_pwr_n;

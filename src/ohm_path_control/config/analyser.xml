@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <config>
-   <target_radius>0.3</target_radius>
+   <target_radius>0.24</target_radius>
    <target_radius_last>0.1</target_radius_last>
    <cos_pwr_first>4</cos_pwr_first>
    <cos_fac_first>8.0</cos_fac_first>

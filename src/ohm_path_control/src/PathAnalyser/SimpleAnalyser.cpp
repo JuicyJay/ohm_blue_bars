@@ -35,6 +35,7 @@ SimpleAnalyser::SimpleAnalyser(std::string config_file) : PathAnalyser_base()
       exit(EXIT_FAILURE);
    }
    _reachedLastPose = false;
+   _curr_target_radius = _target_radius;
 }
 
 SimpleAnalyser::~SimpleAnalyser()
@@ -48,30 +49,36 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    diff_scale.angular = 0;
    diff_scale.linear = 0;
    if(this->isReachedFinalGoal())
+   {
+      _reachedLastPose = false;
       return diff_scale;
+   }
 
    Vector3d ori = current_pose.orientation;
    Vector3d pos = current_pose.position;
    //set z to 0, its just a 2d analyser
    pos(2) = 0;
 
+   //printf("pos: (%f, %f, %f)\n", pos.x(), pos.y(), pos.z());
+   //printf("ori: (%f, %f, %f)\n", ori.x(), ori.y(), ori.z());
+
    Vector3d p = this->currentGoal().position - pos;   //get target Vector from pos
    p.z() = 0;
 
-   //prove Target reached
-   double target_radius = 0;
-   if(this->isLastGoal())
-      target_radius = _target_radius_last;
-   else
-      target_radius = _target_radius;
 
-   while(!_reachedLastPose && (p.norm() < target_radius))
+   while(!_reachedLastPose && (p.norm() < _curr_target_radius))
    {
       this->nextGoal();
-      printf("new goal: (%f, %f, %f)\n", this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.z());
+      //printf("new goal: (%f, %f, %f)\n", this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.z());
       p = this->currentGoal().position - pos;
       p.z() = 0;
+
       if(this->isLastGoal())
+      {
+         _curr_target_radius = _target_radius_last;
+      }
+
+      if(this->isLastGoal() && (p.norm() < _target_radius_last))
       {
          _reachedLastPose = true;
          break;
@@ -85,13 +92,13 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       p = this->currentGoal().orientation;
       p.z() = 0;
 
-      printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
+      //printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
 
    }
-   else
-      printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
-   printf("ori: (%f, %f, %f)\n", ori.x(), ori.y(), ori.z());
-
+   //else
+      //printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
+   //printf("ori: (%f, %f, %f)\n", ori.x(), ori.y(), ori.z());
+   //printf("goal[%d]: (%f, %f, %f)\n",this->getCurrentGoalIndex(), this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.z());
 
    int direction = this->getDirection(p, ori);
    std::cout << "direction: " << direction << std::endl;
@@ -103,7 +110,6 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    {
       diff_scale.angular = 0;
       this->setReachedFinalGoal(true);
-      _reachedLastPose = false;
    }
    else
       diff_scale.angular = (tmp_diff / diff_max) * direction; //scale between -1..1
@@ -126,7 +132,8 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       else
          lin_scale_angle = this->getLinScaleFactor_ang_n(diff_scale.angular);
 
-      if(this->getPathLengthRest() < _end_approach)
+      printf("pathLength_rest: %f \n", this->getPathLengthRest());
+      if((this->getPathLengthRest() + p.norm()) < _end_approach)
       {
          double tmp = this->getPathLengthRest() + p.norm();
          lin_scale_dist = this->getLinFactor_dist(tmp < 0 ? 0 : tmp);
