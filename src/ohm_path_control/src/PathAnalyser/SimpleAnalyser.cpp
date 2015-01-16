@@ -68,7 +68,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    while(!_reachedLastPose && (p.norm() < target_radius))
    {
       this->nextGoal();
-      printf("new goal: (%f, %f, %f)\n", this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.x());
+      printf("new goal: (%f, %f, %f)\n", this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.z());
       p = this->currentGoal().position - pos;
       p.z() = 0;
       if(this->isLastGoal())
@@ -85,11 +85,12 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       p = this->currentGoal().orientation;
       p.z() = 0;
 
-      printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.x());
+      printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
 
    }
-   printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.x());
-
+   else
+      printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
+   printf("ori: (%f, %f, %f)\n", ori.x(), ori.y(), ori.z());
 
 
    int direction = this->getDirection(p, ori);
