@@ -58,6 +58,8 @@ private: //dataelements
    double _ang_reached_range;
    double _end_approach;
 
+   bool _reachedLastPose;
+
    analyser::diff_scale _oldDiff;
 
 };

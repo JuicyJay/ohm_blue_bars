@@ -117,6 +117,10 @@ void PathControl::doPathControl(void)
    analyser::info pathInfo = _pathAnalyser->getInfo();
    std_msgs::Bool reachedTarget;
    reachedTarget.data = pathInfo.reached_final_goal;
+   if(pathInfo.reached_final_goal)
+   {
+      _enable_analyse = false;
+   }
 
    _pubState.publish(reachedTarget);
    _pub_cmd_vel.publish(msgTwist);

@@ -34,6 +34,7 @@ SimpleAnalyser::SimpleAnalyser(std::string config_file) : PathAnalyser_base()
       std::cerr << "will exit now...." << std::endl;
       exit(EXIT_FAILURE);
    }
+   _reachedLastPose = false;
 }
 
 SimpleAnalyser::~SimpleAnalyser()
@@ -56,7 +57,6 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
 
    Vector3d p = this->currentGoal().position - pos;   //get target Vector from pos
 
-   bool reachedLastPose = false;
 
    //prove Target reached
    double target_radius = 0;
@@ -65,19 +65,19 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    else
       target_radius = _target_radius;
 
-   while((p.norm() < target_radius) && !reachedLastPose)
+   while((p.norm() < target_radius) && !_reachedLastPose)
    {
       this->nextGoal();
       p = this->currentGoal().position - pos;
 
       if(this->isLastGoal())
       {
-         reachedLastPose = true;
+         _reachedLastPose = true;
          break;
       }
    }
 
-   if(reachedLastPose)
+   if(_reachedLastPose)
    {
       //set new target (to get corregt target orientation)
       p = this->currentGoal().orientation;
@@ -89,10 +89,11 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    double diff_max = M_PI_2;
    double tmp_diff = ::acos(ori.dot(p) / (ori.norm() * p.norm()));
    //reached last pose if arrived last goal
-   if(reachedLastPose && std::abs(tmp_diff) < _ang_reached_range)
+   if(_reachedLastPose && std::abs(tmp_diff) < _ang_reached_range)
    {
       diff_scale.angular = 0;
       this->setReachedFinalGoal(true);
+      _reachedLastPose = false;
    }
    else
       diff_scale.angular = (tmp_diff / diff_max) * direction; //scale between -1..1
@@ -103,7 +104,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    double lin_scale_dist = 0;
 
    //compute lin scale
-   if(reachedLastPose)
+   if(_reachedLastPose)
    {
       diff_scale.linear = 0;
       this->setDistToCurrentGoal(0);
