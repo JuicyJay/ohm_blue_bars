@@ -133,7 +133,6 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    end.x = msg.pose.position.x;
    end.y = msg.pose.position.y;
 
-   ROS_INFO("ohm_path_plan -> Create Planner");
    apps::Astar_dt* astar_planer = new apps::Astar_dt(NULL);
    astar_planer->setWallValue(WALL_VALUE);
    astar_planer->setAstarParam(_cost_short_step,
@@ -145,17 +144,15 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
                                                _map.info.resolution,
                                                origin));
 
-
-   ROS_INFO("ohm_path_plan -> Do map oerations");
    this->do_map_operations(astar_planer);
    ROS_INFO("ohm_path_plan ->  Do planning");
    std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
 
 
-
-   ROS_INFO("ohm_path_plan -> save debug stuff");
    //save map and dt map
-   this->debug_save_as_img("/tmp/dt_map.png",astar_planer->getCostmap("dt"),path);
+   apps::GridMap* tmp_map = astar_planer->getCostmap("dt");
+   if(tmp_map != NULL)
+      this->debug_save_as_img("/tmp/dt_map.png",tmp_map,path);
    this->debug_save_as_img("/tmp/map.png",astar_planer->getGridMap(), path);
 
    ROS_INFO("ohm_path_plan ->  clear mem");
@@ -165,31 +162,39 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    astar_planer->resetCostmaps();
    delete astar_planer;
 
-   ROS_INFO("ohm_path_plan -> publish data");
    _pubPath.publish(this->toRosPath(path,msg));
 }
 
 void PathPlan_AStar::debug_save_as_img(std::string file, apps::GridMap* map,
-      std::vector<apps::Point2D> path)
+      std::vector<apps::Point2D>& path)
 {
    //debug: draw path in cv::Mat
    cv::Mat cvmap = map->toCvMat();
+
    cv::cvtColor(cvmap, cvmap, CV_GRAY2RGB);
 
-   apps::Pixel p = map->toPixel(path[0]);
-   cv::Point old;
-   cv::Point curr;
-   old.x = p.x;
-   old.y = p.y;
 
-   for(unsigned int i = 1; i < path.size(); ++i)
+
+   if(path.size())
    {
-      p = map->toPixel(path[i]);
-      curr.x = p.x;
-      curr.y = p.y;
-      cv::line(cvmap, curr, old, cv::Scalar(0,255,0),1);
-      old = curr;
+
+      apps::Pixel p = map->toPixel(path[0]);
+      cv::Point old;
+      cv::Point curr;
+      old.x = p.x;
+      old.y = p.y;
+
+      for(unsigned int i = 1; i < path.size(); ++i)
+      {
+         p = map->toPixel(path[i]);
+         curr.x = p.x;
+         curr.y = p.y;
+         cv::line(cvmap, curr, old, cv::Scalar(0,255,0),1);
+         old = curr;
+      }
+
    }
+
 
    cv::flip(cvmap, cvmap, -1);
    cv::flip(cvmap, cvmap, 1);
@@ -216,7 +221,8 @@ nav_msgs::Path PathPlan_AStar::toRosPath(std::vector<apps::Point2D> path,
       msgPath.poses.push_back(tmp);
    }
    //set orientation of last wp
-   msgPath.poses[msgPath.poses.size() - 1].pose.orientation = target.pose.orientation;
+   if(msgPath.poses.size())
+      msgPath.poses[msgPath.poses.size() - 1].pose.orientation = target.pose.orientation;
 
    return msgPath;
 }
@@ -228,7 +234,7 @@ void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
    apps::MapOperations::binarize(planner->getGridMap(), 0, 1, FREE_VALUE, WALL_VALUE);
 
    apps::GridMap* cost_map_dt = new apps::GridMap(planner->getGridMap());
-   apps::MapOperations::distnaceTransform(cost_map_dt,0.8,WALL_VALUE);
+   apps::MapOperations::distnaceTransform(cost_map_dt,0.4,WALL_VALUE);
    planner->addCostmap("dt", cost_map_dt);
 }
 

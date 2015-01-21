@@ -86,7 +86,7 @@ private:    //functions
     void do_map_operations(apps::Astar_dt* planner);
     std::vector<apps::Point2D> do_path_planning(apps::Astar_dt* planner, apps::Point2D start, apps::Point2D end);
 
-    void debug_save_as_img(std::string file, apps::GridMap* map, std::vector<apps::Point2D> path);
+    void debug_save_as_img(std::string file, apps::GridMap* map, std::vector<apps::Point2D>& path);
 
 
 

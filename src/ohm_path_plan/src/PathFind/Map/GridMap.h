@@ -19,11 +19,11 @@ namespace apps
 {
 
 struct Pixel{
-   unsigned int x;
-   unsigned int y;
+   int x;
+   int y;
 
    Pixel() : x(0), y(0) { }
-   Pixel(unsigned int _x, unsigned int _y) : x(_x) , y(_y) { }
+   Pixel(int _x, int _y) : x(_x) , y(_y) { }
 };
 
 typedef struct{

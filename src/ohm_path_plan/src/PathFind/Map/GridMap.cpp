@@ -20,7 +20,8 @@ GridMap::GridMap(uint8_t* data, unsigned int width, unsigned int height, double 
    _width = width;
    _height = height;
    _cellSize = cellSize;
-   _origin = this->toPixel(origin);
+   _origin.x = origin.x / _cellSize + 0.555;
+   _origin.y = origin.y / _cellSize + 0.555;
 }
 
 apps::GridMap::GridMap(GridMap* map)
@@ -84,12 +85,17 @@ void GridMap::setOrigin(Pixel origin)
 
 void GridMap::setOrigin(Point2D origin)
 {
-   _origin = this->toPixel(origin);
+   //_origin = this->toPixel(origin);
+   _origin.x = origin.x / _cellSize + 0.555;
+   _origin.y = origin.y / _cellSize + 0.555;
 }
 
 Point2D GridMap::getOrigin()
 {
-   return this->toPoint2D(_origin);
+   Point2D tmp;
+   tmp.x = (double)_origin.x * _cellSize;
+   tmp.y = (double)_origin.y * _cellSize;
+   return tmp;
 }
 
 Pixel GridMap::getOriginPixel() const
@@ -102,6 +108,11 @@ Pixel GridMap::toPixel(Point2D point)
    Pixel tmp;
    tmp.x = point.x / _cellSize + 0.555;
    tmp.y = point.y / _cellSize + 0.555;
+
+   //translate to origin
+   tmp.x -= _origin.x;
+   tmp.y -= _origin.y;
+
    return tmp;
 }
 
@@ -112,6 +123,9 @@ Point2D GridMap::toPoint2D(Pixel pixel)
    Point2D tmp;
    tmp.x = (double)pixel.x * _cellSize;
    tmp.y = (double)pixel.y * _cellSize;
+
+   tmp.x += (double)_origin.x * _cellSize;
+   tmp.y += (double)_origin.y * _cellSize;
    return tmp;
 }
 
