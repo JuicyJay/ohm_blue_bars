@@ -28,26 +28,28 @@ namespace autonohm {
 class Explore: public IState
 {
 public:
-   /**
-    * Default constructor
-    */
-   Explore(void);
-   /**
-    * Default destructor
-    */
-   virtual ~Explore(void);
-   /**
-    * Function to for processing
-    */
-   virtual void process(void);
+    /**
+     * Default constructor
+     */
+    Explore(void);
+    /**
+     * Default destructor
+     */
+    virtual ~Explore(void);
+    /**
+     * Function to for processing
+     */
+    virtual void process(void);
 
 private:
-   ros::NodeHandle*  _nh;
-   ros::Publisher    _state_pub;
+    ros::NodeHandle*  _nh;
+    ros::Publisher    _state_pub;
     ros::ServiceClient _srvGetTarget;
     ros::ServiceClient _srvMarkTarget;
     ros::ServiceClient _srvTrigger;
+    ros::ServiceClient _srvHeadMode;
     ros::Publisher _pubTarget;
+    ros::Publisher _pubDirection;
 };
 
 } /* namespace autonohm */

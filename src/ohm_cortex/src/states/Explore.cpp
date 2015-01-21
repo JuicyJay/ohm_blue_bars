@@ -12,6 +12,7 @@
 #include <ohm_exploration/MarkTarget.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_srvs/Empty.h>
+#include <ohm_sensor_head/Mode.h>
 
 #include "../Context.h"
 #include "TargetStack.h"
@@ -36,7 +37,9 @@ Explore::Explore(void)
     _srvGetTarget  = _nh->serviceClient<ohm_exploration::GetTarget >("/exploration/get_target" );
     _srvMarkTarget = _nh->serviceClient<ohm_exploration::MarkTarget>("/exploration/mark_target");
     _srvTrigger    = _nh->serviceClient<std_srvs::Empty>("/exploration/wall_finder/trigger");
+    _srvHeadMode   = _nh->serviceClient<ohm_sensor_head::Mode>("mode");
     _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/goal/target", 2);
+    _pubDirection = _nh->advertise<geometry_msgs::PoseStamped>("goal/sensor_head", 2);
 }
 
 
@@ -94,6 +97,14 @@ void Explore::process(void)
 
     stack->drop();
 
+    geometry_msgs::PoseStamped direction;
+
+    direction.header = target.header;
+    direction.pose = target.pose;
+
+    _pubDirection.publish(direction);
+
+
     if (stack->isEmpty())
     {
         ohm_exploration::MarkTarget service;
@@ -109,7 +120,7 @@ void Explore::process(void)
     }
 
     ROS_INFO("Leave state Explore.");
-    //    sleep(1);
+
     Context::getInstance()->setState(new Drive(target.pose));
     delete this;
 }
