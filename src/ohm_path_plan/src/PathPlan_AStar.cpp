@@ -98,11 +98,11 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
 {
    if(!_gotMap)
    {
-      ROS_WARN("Got no valid Pose or Map until now... doing no path planning");
+      ROS_WARN("ohm_path_plan -> Got no valid Pose or Map until now... doing no path planning");
       return;
    }
    //do pathplan
-   ROS_INFO("Do Pathplan");
+   ROS_INFO("ohm_path_plan -> Do Pathplan");
 
    //get tf (current pos)
    tf::StampedTransform tf;
@@ -122,8 +122,8 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    pose.x = tf.getOrigin().x();
    pose.y = tf.getOrigin().y();
 
-   obvious::Timer timer;
-   timer.reset();
+   //obvious::Timer timer;
+   //timer.reset();
 
    apps::Point2D origin;
    origin.x = _map.info.origin.position.x;
@@ -133,6 +133,7 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    end.x = msg.pose.position.x;
    end.y = msg.pose.position.y;
 
+   ROS_INFO("ohm_path_plan -> Create Planner");
    apps::Astar_dt* astar_planer = new apps::Astar_dt(NULL);
    astar_planer->setWallValue(WALL_VALUE);
    astar_planer->setAstarParam(_cost_short_step,
@@ -145,21 +146,26 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
                                                origin));
 
 
+   ROS_INFO("ohm_path_plan -> Do map oerations");
    this->do_map_operations(astar_planer);
+   ROS_INFO("ohm_path_plan ->  Do planning");
    std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
 
 
 
+   ROS_INFO("ohm_path_plan -> save debug stuff");
    //save map and dt map
    this->debug_save_as_img("/tmp/dt_map.png",astar_planer->getCostmap("dt"),path);
    this->debug_save_as_img("/tmp/map.png",astar_planer->getGridMap(), path);
 
+   ROS_INFO("ohm_path_plan ->  clear mem");
    //clear mem
    delete astar_planer->getGridMap();
    delete astar_planer->getCostmap("dt");
    astar_planer->resetCostmaps();
    delete astar_planer;
 
+   ROS_INFO("ohm_path_plan -> publish data");
    _pubPath.publish(this->toRosPath(path,msg));
 }
 
