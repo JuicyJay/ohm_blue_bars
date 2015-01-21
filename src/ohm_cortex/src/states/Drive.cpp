@@ -57,7 +57,7 @@ void Drive::process(void)
       usleep(5000); // sleep 5 ms
    }
    while(!_got_path);
-   ROS_INFO("ohm_cortex: Drive -> Got Path");
+   ROS_INFO("ohm_cortex: Drive -> Got Path: %d",(int)_path.poses.size());
 
    //prove path
    if(_path.poses.size() == 0)
