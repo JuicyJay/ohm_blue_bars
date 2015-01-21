@@ -20,66 +20,79 @@ Drive::Drive(const geometry_msgs::Pose& target)
    msg.data = "drive";
    _state_pub.publish(msg);
 
+   //add publisher
+   _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/georg/target", 1);
+   _pubPath   = _nh->advertise<nav_msgs::Path>("/georg/path", 1);
+
    //add subscriber:
-   _subPose = _nh->subscribe("/georg/pose", 1, &Drive::subPose_callback, this);
-   _ac = new actionlib::SimpleActionClient<ohm_path_plan::MoveToAction>("move_to", true);
-   _pose_rdy = false;
+   _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
+   _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
+   _old_state = true;
+   _reached_target = false;
+   _got_path = false;
 
    _targetPose.pose = target;
-   std::cout << "target = (" << target.position.x << ", " << target.position.y << std::endl;
+   std::cout << "target = (" << target.position.x << ", " << target.position.y << ")" << std::endl;
 }
 
 Drive::~Drive(void)
 {
-   delete _ac;
 }
 
 void Drive::process(void)
 {
-
-   ROS_INFO("Wait for action server...");
-   _ac->waitForServer();
-   ROS_INFO("Action server active...");
-
-   while(ros::ok())
+   ROS_INFO("ohm_cortex: Drive -> Prove to Subscripber");
+   if(_pubTarget.getNumSubscribers() == 0 || _pubPath.getNumSubscribers() == 0)
    {
-      do{
-         ros::spinOnce();
-      }
-      while(!_pose_rdy);
-      //got pose:
-
-      //transmitt to Actionserver
-      ROS_INFO("Transmitt goal to server");
-      ohm_path_plan::MoveToGoal goal;
-      goal.start = _currentPose;
-      goal.end = _targetPose;
-
-      _ac->sendGoal(goal);
-
-      ROS_INFO("Waiting for Result");
-      bool succes = _ac->waitForResult(ros::Duration(200.0));
-      ROS_INFO("Received Result");
-
-      if(succes)
-      {
-         ROS_INFO("Reached Target");
-      }
-      else
-      {
-         ROS_INFO("Timeout (100s) or no Path found");
-      }
-
-      Context::getInstance()->setState(new Explore);
-      delete this;
+      ROS_INFO("ohm_cortex: Drive -> -- NO Subscriber");
       return;
    }
+
+   //publish target
+   _pubTarget.publish(_targetPose);
+
+   //wait for path:
+   do{
+      ros::spinOnce();
+      usleep(5000); // sleep 5 ms
+   }
+   while(!_got_path);
+   ROS_INFO("ohm_cortex: Drive -> Got Path");
+
+   ROS_INFO("ohm_cortex: Drive -> Transmitt Path");
+   //got path:
+   //now pubish to pathcontroll and begin moving until target reached
+   _pubPath.publish(_path);
+
+   ROS_INFO("ohm_cortex: Drive -> Wait for arival");
+   do{
+      ros::spinOnce();
+      usleep(5000); // sleep 5 ms
+   }
+   while(!_reached_target);
+
+   ROS_INFO("ohm_cortex: Drive ->  Arrived!!!!");
+
+   Context::getInstance()->setState(new Explore);
+   delete this;
+   return;
 }
 
-void Drive::subPose_callback(const geometry_msgs::PoseStamped& msg)
+void Drive::subPath_callback(const nav_msgs::Path& msg)
 {
-   _currentPose = msg;
-   _pose_rdy = true;
+   _path = msg;
+   _got_path = true;
+}
+
+void Drive::subState_callback(const std_msgs::Bool& msg)
+{
+   bool tmp = msg.data;
+   //get rising edge
+   if(!_old_state && tmp)
+   {
+      _reached_target = true;
+   }
+   _old_state = tmp;
 }
 
 } // end namespace autonohm

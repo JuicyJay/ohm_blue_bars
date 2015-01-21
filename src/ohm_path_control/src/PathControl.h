@@ -43,8 +43,8 @@ private:    //dataelements
 
     bool _enable_analyse;
 
-    std::string _tf_target_frame;
-    std::string _tf_source_frame;
+    std::string _tf_map_frame;
+    std::string _tf_robot_frame;
 
 public:
     PathControl();
