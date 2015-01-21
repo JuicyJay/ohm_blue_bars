@@ -59,6 +59,15 @@ void Drive::process(void)
    while(!_got_path);
    ROS_INFO("ohm_cortex: Drive -> Got Path");
 
+   //prove path
+   if(_path.poses.size() == 0)
+   {
+      ROS_INFO("No Path found ... return to ExloreState");
+      Context::getInstance()->setState(new Explore);
+      delete this;
+      return;
+   }
+
    ROS_INFO("ohm_cortex: Drive -> Transmitt Path");
    //got path:
    //now pubish to pathcontroll and begin moving until target reached
