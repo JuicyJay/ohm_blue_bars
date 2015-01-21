@@ -88,7 +88,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    if(_reachedLastPose)
    {
       //set new target (to get corregt target orientation)
-      std::cout << "reached last Pose" << std::endl;
+      //std::cout << "reached last Pose" << std::endl;
       p = this->currentGoal().orientation;
       p.z() = 0;
 
@@ -101,7 +101,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    //printf("goal[%d]: (%f, %f, %f)\n",this->getCurrentGoalIndex(), this->currentGoal().position.x(), this->currentGoal().position.y(), this->currentGoal().position.z());
 
    int direction = this->getDirection(p, ori);
-   std::cout << "direction: " << direction << std::endl;
+   //std::cout << "direction: " << direction << std::endl;
    //get scalfactor angular
    double diff_max = M_PI_2;
    double tmp_diff = ::acos(ori.dot(p) / (ori.norm() * p.norm()));
@@ -132,7 +132,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       else
          lin_scale_angle = this->getLinScaleFactor_ang_n(diff_scale.angular);
 
-      printf("pathLength_rest: %f \n", this->getPathLengthRest());
+      //printf("pathLength_rest: %f \n", this->getPathLengthRest());
       if((this->getPathLengthRest() + p.norm()) < _end_approach)
       {
          double tmp = this->getPathLengthRest() + p.norm();

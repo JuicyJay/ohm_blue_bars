@@ -31,6 +31,7 @@ Drive::Drive(const geometry_msgs::Pose& target)
    _reached_target = false;
    _got_path = false;
 
+   _targetPose.header.frame_id = "map";
    _targetPose.pose = target;
    std::cout << "target = (" << target.position.x << ", " << target.position.y << ")" << std::endl;
 }
