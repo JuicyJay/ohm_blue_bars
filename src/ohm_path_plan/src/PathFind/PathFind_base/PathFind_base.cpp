@@ -119,6 +119,16 @@ bool PathFind_base::addCostmap(std::string key, GridMap* costmap)
    }
 }
 
+GridMap* apps::PathFind_base::getCostmap(std::string key)
+{
+   try{
+      return _costMapStack.at(key);
+   }
+   catch (const std::out_of_range& e) {
+      return NULL;
+   }
+}
+
 bool PathFind_base::removeCostmap(std::string key)
 {
    try {
