@@ -36,12 +36,23 @@ Explore::Explore(void)
 
 
     /* Communication with the target stack node. */
-    _srvGetTarget  = _nh->serviceClient<ohm_exploration::GetTarget >("/exploration/get_target" );
-    _srvMarkTarget = _nh->serviceClient<ohm_exploration::MarkTarget>("/exploration/mark_target");
-    _srvTrigger    = _nh->serviceClient<std_srvs::Empty>("/exploration/wall_finder/trigger");
-    _srvHeadMode   = _nh->serviceClient<ohm_sensor_head::Mode>("mode");
-    _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/goal/target", 2);
-    _pubDirection = _nh->advertise<geometry_msgs::PoseStamped>("goal/sensor_head", 2);
+    _srvGetTarget  = _nh->serviceClient<ohm_exploration::GetTarget >("/georg/exploration/get_target" );
+    _srvMarkTarget = _nh->serviceClient<ohm_exploration::MarkTarget>("/georg/exploration/mark_target");
+    _srvTrigger    = _nh->serviceClient<std_srvs::Empty>("/georg/exploration/wall_finder/trigger");
+    _srvHeadMode   = _nh->serviceClient<ohm_sensor_head::Mode>("/georg/mode");
+    _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("goal/target", 2);
+    _pubDirection = _nh->advertise<geometry_msgs::PoseStamped>("/georg/goal/sensor_head", 2);
+
+    //    ohm_sensor_head::Mode mode;
+    //    mode.request.mode = 4; // fix me!!! Use BIND_DIRECTION constant.
+
+
+    //    if (!_srvHeadMode.call(mode))
+    //    {
+    //      ROS_ERROR("Can't call change mode service of the sensor head node.");
+    //    }
+
+    sleep(1);
 }
 
 
@@ -100,27 +111,22 @@ void Explore::process(void)
     stack->drop();
 
     geometry_msgs::PoseStamped direction;
+    direction = target;
 
-    if (stack->isEmpty())
-    {
-        direction.pose = target.pose;
-    }
-    else
+    if (!stack->isEmpty())
     {
         Eigen::Quaternionf rot;
-        geometry_msgs::Pose pose = stack->target();
-        Eigen::Vector3f v(pose.x - target.pose.x, pose.y - target.pose.y, pose.z - target.pose.z);
+        geometry_msgs::Point next = stack->target().position;
+        Eigen::Vector3f v(next.x - target.pose.position.x, next.y - target.pose.position.y, next.z - target.pose.position.z);
 
         v.normalized();
         rot.setFromTwoVectors(Eigen::Vector3f(1.0f, 0.0f, 0.0f), v);
-        direction.position = target.position;
-        direction.orientation.x = rot.x();
-        direction.orientation.y = rot.y();
-        direction.orientation.z = rot.z();
-        direction.orientation.w = rot.w();
+        target.pose.orientation.x = rot.x();
+        target.pose.orientation.y = rot.y();
+        target.pose.orientation.z = rot.z();
+        target.pose.orientation.w = rot.w();
     }
 
-    direction.header = target.header;
     _pubDirection.publish(direction);
 
 

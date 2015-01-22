@@ -15,15 +15,17 @@ find_package(catkin REQUIRED COMPONENTS
     ohm_sensor_head
     )
 
+find_package(cmake_modules REQUIRED)
+find_package(Eigen REQUIRED)
 find_package(Qt4 REQUIRED COMPONENTS QtCore QtGui)
-
 
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_CURRENT_BINARY_DIR}
-                    )
+                    ${EIGEN_INCLUDE_DIRS}
+		    )
 
 set(QT_HEADERS src/viz/main_window.hpp
                src/viz/Node.h

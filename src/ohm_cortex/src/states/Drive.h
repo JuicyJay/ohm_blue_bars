@@ -13,8 +13,8 @@
 #include <ros/ros.h>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <actionlib/client/simple_action_client.h>
-#include <ohm_path_plan/MoveToAction.h>
+#include <nav_msgs/Path.h>
+#include <std_msgs/Bool.h>
 
 #include "Explore.h"
 
@@ -33,19 +33,26 @@ public:
 
 private: // functions
 
-    void subPose_callback(const geometry_msgs::PoseStamped& msg);
+    //void subPose_callback(const geometry_msgs::PoseStamped& msg);
+    void subPath_callback(const nav_msgs::Path& msg);
+    void subState_callback(const std_msgs::Bool& msg);
 
 private:
     ros::NodeHandle* _nh;
     ros::Publisher _state_pub;
+    ros::Publisher _pubPath;
+    ros::Publisher _pubTarget;
 
-    ros::Subscriber _subPose;
-    actionlib::SimpleActionClient<ohm_path_plan::MoveToAction>* _ac;
+    ros::Subscriber _subPath;
+    ros::Subscriber _subState;
 
-    geometry_msgs::PoseStamped _currentPose;
     geometry_msgs::PoseStamped _targetPose;
+    nav_msgs::Path _path;
 
-    bool _pose_rdy;
+    bool _old_state;
+    bool _reached_target;
+    bool _got_path;
+
 };
 
 } // end namespace autonohm

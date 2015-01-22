@@ -81,11 +81,11 @@ int main(int argc, char** argv)
     ros::NodeHandle para("~");
     ros::NodeHandle nh;
 
-    para.param<std::string>("topic_walls", topic, "/exploration/walls");
+    para.param<std::string>("topic_walls", topic, "exploration/walls");
     ros::Subscriber subWalls(nh.subscribe(topic, 2, callbackWalls));
-    para.param<std::string>("service_get_target", topic, "/exploration/get_target");
+    para.param<std::string>("service_get_target", topic, "exploration/get_target");
     ros::ServiceServer srvGetTarget(nh.advertiseService(topic, callbackGetTarget));
-    para.param<std::string>("service_mark_target", topic, "/exploration/mark_target");
+    para.param<std::string>("service_mark_target", topic, "exploration/mark_target");
     ros::ServiceServer srvMarkTarget(nh.advertiseService(topic, callbackMarkTarget));
 
     ros::spin();
