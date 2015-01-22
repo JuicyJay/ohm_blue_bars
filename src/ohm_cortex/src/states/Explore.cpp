@@ -14,6 +14,8 @@
 #include <std_srvs/Empty.h>
 #include <ohm_sensor_head/Mode.h>
 
+#include <Eigen/Geometry>
+
 #include "../Context.h"
 #include "TargetStack.h"
 #include "Init.h"
@@ -99,9 +101,26 @@ void Explore::process(void)
 
     geometry_msgs::PoseStamped direction;
 
-    direction.header = target.header;
-    direction.pose = target.pose;
+    if (stack->isEmpty())
+    {
+        direction.pose = target.pose;
+    }
+    else
+    {
+        Eigen::Quaternionf rot;
+        geometry_msgs::Pose pose = stack->target();
+        Eigen::Vector3f v(pose.x - target.pose.x, pose.y - target.pose.y, pose.z - target.pose.z);
 
+        v.normalized();
+        rot.setFromTwoVectors(Eigen::Vector3f(1.0f, 0.0f, 0.0f), v);
+        direction.position = target.position;
+        direction.orientation.x = rot.x();
+        direction.orientation.y = rot.y();
+        direction.orientation.z = rot.z();
+        direction.orientation.w = rot.w();
+    }
+
+    direction.header = target.header;
     _pubDirection.publish(direction);
 
 
