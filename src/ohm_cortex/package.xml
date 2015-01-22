@@ -39,9 +39,14 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
-  <build_depend>message_generation</build_depend> 
+  <build_depend>message_generation</build_depend>
+  <build_depend>ohm_exploration</build_depend>
+  <build_depend>ohm_sensor_head</build_depend>
+
   <run_depend>roscpp</run_depend>
   <run_depend>message_runtime</run_depend>
+  <run_depend>ohm_exploration</run_depend>
+  <run_depend>ohm_sensor_head</run_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
