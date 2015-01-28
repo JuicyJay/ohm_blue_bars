@@ -38,8 +38,8 @@ void Approach::process(void)
    }
 
    if(1/*possible victim approached*/) {
-      autonohm::Context::getInstance()->setState(new Inspect());
-      delete this;
+//      autonohm::Context::getInstance()->setState(new Inspect());
+//      delete this;
    }
 
    if(1/*abort to teleop*/) {

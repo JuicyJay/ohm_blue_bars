@@ -47,9 +47,6 @@ private:
     ros::ServiceClient _srvGetTarget;
     ros::ServiceClient _srvMarkTarget;
     ros::ServiceClient _srvTrigger;
-    ros::ServiceClient _srvHeadMode;
-    ros::Publisher _pubTarget;
-    ros::Publisher _pubDirection;
 };
 
 } /* namespace autonohm */

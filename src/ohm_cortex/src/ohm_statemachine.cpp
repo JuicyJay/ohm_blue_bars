@@ -59,7 +59,7 @@ bool force(ohm_cortex::Force::Request& req, ohm_cortex::Force::Response& res)
    if(req.state == "init"     )      context->setState(new autonohm::ConfirmVictim());
    if(req.state == "explore"  )      context->setState(new autonohm::Explore());
    if(req.state == "confirmvictim")  context->setState(new autonohm::Init());
-   if(req.state == "inspect")        context->setState(new autonohm::Inspect());
+//   if(req.state == "inspect")        context->setState(new autonohm::Inspect());
    if(req.state == "rejectvictim")   context->setState(new autonohm::RejectVictim());
    if(req.state == "stateping")      context->setState(new autonohm::StatePing());
    if(req.state == "statepong")      context->setState(new autonohm::StatePong());

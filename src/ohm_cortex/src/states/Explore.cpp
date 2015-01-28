@@ -39,20 +39,6 @@ Explore::Explore(void)
     _srvGetTarget  = _nh->serviceClient<ohm_exploration::GetTarget >("/georg/exploration/get_target" );
     _srvMarkTarget = _nh->serviceClient<ohm_exploration::MarkTarget>("/georg/exploration/mark_target");
     _srvTrigger    = _nh->serviceClient<std_srvs::Empty>("/georg/exploration/wall_finder/trigger");
-    _srvHeadMode   = _nh->serviceClient<ohm_sensor_head::Mode>("/georg/mode");
-    _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("goal/target", 2);
-    _pubDirection = _nh->advertise<geometry_msgs::PoseStamped>("/georg/goal/sensor_head", 2);
-
-    //    ohm_sensor_head::Mode mode;
-    //    mode.request.mode = 4; // fix me!!! Use BIND_DIRECTION constant.
-
-
-    //    if (!_srvHeadMode.call(mode))
-    //    {
-    //      ROS_ERROR("Can't call change mode service of the sensor head node.");
-    //    }
-
-    sleep(1);
 }
 
 
@@ -98,37 +84,8 @@ void Explore::process(void)
 
 
     /* Publish a target to the navigation stuff. */
-    geometry_msgs::PoseStamped target;
-    static unsigned int seq = 0;
-
-    target.header.seq = ++seq;
-    target.header.stamp = ros::Time::now();
-    target.header.frame_id = "map";
-    target.pose = stack->target();
-
-    _pubTarget.publish(target);
-
+    geometry_msgs::Pose target(stack->target());
     stack->drop();
-
-    geometry_msgs::PoseStamped direction;
-    direction = target;
-
-    if (!stack->isEmpty())
-    {
-        Eigen::Quaternionf rot;
-        geometry_msgs::Point next = stack->target().position;
-        Eigen::Vector3f v(next.x - target.pose.position.x, next.y - target.pose.position.y, next.z - target.pose.position.z);
-
-        v.normalized();
-        rot.setFromTwoVectors(Eigen::Vector3f(1.0f, 0.0f, 0.0f), v);
-        target.pose.orientation.x = rot.x();
-        target.pose.orientation.y = rot.y();
-        target.pose.orientation.z = rot.z();
-        target.pose.orientation.w = rot.w();
-    }
-
-    _pubDirection.publish(direction);
-
 
     if (stack->isEmpty())
     {
@@ -144,9 +101,10 @@ void Explore::process(void)
         }
     }
 
-    ROS_INFO("Leave state Explore.");
 
-    Context::getInstance()->setState(new Drive(target.pose));
+
+    ROS_INFO("Leave state Explore.");
+    Context::getInstance()->setState(new Drive(target));
     delete this;
 }
 
