@@ -12,11 +12,12 @@ find_package(catkin REQUIRED COMPONENTS
   genmsg
   actionlib_msgs
   actionlib
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
 find_package(Boost REQUIRED COMPONENTS system)
-
+find_package(OpenCV REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -55,11 +56,11 @@ find_package(Boost REQUIRED COMPONENTS system)
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
+add_service_files(
+   FILES
+   PlanPathsSorted.srv
 #   Service2.srv
-# )
+)
 
 ## Generate actions in the 'action' folder
 add_action_files(
@@ -73,6 +74,7 @@ add_action_files(
 generate_messages(
   DEPENDENCIES
   actionlib_msgs
+  nav_msgs
   geometry_msgs#   nav_msgs#
   std_msgs
 )
@@ -89,7 +91,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ohm_path_plan
-#  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp std_msgs
+  CATKIN_DEPENDS geometry_msgs nav_msgs roscpp std_msgs tf
 #  DEPENDS system_lib
 )
 
@@ -103,7 +105,9 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${Boost_INCLUDE_DIRS}
+  ${OpenCV_INCLUDE_DIRS}
 )
+
 
 INCLUDE_DIRECTORIES($ENV{OBVIOUSLY_ROOT})
 
@@ -118,10 +122,17 @@ file(GLOB source_plan "src/PathPlan.cpp"
                         )
 file(GLOB source_semi "src/SemiAutonohm.cpp"
                         )
+file(GLOB source_astar  "src/PathFind/AStar_dt/*.cpp"
+                        "src/PathFind/Map/MapOperations/*.cpp"
+                        "src/PathFind/Map/*.cpp"
+                        "src/PathFind/PathFind_base/*.cpp"
+                        "src/PathPlan_AStar.cpp"
+                        )            
 
 ## Declare a cpp executable
 add_executable(ohm_path_plan_node ${source_plan})
 add_executable(ohm_semiautonom_node ${source_semi})
+add_executable(ohm_path_plan_astar_node ${source_astar})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -129,6 +140,8 @@ add_dependencies(ohm_path_plan_node #ohm_path_plan_generate_messages_cpp)
                  ${ohm_path_plan_EXPORTED_TARGETS})
 add_dependencies(ohm_semiautonom_node #ohm_path_plan_generate_messages_cpp)
                  ${ohm_path_plan_EXPORTED_TARGETS})
+add_dependencies(ohm_path_plan_astar_node          
+                 ${ohm_path_plan_EXPORTED_TARGETS})       
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ohm_path_plan_node
@@ -142,6 +155,13 @@ target_link_libraries(ohm_semiautonom_node
   obvision
   obcore
   ${Boost_LIBRARIES} 
+)
+
+target_link_libraries(ohm_path_plan_astar_node
+  ${catkin_LIBRARIES}
+  ${Boost_LIBRARIES} 
+  ${OpenCV_LIBRARIES}
+  obcore
 )
 
 #############
@@ -159,7 +179,7 @@ target_link_libraries(ohm_semiautonom_node
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ohm_path_plan_node
+install(TARGETS ohm_path_plan_astar_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

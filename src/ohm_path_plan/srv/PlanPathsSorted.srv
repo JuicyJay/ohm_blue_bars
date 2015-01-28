@@ -1,0 +1,6 @@
+geometry_msgs/PoseStamped     origin
+geometry_msgs/PoseStamped[]   targets
+---
+geometry_msgs/PoseStamped[]   sorted_targets
+geometry_msgs/PoseStamped[]   sorted_path_lenths
+nav_msgs/Path[]               sorted_paths

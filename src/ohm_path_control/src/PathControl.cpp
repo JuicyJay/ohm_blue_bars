@@ -12,23 +12,23 @@ PathControl::PathControl() : _rate(0)
     std::string pub_name_cmd_vel;
     std::string pub_name_state;
     std::string sub_name_path;
-    std::string sub_name_pose;
+    //std::string sub_name_pose;
     std::string config_file_controller;
     std::string config_file_analyser;
-    std::string tf_target_frame;
-    std::string tf_source_frame;
+    std::string tf_map_frame;
+    std::string tf_robot_frame;
     
     privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("vel/teleop"));
     privNh.param("pub_name_state",         pub_name_state,         std::string("path_control/state"));
     privNh.param("sub_name_path",          sub_name_path,          std::string("path"));
-    privNh.param("sub_name_pose",          sub_name_pose,          std::string("pose"));
+    //privNh.param("sub_name_pose",          sub_name_pose,          std::string("pose"));
     privNh.param("config_file_controller", config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
     privNh.param("config_file_analyser",   config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
-    privNh.param("tf_target_frame",        tf_target_frame,        std::string("map"));
-    privNh.param("tf_source_frame",        tf_source_frame,        std::string("base_footprint"));
+    privNh.param("tf_map_frame",           tf_map_frame,           std::string("map"));
+    privNh.param("tf_robot_frame",         tf_robot_frame,         std::string("base_footprint"));
 
-    _tf_target_frame = tf_target_frame;
-    _tf_source_frame = tf_source_frame;
+    _tf_map_frame = tf_map_frame;
+    _tf_robot_frame = tf_robot_frame;
 
     //init publisher
     _pub_cmd_vel = _nh.advertise<geometry_msgs::Twist>(pub_name_cmd_vel,1);
@@ -85,8 +85,8 @@ void PathControl::doPathControl(void)
    tf::StampedTransform tf;
    try {
       ros::Time time = ros::Time::now();
-      _tf_listnener.waitForTransform(_tf_target_frame, _tf_source_frame, time, ros::Duration(1));
-      _tf_listnener.lookupTransform(_tf_target_frame, _tf_source_frame, time, tf);
+      //_tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(1));
+      _tf_listnener.lookupTransform(_tf_map_frame, _tf_robot_frame, time, tf);
 
    } catch (tf::TransformException& e)
    {
@@ -108,13 +108,13 @@ void PathControl::doPathControl(void)
 
    //get diff scale
    analyser::diff_scale diff_scale = _pathAnalyser->analyse(pose);
-   ROS_INFO("controller _> diff_scale: (%f, %f)", diff_scale.linear, diff_scale.angular);
+   //ROS_INFO("controller _> diff_scale: (%f, %f)", diff_scale.linear, diff_scale.angular);
 
 
 
    //controll diffscale
    controller::velocity vel = _controller->control(diff_scale.linear, diff_scale.angular);
-   ROS_INFO("controller _> vel: (%f, %f)", vel.linear, vel.angular);
+   //ROS_INFO("controller _> vel: (%f, %f)", vel.linear, vel.angular);
    //set twist msg
    geometry_msgs::Twist msgTwist;
 
