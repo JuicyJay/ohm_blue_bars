@@ -11,8 +11,10 @@
 
 #include "MapSubsampler.h"
 
+#include "FrontierController.h"
 
 
+#include <visualization_msgs/Marker.h>
 
 
 namespace autonohm {
@@ -41,11 +43,11 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
 {
    ros::NodeHandle private_nh("~");
 
-   FrontierFinderConfig config;
+   frontier::FinderConfig config;
    private_nh.param<double>("robot_radius",               config.robot_radius,               0.6);
    private_nh.param<double>("min_dist_between_frontiers", config.min_dist_between_frontiers, 1.0);
    private_nh.param<double>("max_search_radius",          config.max_search_radius,          10.0);
-   _frontierFinder = new FrontierFinder(config);
+   _frontierFinder = new frontier::Finder(config);
 
    std::string map_topic;
    std::string frontier_topic;
@@ -53,12 +55,13 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
    private_nh.param("frontier_topic",  frontier_topic, std::string("frontiers"));
 
    // Publishers
-   _frontier_pub = _nh.advertise<geometry_msgs::PoseArray>(frontier_topic,  1);
+   _frontier_pub      = _nh.advertise<geometry_msgs::PoseArray>(frontier_topic,  1);
 
    // Subscriber
-   _map_sub      = _nh.subscribe(map_topic, 1, &FrontierExplorationNode::mapCallback, this);
-   _sub_map_pub  = _nh.advertise<nav_msgs::OccupancyGrid>("sub_map",  1);
-
+   _map_sub           = _nh.subscribe(map_topic, 1, &FrontierExplorationNode::mapCallback, this);
+   _sub_map_pub       = _nh.advertise<nav_msgs::OccupancyGrid>("sub_map",  1);
+   _frontier_grid_pub = _nh.advertise<nav_msgs::GridCells>("frontier_grid", 1);
+//   _maker_pub         = _nh.advertise<visualization_msgs::Marker>("frontier_marker", 1);
 
 
 //   std::cout << config << std::endl;
@@ -66,7 +69,7 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
 //                     << std::endl << config << std::endl);
 
 
-   std::cout << "finished constructor" << std::endl;
+   _viz.setNodeHandle(_nh);
 
    // start node
    this->run();
@@ -114,22 +117,50 @@ void FrontierExplorationNode::publishFrontiers(void)
 
    // publish message
    _frontier_pub.publish(frontierMarkers);
+
+   _frontier_grid_pub.publish(_frontierFinder->getFrontierLayer());
+
+//   // look for best frontier
+   FrontierController fController;
+   fController.setWeightedFrontiers(_frontierFinder->getWeightedFrontiers());
+   fController.findBestFrontier();
+
+   _viz.setFrontiers(_frontiers);
+   _viz.setBestFrontier(fController.getBestFrontier());
+   std::vector<WeightedFrontier> wf = fController.getWeightedFrontiers();
+   _viz.setWeightedFrontiers(wf);
+   _viz.publish();
+
+//   std::cout << "bestFrontier: " << best.position.x << ", " << best.position.y << std::endl;
+
+//   visualization_msgs::Marker frontiers;
+//   frontiers.header.frame_id = "/map";
+//   frontiers.ns              = "frontiers";
+//   frontiers.pose            = fController.getBestFrontier();
+//
+//   frontiers.type            = visualization_msgs::Marker::CYLINDER;
+//   frontiers.scale.x         = 1.0;
+//   frontiers.scale.y         = 1.0;
+//   frontiers.scale.z         = 1.0;
+//   frontiers.color.r         = 1.0;
+//   frontiers.color.a         = 1.0;
+//
+//   _maker_pub.publish(frontiers);
 }
 
 
 void FrontierExplorationNode::mapCallback(const nav_msgs::OccupancyGrid& map)
 {
-//   MapSubsampler sampler;
-//   sampler.setInput(map);
-//   sampler.convert();
-//   _sub_map_pub.publish(sampler.getSubsampledMap());
-
-
    ROS_DEBUG_STREAM("received new map. ");
    _frontierFinder->setMap(map);
 
    this->findFrontiers();
    this->publishFrontiers();
+}
+
+void FrontierExplorationNode::publishMarkers(void)
+{
+
 }
 
 } /* namespace autonohm */

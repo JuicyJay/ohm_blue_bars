@@ -1,0 +1,99 @@
+/*
+ * FrontierController.h
+ *
+ *  Created on: 28.01.2015
+ *      Author: chris
+ */
+
+#ifndef OHM_FRONTIER_EXPLORATION_SRC_FRONTIERCONTROLLER_H_
+#define OHM_FRONTIER_EXPLORATION_SRC_FRONTIERCONTROLLER_H_
+
+// ros includes
+#include <ros/ros.h>
+
+//
+#include "Frontier.h"
+
+/**
+ * @namespace  autonohm
+ */
+namespace autonohm {
+
+/**
+ * @struct  FrontierControllerConfig
+ * @author  Christian Pfitzner
+ * @date    2015-01-27
+ */
+struct FrontierControllerConfig
+{
+   float sizeFactor;                   //!< factor to be multiplied with frontier size
+   float euclideanDistanceFactor;      //!< factor to be multiplied with euclidean distance to robot's pose
+   float orientationFactor;            //!< factor to be multiplied with orientation to robot's pose
+
+   float maxEuclideanDistance;         //!< maximum value for distance to travel to next
+};
+
+
+
+
+/**
+ * @class   FrontierController
+ * @author  Christian Pfitzner
+ * @date    2015-01-27
+ *
+ * @brief   Class to choose best suitable frontier depending on
+ *          size of the frontier
+ */
+class FrontierController
+{
+public:
+   /**
+    * Default constructor
+    */
+   FrontierController(void);
+   /**
+    * Default destructor
+    */
+   virtual ~FrontierController(void);
+
+
+   // SETTERS
+   /**
+    * Function to set all fund frontiers
+    * @param wf
+    */
+   void setWeightedFrontiers(const std::vector<WeightedFrontier>& wf);
+   /**
+    * Function to set configuration to frontier controller
+    * @param config
+    */
+   void setConfig(const FrontierControllerConfig& config) { _config = config; }
+
+
+   // GETTERS
+   /**
+    * Function to return best frontier
+    * @return
+    */
+   Frontier         getBestFrontier(void) const { return _bestFrontier; }
+   std::vector<WeightedFrontier> getWeightedFrontiers(void) const { return _wf; }
+
+
+   // PROCESSING
+   /**
+    * Function to start processing
+    */
+   void findBestFrontier(void);
+
+
+private:
+   Frontier                      _bestFrontier;       //!< best solution for all frontiers depending on weight
+   std::vector<WeightedFrontier> _wf;                 //!< all weighted frontiers
+
+   FrontierControllerConfig      _config;
+
+};
+
+};
+
+#endif /* OHM_FRONTIER_EXPLORATION_SRC_FRONTIERCONTROLLER_H_ */

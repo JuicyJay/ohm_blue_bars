@@ -17,6 +17,7 @@
 
 #include "Frontier.h"
 #include "FrontierFinder.h"
+#include "Visualization.h"
 
 /**
  * @namespace autonohm
@@ -66,6 +67,8 @@ private:
     */
    void publishFrontiers(void);
 
+   void publishMarkers(void);
+
    // CALLBACK FUNCTIONS
    /**
     * Callback function for map
@@ -81,10 +84,13 @@ private:
    ros::Subscriber                  _map_sub;
    ros::Publisher                   _sub_map_pub;
    ros::Publisher                   _frontier_pub;
+   ros::Publisher                   _frontier_grid_pub;
+   ros::Publisher                   _maker_pub;
 
    std::vector<Frontier>            _frontiers;
 
-   FrontierFinder*                  _frontierFinder;
+   frontier::Finder*                _frontierFinder;
+   frontier::Visualization          _viz;
 };
 
 } /* namespace autonohm */

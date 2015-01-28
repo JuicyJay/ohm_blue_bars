@@ -19,7 +19,11 @@
  */
 namespace autonohm {
 
-
+/**
+ * @class   Frontier
+ * @author  Christian Pfitzner
+ * @date    2015-01-27
+ */
 class Frontier : public geometry_msgs::Pose
 {
 public:
@@ -28,6 +32,20 @@ public:
 //   {
 //
 //   }
+};
+
+/**
+ * @struct  WeightedFrontier
+ */
+struct WeightedFrontier
+{
+   Frontier       frontier;
+   float          size;
+   float          weight;
+
+   bool operator<(const WeightedFrontier& f) const {
+      return weight < f.weight;
+   }
 };
 
 /**
