@@ -85,7 +85,7 @@ void PathControl::doPathControl(void)
    tf::StampedTransform tf;
    try {
       ros::Time time = ros::Time::now();
-      _tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(1));
+      //_tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(1));
       _tf_listnener.lookupTransform(_tf_map_frame, _tf_robot_frame, time, tf);
 
    } catch (tf::TransformException& e)
@@ -108,13 +108,13 @@ void PathControl::doPathControl(void)
 
    //get diff scale
    analyser::diff_scale diff_scale = _pathAnalyser->analyse(pose);
-   ROS_INFO("controller _> diff_scale: (%f, %f)", diff_scale.linear, diff_scale.angular);
+   //ROS_INFO("controller _> diff_scale: (%f, %f)", diff_scale.linear, diff_scale.angular);
 
 
 
    //controll diffscale
    controller::velocity vel = _controller->control(diff_scale.linear, diff_scale.angular);
-   ROS_INFO("controller _> vel: (%f, %f)", vel.linear, vel.angular);
+   //ROS_INFO("controller _> vel: (%f, %f)", vel.linear, vel.angular);
    //set twist msg
    geometry_msgs::Twist msgTwist;
 
