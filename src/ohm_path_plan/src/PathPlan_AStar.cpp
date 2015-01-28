@@ -99,6 +99,9 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    if(!_gotMap)
    {
       ROS_WARN("ohm_path_plan -> Got no valid Pose or Map until now... doing no path planning");
+      //publish emty path
+      nav_msgs::Path path;
+      _pubPath.publish(path);
       return;
    }
    //do pathplan

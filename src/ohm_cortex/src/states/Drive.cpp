@@ -66,7 +66,8 @@ Drive::Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orie
 
    _targetPose.header.frame_id = "map";
    _targetPose.pose.position = target;
-   std::cout << "target = (" << target.x << ", " << target.y << ")" << std::endl;
+   _targetPose.pose.orientation = orientation;
+   //std::cout << "target = (" << target.x << ", " << target.y << ")" << std::endl;
 }
 
 Drive::~Drive(void)
@@ -115,7 +116,7 @@ void Drive::process(void)
          Eigen::Vector3d bl(p_blast.x, p_blast.y, p_blast.z);  //before last
 
          Eigen::Quaternion<double> q;
-         q = q.FromTwoVectors(l-bl, Eigen::Vector3d(1,0,0));
+         q = q.FromTwoVectors(Eigen::Vector3d(1,0,0), l-bl);
 
          geometry_msgs::Quaternion ori;
          ori.x = q.x();
@@ -138,12 +139,12 @@ void Drive::process(void)
 
    if(_mode == drive::NO_TARGET_ORI)
    {//next inspect
-      ROS_INFO("ohm_cortex: Drive _-> Call Inspect");
+      ROS_INFO("ohm_cortex: Drive -> Call Inspect");
       Context::getInstance()->setState(new Inspect(_targetOrientation));
    }
    else
    {//next explore
-      ROS_INFO("ohm_cortex: Drive _-> Call Explore");
+      ROS_INFO("ohm_cortex: Drive -> Call Explore");
       Context::getInstance()->setState(new Explore);
    }
    delete this;
