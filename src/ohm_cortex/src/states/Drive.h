@@ -13,20 +13,32 @@
 #include <ros/ros.h>
 #include <ros/ros.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/Point.h>
+#include <geometry_msgs/Quaternion.h>
 #include <nav_msgs/Path.h>
 #include <std_msgs/Bool.h>
 
 #include "Explore.h"
+#include "Inspect.h"
+
+#include <Eigen/Dense>
 
 /**
  * @namespace autonohm
  */
 namespace autonohm {
 
+namespace drive{
+enum enumMode{
+   DEFAULT = 0,    //robot will rotate to target orientation
+   NO_TARGET_ORI   //robot will not rotate to target orientation -> will rotate to orientation (from before last wp to last wp)
+};
+}
 class Drive : public IState
 {
 public:
     Drive(const geometry_msgs::Pose& target);
+    Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orientation);
 
     virtual ~Drive(void);
     virtual void process(void);
@@ -47,7 +59,10 @@ private:
     ros::Subscriber _subState;
 
     geometry_msgs::PoseStamped _targetPose;
+    geometry_msgs::Quaternion _targetOrientation;  //just used in non default mode
     nav_msgs::Path _path;
+
+    drive::enumMode _mode;
 
     bool _old_state;
     bool _reached_target;
