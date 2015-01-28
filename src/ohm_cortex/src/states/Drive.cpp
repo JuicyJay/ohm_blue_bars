@@ -11,10 +11,12 @@ namespace autonohm {
 Drive::Drive(const geometry_msgs::Pose& target)
     : _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
-   ROS_INFO("New state is Drive.");
+   ROS_INFO("New state is Drive -> default... just drive.");
 
    /* Publish current state for debugging. */
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
+
+   _mode = drive::DEFAULT;
 
    std_msgs::String msg;
    msg.data = "drive";
@@ -34,6 +36,37 @@ Drive::Drive(const geometry_msgs::Pose& target)
    _targetPose.header.frame_id = "map";
    _targetPose.pose = target;
    std::cout << "target = (" << target.position.x << ", " << target.position.y << ")" << std::endl;
+}
+
+Drive::Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orientation)
+      : _nh(autonohm::Context::getInstance()->getNodeHandle())
+{
+   ROS_INFO("New state is Drive -> mode: no rotate, Inspect");
+
+   /* Publish current state for debugging. */
+   _state_pub = _nh->advertise<std_msgs::String>("state", 1);
+
+   _mode = drive::NO_TARGET_ORI;
+   _targetOrientation = orientation;
+
+   std_msgs::String msg;
+   msg.data = "drive";
+   _state_pub.publish(msg);
+
+   //add publisher
+   _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/georg/target", 1);
+   _pubPath   = _nh->advertise<nav_msgs::Path>("/georg/path", 1);
+
+   //add subscriber:
+   _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
+   _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
+   _old_state = true;
+   _reached_target = false;
+   _got_path = false;
+
+   _targetPose.header.frame_id = "map";
+   _targetPose.pose.position = target;
+   std::cout << "target = (" << target.x << ", " << target.y << ")" << std::endl;
 }
 
 Drive::~Drive(void)
@@ -63,7 +96,7 @@ void Drive::process(void)
    //prove path
    if(_path.poses.size() == 0)
    {
-      ROS_INFO("No Path found ... return to ExloreState");
+      ROS_INFO("ohm_cortex: Drive -> No Path found ... return to ExloreState");
       Context::getInstance()->setState(new Explore);
       delete this;
       return;
@@ -72,6 +105,26 @@ void Drive::process(void)
    ROS_INFO("ohm_cortex: Drive -> Transmitt Path");
    //got path:
    //now pubish to pathcontroll and begin moving until target reached
+   if(_mode == drive::NO_TARGET_ORI)
+   {//change last wp orientation
+      if(_path.poses.size() >= 2)
+      {
+         geometry_msgs::Point p_last = _path.poses[_path.poses.size() - 1].pose.position;
+         geometry_msgs::Point p_blast = _path.poses[_path.poses.size() - 2].pose.position;
+         Eigen::Vector3d l(p_last.x, p_last.y, p_last.z);   //last
+         Eigen::Vector3d bl(p_blast.x, p_blast.y, p_blast.z);  //before last
+
+         Eigen::Quaternion<double> q;
+         q = q.FromTwoVectors(l-bl, Eigen::Vector3d(1,0,0));
+
+         geometry_msgs::Quaternion ori;
+         ori.x = q.x();
+         ori.y = q.y();
+         ori.z = q.z();
+         ori.w = q.w();
+         _path.poses[_path.poses.size() - 1].pose.orientation = ori;
+      }
+   }
    _pubPath.publish(_path);
 
    ROS_INFO("ohm_cortex: Drive -> Wait for arival");
@@ -83,7 +136,16 @@ void Drive::process(void)
 
    ROS_INFO("ohm_cortex: Drive ->  Arrived!!!!");
 
-   Context::getInstance()->setState(new Explore);
+   if(_mode == drive::NO_TARGET_ORI)
+   {//next inspect
+      ROS_INFO("ohm_cortex: Drive _-> Call Inspect");
+      Context::getInstance()->setState(new Inspect(_targetOrientation));
+   }
+   else
+   {//next explore
+      ROS_INFO("ohm_cortex: Drive _-> Call Explore");
+      Context::getInstance()->setState(new Explore);
+   }
    delete this;
    return;
 }
@@ -93,6 +155,8 @@ void Drive::subPath_callback(const nav_msgs::Path& msg)
    _path = msg;
    _got_path = true;
 }
+
+
 
 void Drive::subState_callback(const std_msgs::Bool& msg)
 {
