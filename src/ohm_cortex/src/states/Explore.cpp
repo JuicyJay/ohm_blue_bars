@@ -104,7 +104,8 @@ void Explore::process(void)
 
 
     ROS_INFO("Leave state Explore.");
-    Context::getInstance()->setState(new Drive(target));
+//    Context::getInstance()->setState(new Drive(target));
+    Context::getInstance()->setState(new Drive(target.position, target.orientation));
     delete this;
 }
 
