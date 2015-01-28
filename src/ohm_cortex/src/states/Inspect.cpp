@@ -4,7 +4,7 @@
 #include "Explore.h"
 
 #include <ohm_sensor_head/Mode.h>
-#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/QuaternionStamped.h>
 
 namespace autonohm {
 
@@ -24,7 +24,7 @@ Inspect::Inspect(const geometry_msgs::Quaternion& orientation)
 
     /* Sensor head control. */
    _srvHeadMode = _nh->serviceClient<ohm_sensor_head::Mode>("/georg/mode");
-   _pubDirection = _nh->advertise<geometry_msgs::PoseStamped>("/georg/goal/sensor_head", 2);
+   _pubDirection = _nh->advertise<geometry_msgs::QuaternionStamped>("/georg/goal/sensor_head", 2);
 
    ohm_sensor_head::Mode mode;
    mode.request.mode = ohm_sensor_head::Mode::Request::BIND_DIRECTION;
