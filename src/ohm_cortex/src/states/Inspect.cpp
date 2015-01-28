@@ -61,6 +61,7 @@ void Inspect::process(void)
 
     direction.quaternion = _orientation;
 
+    ROS_INFO("Inspect: publish direction.");
     _pubDirection.publish(direction);
 }
 
