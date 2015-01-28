@@ -56,6 +56,9 @@ int main(int argc,char **argv)
             map_dummy.data[idx] = 100;
          }
 
+         if(((w>3/res) && (w<7/res)) && ((h==7/res))) {
+            map_dummy.data[idx] = 100;
+         }
 //         if(((w>3/res) && (w<7/res)) && ((h==7/res))) {
 //            map_dummy.data[idx] = 100;
 //         }
@@ -64,8 +67,8 @@ int main(int argc,char **argv)
 //            map_dummy.data[idx] = 100;
 //         }
 //
-//         if(w<=4/res)
-//            map_dummy.data[idx] = 0;
+         if(w<=4/res)
+            map_dummy.data[idx] = 0;
 //
 //         if(w==0)
 //            map_dummy.data[idx] = 100;

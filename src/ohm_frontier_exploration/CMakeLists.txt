@@ -92,6 +92,8 @@ catkin_package(
 ###########
 ## Build ##
 ###########
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O2 -DNDEBUG")
+
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
@@ -110,6 +112,8 @@ add_executable(ohm_frontier_exploration_node
                                               src/FrontierExplorationNode.cpp
                                               src/FrontierFinder.cpp
                                               src/MapSubsampler.cpp
+                                              src/FrontierController.cpp
+                                              src/Visualization.cpp
                                               )
                                               
 add_executable(map_dummy                      src/map_dummy_generator.cpp)                                            
