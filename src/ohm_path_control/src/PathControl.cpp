@@ -100,7 +100,7 @@ void PathControl::doPathControl(void)
    //get tf
    tf::StampedTransform tf;
    try {
-      ros::Time time = ros::Time::now();
+      ros::Time time = ros::Time(0);
       //_tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(2));
       _tf_listnener.lookupTransform(_tf_map_frame, _tf_robot_frame, time, tf);
 
