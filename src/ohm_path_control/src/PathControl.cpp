@@ -54,6 +54,22 @@ void PathControl::start(const unsigned int rate)
     delete _rate;
     _loopRate = rate;
     _rate = new ros::Rate(_loopRate);
+
+    //wait for first transform
+    bool rdy = false;
+    do{
+       try {
+          ros::Time time = ros::Time::now();
+          _tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(20));
+          rdy = true;
+
+       } catch (tf::TransformException& e)
+       {
+          ROS_ERROR("ohm_path_control -> Exeption at tf: %s", e.what());
+          return;
+       }
+    }while(!rdy);
+
     this->run();
 }
 
@@ -85,7 +101,7 @@ void PathControl::doPathControl(void)
    tf::StampedTransform tf;
    try {
       ros::Time time = ros::Time::now();
-      _tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(2));
+      //_tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(2));
       _tf_listnener.lookupTransform(_tf_map_frame, _tf_robot_frame, time, tf);
 
    } catch (tf::TransformException& e)
