@@ -20,6 +20,8 @@
 #include "Visualization.h"
 #include "FrontierController.h"
 
+#include "ohm_frontier_exploration/GetTarget.h"
+
 
 /**
  * @namespace autonohm
@@ -84,16 +86,37 @@ private:
     */
    void mapCallback(const nav_msgs::OccupancyGrid& map);
 
+   /**
+    * Service callback to receive next frontier for navigation
+    * @param req
+    * @param res
+    * @return
+    */
+   bool getFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request&  req,
+                             ohm_frontier_exploration::GetTarget::Response& res);
+   /**
+    * Service callback to return all frontiers
+    * @param req
+    * @param res
+    * @return
+    */
+   bool getAllFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request&  req,
+                                ohm_frontier_exploration::GetTarget::Response& res);
+
    // MEMBERS
    static FrontierExplorationNode* _instance;
 
    ros::NodeHandle                  _nh;
 
    ros::Subscriber                  _map_sub;
+
    ros::Publisher                   _sub_map_pub;
    ros::Publisher                   _frontier_pub;
    ros::Publisher                   _frontier_grid_pub;
    ros::Publisher                   _maker_pub;
+
+   ros::ServiceServer               _best_target_service;
+   ros::ServiceServer               _all_targets_service;
 
    std::vector<Frontier>            _frontiers;
 

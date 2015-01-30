@@ -81,6 +81,9 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
    _sub_map_pub       = _nh.advertise<nav_msgs::OccupancyGrid>("sub_map",  1);
    _frontier_grid_pub = _nh.advertise<nav_msgs::GridCells>("frontier_grid", 1);
 
+   // Service Server
+   _best_target_service = private_nh.advertiseService("get_target", &FrontierExplorationNode::getFrontierServiceCB, this);
+
    _viz.setNodeHandle(_nh);
 
    _is_initialized = true;
@@ -155,6 +158,14 @@ void FrontierExplorationNode::mapCallback(const nav_msgs::OccupancyGrid& map)
 
    this->findFrontiers();
    this->publishFrontiers();
+}
+
+bool FrontierExplorationNode::getFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request& req,
+                                                   ohm_frontier_exploration::GetTarget::Response& res)
+{
+   ROS_DEBUG_STREAM("service call: returning new frontier to: " << _frontierController->getBestFrontier());
+   res.target = _frontierController->getBestFrontier();
+   return true;
 }
 
 void FrontierExplorationNode::publishMarkers(void)
