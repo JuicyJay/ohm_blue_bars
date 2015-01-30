@@ -7,14 +7,13 @@
 
 #include "FrontierExplorationNode.h"
 
+#include <visualization_msgs/Marker.h>
 #include "geometry_msgs/PoseArray.h"
 
-#include "MapSubsampler.h"
+// dynamic reconfigure
+#include <dynamic_reconfigure/server.h>
+#include "ohm_frontier_exploration/ExplorationConfig.h"
 
-#include "FrontierController.h"
-
-
-#include <visualization_msgs/Marker.h>
 
 
 namespace autonohm {
@@ -31,15 +30,29 @@ FrontierExplorationNode* FrontierExplorationNode::getInstance(void)
 
 void FrontierExplorationNode::run(void)
 {
-   while(ros::ok())
-   {
+   ros::Rate looprate(_rate);
+   while(ros::ok()) {
       ros::spinOnce();
+      looprate.sleep();
    }
+}
+
+bool FrontierExplorationNode::isInitialized(void)
+{
+   return _is_initialized;
+}
+
+
+void FrontierExplorationNode::setDynamicConfig(FrontierControllerConfig c)
+{
+   _frontierController->setConfig(c);
 }
 
 
 FrontierExplorationNode::FrontierExplorationNode(void) :
       _frontierFinder(NULL)
+,     _is_initialized(false)
+,     _rate(5.0)
 {
    ros::NodeHandle private_nh("~");
 
@@ -47,12 +60,18 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
    private_nh.param<double>("robot_radius",               config.robot_radius,               0.6);
    private_nh.param<double>("min_dist_between_frontiers", config.min_dist_between_frontiers, 1.0);
    private_nh.param<double>("max_search_radius",          config.max_search_radius,          10.0);
-   _frontierFinder = new frontier::Finder(config);
+
+   _frontierFinder     = new frontier::Finder(config);
+   _frontierController = new FrontierController;
 
    std::string map_topic;
    std::string frontier_topic;
-   private_nh.param("map_topic",       map_topic,      std::string("/map"));
-   private_nh.param("frontier_topic",  frontier_topic, std::string("frontiers"));
+   std::string base_topic;
+   private_nh.param("map_topic",             map_topic,      std::string("/map"));
+   private_nh.param("base_footprint_topic",  base_topic,     std::string("laser"));
+   private_nh.param("frontier_topic",        frontier_topic, std::string("frontiers"));
+
+   _frontierController->setTFFrameIds(map_topic, base_topic);
 
    // Publishers
    _frontier_pub      = _nh.advertise<geometry_msgs::PoseArray>(frontier_topic,  1);
@@ -61,15 +80,10 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
    _map_sub           = _nh.subscribe(map_topic, 1, &FrontierExplorationNode::mapCallback, this);
    _sub_map_pub       = _nh.advertise<nav_msgs::OccupancyGrid>("sub_map",  1);
    _frontier_grid_pub = _nh.advertise<nav_msgs::GridCells>("frontier_grid", 1);
-//   _maker_pub         = _nh.advertise<visualization_msgs::Marker>("frontier_marker", 1);
-
-
-//   std::cout << config << std::endl;
-//   ROS_DEBUG_STREAM("Starting frontier exploration node with following parameters: "
-//                     << std::endl << config << std::endl);
-
 
    _viz.setNodeHandle(_nh);
+
+   _is_initialized = true;
 
    // start node
    this->run();
@@ -82,6 +96,9 @@ FrontierExplorationNode::~FrontierExplorationNode(void)
       delete _instance;
       _instance = 0;
    }
+
+   delete _frontierFinder;
+   delete _frontierController;
 }
 
 
@@ -117,35 +134,17 @@ void FrontierExplorationNode::publishFrontiers(void)
 
    // publish message
    _frontier_pub.publish(frontierMarkers);
-
    _frontier_grid_pub.publish(_frontierFinder->getFrontierLayer());
 
 //   // look for best frontier
-   FrontierController fController;
-   fController.setWeightedFrontiers(_frontierFinder->getWeightedFrontiers());
-   fController.findBestFrontier();
+   _frontierController->setWeightedFrontiers(_frontierFinder->getWeightedFrontiers());
+   _frontierController->findBestFrontier();
 
+   // visualization
    _viz.setFrontiers(_frontiers);
-   _viz.setBestFrontier(fController.getBestFrontier());
-   std::vector<WeightedFrontier> wf = fController.getWeightedFrontiers();
-   _viz.setWeightedFrontiers(wf);
+   _viz.setBestFrontier(     _frontierController->getBestFrontier());
+   _viz.setWeightedFrontiers(_frontierController->getWeightedFrontiers());
    _viz.publish();
-
-//   std::cout << "bestFrontier: " << best.position.x << ", " << best.position.y << std::endl;
-
-//   visualization_msgs::Marker frontiers;
-//   frontiers.header.frame_id = "/map";
-//   frontiers.ns              = "frontiers";
-//   frontiers.pose            = fController.getBestFrontier();
-//
-//   frontiers.type            = visualization_msgs::Marker::CYLINDER;
-//   frontiers.scale.x         = 1.0;
-//   frontiers.scale.y         = 1.0;
-//   frontiers.scale.z         = 1.0;
-//   frontiers.color.r         = 1.0;
-//   frontiers.color.a         = 1.0;
-//
-//   _maker_pub.publish(frontiers);
 }
 
 
@@ -160,11 +159,32 @@ void FrontierExplorationNode::mapCallback(const nav_msgs::OccupancyGrid& map)
 
 void FrontierExplorationNode::publishMarkers(void)
 {
-
 }
 
 } /* namespace autonohm */
 
+
+void callback(ohm_frontier_exploration::ExplorationConfig &config, uint32_t level)
+{
+   std::cout << __PRETTY_FUNCTION__ << std::endl;
+
+//   if(!autonohm::FrontierExplorationNode::getInstance()->isInitialized())
+//      return;
+
+   autonohm::FrontierControllerConfig cfg;
+   cfg.euclideanDistanceFactor = 0; //config.dist_factor;
+   cfg.orientationFactor       = config.orientation_factor;
+   cfg.sizeFactor              = 8.0; //config.size_factor;
+
+
+   ROS_INFO_STREAM("changed configuration: "                              << std::endl <<
+                   "distance factor :   "  << cfg.euclideanDistanceFactor << std::endl <<
+                   "size factor:        "  << cfg.orientationFactor       << std::endl <<
+                   "orientation factor: "  << cfg.sizeFactor              << std::endl);
+
+
+   autonohm::FrontierExplorationNode::getInstance()->setDynamicConfig(cfg);
+}
 
 /*
  * Main program
@@ -172,6 +192,14 @@ void FrontierExplorationNode::publishMarkers(void)
 int main(int argc,char **argv)
 {
    ros::init(argc, argv, "frontier_exploration_node");
+
+//   // configuration for dynamic reconfigure
+   dynamic_reconfigure::Server<ohm_frontier_exploration::ExplorationConfig> server;
+   dynamic_reconfigure::Server<ohm_frontier_exploration::ExplorationConfig>::CallbackType f;
+//
+   f = boost::bind(&callback, _1, _2);
+   server.setCallback(f);
+
    autonohm::FrontierExplorationNode::getInstance()->run();
 }
 

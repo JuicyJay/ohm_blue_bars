@@ -67,7 +67,12 @@ public:
     * Function to set configuration to frontier controller
     * @param config
     */
-   void setConfig(const FrontierControllerConfig& config) { _config = config; }
+   void setConfig(FrontierControllerConfig config) { _config = config; }
+
+   void setTFFrameIds(std::string map_frame_id, std::string base_footprint_frame_id) {
+      _map_topic            = map_frame_id;
+      _base_footprint_topic = base_footprint_frame_id;
+   }
 
 
    // GETTERS
@@ -75,7 +80,7 @@ public:
     * Function to return best frontier
     * @return
     */
-   Frontier         getBestFrontier(void) const { return _bestFrontier; }
+   Frontier getBestFrontier(void) const                   { return _bestFrontier; }
    std::vector<WeightedFrontier> getWeightedFrontiers(void) const { return _wf; }
 
 
@@ -91,6 +96,9 @@ private:
    std::vector<WeightedFrontier> _wf;                 //!< all weighted frontiers
 
    FrontierControllerConfig      _config;
+
+   std::string                   _map_topic;
+   std::string                   _base_footprint_topic;
 
 };
 

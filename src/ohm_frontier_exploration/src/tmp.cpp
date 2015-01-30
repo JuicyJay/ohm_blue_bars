@@ -301,9 +301,9 @@ void ExploreFrontier::findFrontiers(Costmap2DROS& costmap_) {
       y += (idx / map_.info.width);
     }
     d = d / size;
-    frontier.pose.position.x = map_.info.origin.position.x + map_.info.resolution * (x / size);
-    frontier.pose.position.y = map_.info.origin.position.y + map_.info.resolution * (y / size);
-    frontier.pose.position.z = 0.0;
+    frontier.pose.position.x  = map_.info.origin.position.x + map_.info.resolution * (x / size);
+    frontier.pose.position.y  = map_.info.origin.position.y + map_.info.resolution * (y / size);
+    frontier.pose.position.z  = 0.0;
 
     frontier.pose.orientation = tf::createQuaternionMsgFromYaw(btAtan2(d.y(), d.x()));
     frontier.size = size;

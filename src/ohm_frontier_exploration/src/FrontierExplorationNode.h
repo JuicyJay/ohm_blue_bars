@@ -18,6 +18,8 @@
 #include "Frontier.h"
 #include "FrontierFinder.h"
 #include "Visualization.h"
+#include "FrontierController.h"
+
 
 /**
  * @namespace autonohm
@@ -46,6 +48,12 @@ public:
     * Function to spin ros node
     */
    void run(void);
+
+   bool isInitialized(void);
+
+   void setDynamicConfig(FrontierControllerConfig c);
+
+   void setLoopRate(const double& looprate) { _rate = looprate; }
 
 private:
    /**
@@ -91,6 +99,10 @@ private:
 
    frontier::Finder*                _frontierFinder;
    frontier::Visualization          _viz;
+   FrontierController*              _frontierController;
+
+   bool                             _is_initialized;        //!< flag to check if node is initialized
+   double                           _rate;                  //!< looprate to spin ros node
 };
 
 } /* namespace autonohm */

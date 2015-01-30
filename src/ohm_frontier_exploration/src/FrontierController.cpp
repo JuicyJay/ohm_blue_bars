@@ -15,9 +15,9 @@ namespace autonohm {
 FrontierController::FrontierController(void)
 {
    // default setting for only size
-   _config.euclideanDistanceFactor = 8;
+   _config.euclideanDistanceFactor = 2;
    _config.orientationFactor       = 0;
-   _config.sizeFactor              = 0.0;
+   _config.sizeFactor              = 0.1;
 
    _config.maxEuclideanDistance    = 12.0;
 }
@@ -42,11 +42,12 @@ void FrontierController::findBestFrontier(void)
    tf::StampedTransform transform;
 
    try {
-      listener.waitForTransform("/map", "laser", ros::Time(0), ros::Duration(4.0) );
-      listener.lookupTransform( "/map", "laser", ros::Time(0), transform);
+      listener.waitForTransform(_map_topic,            _base_footprint_topic, ros::Time(0), ros::Duration(1.0) );
+      listener.lookupTransform( _base_footprint_topic, _base_footprint_topic, ros::Time(0), transform);
    }
    catch (tf::TransformException ex) {
       ROS_ERROR("%s",ex.what());
+
    }
 
    const double x = transform.getOrigin().x();
@@ -60,9 +61,6 @@ void FrontierController::findBestFrontier(void)
 
       float dist           = sqrt(diffX*diffX + diffY*diffY);
 
-      if(dist > _config.maxEuclideanDistance)
-         dist = 1000;
-
       const float ori            = 0;
 
       const float sizeWeight     = it->size   * _config.sizeFactor;
@@ -70,7 +68,8 @@ void FrontierController::findBestFrontier(void)
       const float oriWeight      = ori        * _config.orientationFactor;
 
       // sum up all weights
-      const float weight         = sizeWeight + euclDistWeight + oriWeight;
+      float weight         = sizeWeight + euclDistWeight + oriWeight;
+      if(dist > _config.maxEuclideanDistance) weight = 1000;
 
       // set weight to object
       it->weight = weight;
