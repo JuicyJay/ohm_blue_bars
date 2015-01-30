@@ -78,7 +78,8 @@ void Visualization::publishFrontierMarker(void)
       m.scale.y         = 0.1f;
       m.scale.z         = 0.5f;
 
-      m.pose.position = it->position;
+      m.pose.position   =  it->position;
+      m.pose.position.z += m.scale.z / 2.0f;
 
       _markers.markers.push_back(m);
    }
@@ -93,27 +94,28 @@ void Visualization::publishWeightedFrontierMarker(void)
    for(std::vector<WeightedFrontier>::const_iterator it=_wFrontiers.begin() ; it != _wFrontiers.end() ; ++it)
    {
       visualization_msgs::Marker m;
-      m.header.frame_id = "/map";
-      m.header.stamp    = ros::Time::now();
-      m.ns              = "weight_frontiers";
-      m.id              = idx++;
+      m.header.frame_id  = "/map";
+      m.header.stamp     = ros::Time::now();
+      m.ns               = "weight_frontiers";
+      m.id               = idx++;
 
-      m.type            = visualization_msgs::Marker::CYLINDER;
-      m.action          = visualization_msgs::Marker::ADD;
-      m.lifetime        = ros::Duration(5.0f);
+      m.type             = visualization_msgs::Marker::CYLINDER;
+      m.action           = visualization_msgs::Marker::ADD;
+      m.lifetime         = ros::Duration(5.0f);
 
       // set color
-      m.color.r         = 1.0f;
-      m.color.g         = 0.0f;
-      m.color.b         = 0.0f;
-      m.color.a         = 0.5f;
+      m.color.r          = 1.0f;
+      m.color.g          = 0.0f;
+      m.color.b          = 0.0f;
+      m.color.a          = 0.5f;
 
       // set size
-      m.scale.x         = 0.2f;
-      m.scale.y         = 0.2f;
-      m.scale.z         = it->weight;
+      m.scale.x          = 0.2f;
+      m.scale.y          = 0.2f;
+      m.scale.z          = it->weight;
 
-      m.pose.position = it->frontier.position;
+      m.pose.position    = it->frontier.position;
+      m.pose.position.z += m.scale.z / 2.0f;
 
       _markers.markers.push_back(m);
    }

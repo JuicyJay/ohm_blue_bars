@@ -7,9 +7,6 @@
 
 #include "FrontierFinder.h"
 
-#include <costmap_2d/costmap_2d.h>
-#include <costmap_2d/cost_values.h>
-
 #include <tf/tf.h>
 #include <tf/LinearMath/Vector3.h>
 
@@ -59,20 +56,22 @@ void Finder::calculateFrontiers(void)
    _frontier_layer.cell_height     = _map.info.resolution;
    _frontier_layer.cell_width      = _map.info.resolution;
 
-   const unsigned int w    = _map.info.width;
-   const unsigned int size = _map.info.height * w;
+
+   int idx;
+   const int w    = _map.info.width;
+   const int size = _map.info.height * w;
 
 
    // copy to tmp array
    signed char* map = new signed char[size];
-   for(unsigned int idx=0 ; idx<size ; idx++) {
+   for(idx=0 ; idx<size ; idx++) {
       map[idx] = _map.data[idx];
    }
 
    /*
     * Find all frontiers
     */
-   for (unsigned idx = 0; idx<size; idx++)
+   for (idx=0; idx<size; idx++)
    {
       const bool valid_point = (map[idx] == FREE) ;
 
@@ -80,8 +79,7 @@ void Finder::calculateFrontiers(void)
                         && (((idx + 1 < size) && (map[idx + 1] == UNKNOWN))
                         ||  ((idx - 1 >= 0)   && (map[idx - 1] == UNKNOWN))
                         ||  ((idx + w < size) && (map[idx + w] == UNKNOWN))
-                        ||  ((idx - w >= 0)   && (map[idx - w] == UNKNOWN))))
-      {
+                        ||  ((idx - w >= 0)   && (map[idx - w] == UNKNOWN)))) {
          _map.data[idx] = -128;
          _frontier_layer.cells.push_back(this->getPointFromIndex(idx,
                                                                  w,
@@ -89,15 +87,13 @@ void Finder::calculateFrontiers(void)
                                                                  _map.info.origin.position.y,
                                                                  _map.info.resolution));
       }
-      else
-      {
+      else {
          _map.data[idx] = -127;
       }
    }
 
-
    // clean up frontiers on seperate rows of the map
-   unsigned idx = _map.info.height - 1;
+   idx = _map.info.height - 1;
    for (unsigned int y = 0; y < _map.info.width; y++) {
       _map.data[idx] = -127;
       idx += _map.info.height;
@@ -107,7 +103,7 @@ void Finder::calculateFrontiers(void)
    int segment_id = 127;
    std::vector<std::vector<FrontierPoint> > segments;
 
-   for (unsigned int i = 0; i < size; i++)
+   for (int i = 0; i < size; i++)
    {
       if (_map.data[i] == -128)
       {
@@ -117,12 +113,12 @@ void Finder::calculateFrontiers(void)
 
          while (neighbors.size() > 0)
          {
-            unsigned int idx = neighbors.back();
+            idx = neighbors.back();
             neighbors.pop_back();
             _map.data[idx] = segment_id;
 
             tf::Vector3 orientation(0, 0, 0);
-            unsigned int c = 0;
+            int c = 0;
             if ((idx + 1 < size) && (map[idx+1] == UNKNOWN)) {
                orientation += tf::Vector3(1, 0, 0); c++;
             }
@@ -176,7 +172,10 @@ void Finder::calculateFrontiers(void)
       }
    }
 
-   delete [] map;
+
+   delete [] map;                            // clean up of map
+
+
 
    int num_segments = 127 - segment_id;
    if (num_segments <= 0)
@@ -185,7 +184,7 @@ void Finder::calculateFrontiers(void)
    ROS_DEBUG_STREAM("Found " << segments.size() << " frontieres. ");
 
 
-   for (unsigned int i=0; i < segments.size(); i++)
+   for (int i=0; i < segments.size(); i++)
    {
 
       std::vector<FrontierPoint>& segment = segments[i];
@@ -208,8 +207,8 @@ void Finder::calculateFrontiers(void)
 
             unsigned int cellIdx = segment[j].idx;
             geometry_msgs::Point p = this->getPointFromIndex(cellIdx, _map.info.width);
-            x += (float)(cellIdx % _map.info.width);
-            y += (float)(cellIdx / _map.info.width);
+            x += p.x;
+            y += p.y;
 
          }
 

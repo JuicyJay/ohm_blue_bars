@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
                              geometry_msgs
                              std_msgs
                              tf
-                             costmap_2d
+                             dynamic_reconfigure
                              )
 
 ## System dependencies are found with CMake's conventions
@@ -72,6 +72,9 @@ find_package(catkin REQUIRED COMPONENTS
 #   DEPENDENCIES
 #   std_msgs  # Or other packages containing msgs
 # )
+generate_dynamic_reconfigure_options(
+  cfg/Exploration.cfg
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -117,6 +120,10 @@ add_executable(ohm_frontier_exploration_node
                                               )
                                               
 add_executable(map_dummy                      src/map_dummy_generator.cpp)                                            
+
+add_dependencies(ohm_frontier_exploration_node 
+                                              ${PROJECT_NAME}_gencfg)
+
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
