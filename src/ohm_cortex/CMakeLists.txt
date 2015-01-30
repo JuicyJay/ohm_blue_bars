@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib_msgs
     actionlib
     ohm_exploration
+    ohm_frontier_exploration
     ohm_sensor_head
     )
 
@@ -73,6 +74,7 @@ add_library(ohm_cortex
   src/states/Drive.cpp
   src/states/Init.cpp
   src/states/TargetStack.cpp
+  src/states/FrontierExplore.cpp
 )
 
 
@@ -92,6 +94,7 @@ add_executable(statemachine
                src/states/Drive.cpp
                src/states/Init.cpp
                src/states/TargetStack.cpp
+               src/states/FrontierExplore.cpp
                )
 
 add_executable(viz                   src/viz/viz_node.cpp           ${QT_SOURCES} ${QT_MOC_HPP} ${QT_FORMS_HPP})
