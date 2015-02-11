@@ -65,7 +65,7 @@ PathPlan_AStar::PathPlan_AStar() :
    _subTargetPose = _nh.subscribe(sub_target, 1, &PathPlan_AStar::subCallback_target, this);
 
    _gotMap = false;
-   _gotPose = false;
+   //_gotPose = false;
 }
 
 PathPlan_AStar::~PathPlan_AStar()
