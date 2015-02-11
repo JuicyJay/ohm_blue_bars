@@ -41,10 +41,12 @@ private:    //dataelements
     bool _gotMap;
 
     double _robot_radius;
+    double _dt_radius;
 
     double _cost_short_step;
     double _cost_long_step ;
     double _factor_dist    ;
+    double _costmap_weight ;
 
     std::string _frame_id;
 

@@ -18,12 +18,11 @@ namespace apps
 
 Astar_dt::Astar_dt(GridMap* map) : PathFind_base::PathFind_base(map)
 {
-   // TODO Auto-generated constructor stub
-   //_currentCosts = 0;
    _wall_value = 255; //default
    _cost_short_step = 1;
    _cost_long_step = _cost_short_step * ::sqrt(2);
    _factor_dist = 1;
+   _costmap_weight = 10;
 }
 
 Astar_dt::~Astar_dt()

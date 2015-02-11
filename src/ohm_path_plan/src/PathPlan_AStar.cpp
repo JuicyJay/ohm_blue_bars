@@ -22,9 +22,11 @@ PathPlan_AStar::PathPlan_AStar() :
    std::string tf_robot_frame;
 
    double robot_radius;
+   double dt_radius;
    double cost_short_step;
    double cost_long_step ;
    double factor_dist    ;
+   double costmap_weight ;
    //int int_val;
 
    privNh.param("sub_map",               sub_map,        std::string("map"));
@@ -36,19 +38,20 @@ PathPlan_AStar::PathPlan_AStar() :
    privNh.param("tf_robot_frame",         tf_robot_frame,         std::string("base_footprint"));
 
    privNh.param<double>("robot_radius",     robot_radius   ,   0.35);
+   privNh.param<double>("dt_radius",        dt_radius,         0.6);
    privNh.param<double>("cost_short_step",  cost_short_step,   1);
    privNh.param<double>("cost_long_step",   cost_long_step ,   ::sqrt(2) * 1);
    privNh.param<double>("factor_dist",      factor_dist    ,   1);
-
-
-
+   privNh.param<double>("costmap_weight",   costmap_weight ,   10);
 
    //privNh.param<int>("int_val",int_val, 1234);
 
    _robot_radius = robot_radius;
+   _dt_radius    = dt_radius;
    _cost_short_step = cost_short_step;
    _cost_long_step  = cost_long_step ;
    _factor_dist     = factor_dist    ;
+   _costmap_weight  = costmap_weight ;
 
    _frame_id = frame_id;
    _tf_map_frame = tf_map_frame;
@@ -62,6 +65,7 @@ PathPlan_AStar::PathPlan_AStar() :
    _subTargetPose = _nh.subscribe(sub_target, 1, &PathPlan_AStar::subCallback_target, this);
 
    _gotMap = false;
+   _gotPose = false;
 }
 
 PathPlan_AStar::~PathPlan_AStar()
@@ -140,7 +144,8 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    astar_planer->setWallValue(WALL_VALUE);
    astar_planer->setAstarParam(_cost_short_step,
                                _cost_long_step,
-                               _factor_dist);
+                               _factor_dist,
+                               _costmap_weight);
    astar_planer->setGridMap(new apps::GridMap((uint8_t*) &_map.data[0],
                                                _map.info.width,
                                                _map.info.height,
@@ -150,7 +155,6 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    this->do_map_operations(astar_planer);
    ROS_INFO("ohm_path_plan ->  Do planning");
    std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
-
 
    //save map and dt map
    apps::GridMap* tmp_map = astar_planer->getCostmap("dt");
@@ -233,11 +237,11 @@ nav_msgs::Path PathPlan_AStar::toRosPath(std::vector<apps::Point2D> path,
 void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
 {
    //inflate and binarize image
-   apps::MapOperations::inflate(planner->getGridMap(), 10, 127, _robot_radius);
+   apps::MapOperations::inflateCirc(planner->getGridMap(), 10, 127, _robot_radius);
    apps::MapOperations::binarize(planner->getGridMap(), 0, 1, FREE_VALUE, WALL_VALUE);
 
    apps::GridMap* cost_map_dt = new apps::GridMap(planner->getGridMap());
-   apps::MapOperations::distnaceTransform(cost_map_dt,0.4,WALL_VALUE);
+   apps::MapOperations::distnaceTransformCirc(cost_map_dt, _dt_radius, WALL_VALUE);
    planner->addCostmap("dt", cost_map_dt);
 }
 

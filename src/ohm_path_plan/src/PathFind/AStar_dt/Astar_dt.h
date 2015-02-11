@@ -10,10 +10,13 @@
 
 #include <iostream>
 #include <stdio.h>
-#include "../PathFind_base/PathFind_base.h"
+
 #include <queue>
 #include <cmath>
 //#include <Eigen/Dense>
+
+#include "../PathFind_base/PathFind_base.h"
+#include "../Map/MapOperations/MapOperations.h"
 
 namespace apps
 {
@@ -83,11 +86,13 @@ public:
 
    void setAstarParam(astar_f_type cost_short_step,
                       astar_f_type cost_long_step,
-                      astar_f_type factor_dist )
+                      astar_f_type factor_dist,
+                      astar_f_type costmap_weight)
    {
       _cost_short_step = cost_short_step;
       _cost_long_step  = cost_long_step;
       _factor_dist     = factor_dist;
+      _costmap_weight  = costmap_weight;
    }
 
 
@@ -113,18 +118,67 @@ private:
       int y = end.y - curr.y;
       astar_f_type tmp = (::sqrt(x*x + y*y) * _factor_dist);
 
-      uint8_t costMapVal = _costMapStack.at("dt")->getMapData()[this->pixelToIdx(curr,
-                                                                this->getGridMap()->getWidth())];
       astar_f_type scale = 0;
-      if(costMapVal != 0)
-      {
-         scale = (astar_f_type)costMapVal / (astar_f_type)255;
-         //scale =  1 - scale;//scale *= 0.0001;
-         //todo continue here
-      }
+
+      scale = this->getCostmapScale(curr);
+
       //printf("scale: %f\n", scale);
 
       return tmp * (scale + 1);
+   }
+
+
+   inline astar_f_type getGx(Astar_node* currNode, Astar_child child)
+   {
+      astar_f_type tmp = currNode->g + (child.isDiagonal ? _cost_long_step : _cost_short_step);
+
+      //astar_f_type scale = this->getCostmapScale(currNode->pixel);
+
+      return tmp;// * (scale);
+   }
+
+   /**
+    * @brief returs the merged scale from all costmaps
+    *
+    * If only one costmap sets a pixel as "wall" then the pixel is a wall.
+    *
+    * @todo Higher values from a cos map may should have an higher priority
+    *
+    * @return scalevalue [0..1], if wall -> [>2]
+    */
+   inline astar_f_type getCostmapScale(Pixel p)
+   {
+      astar_f_type scale = 0;
+
+      //if no costmap... return 0
+      if(!_costMapStack.size())
+      {
+         return 0;
+      }
+
+      //get values from all costmaps and merge....
+      std::vector<uint8_t> mapValues;
+      for(std::map<std::string,GridMap*>::iterator it = _costMapStack.begin(); it != _costMapStack.end(); ++it)
+      {
+         uint8_t val = it->second->getMapData()[MapOperations::pixelToIdx(p, it->second->getWidth())];
+         if(val == 255)
+         {//return wall detected (return >2)
+            return 3.0;
+         }
+         mapValues.push_back(val);
+      }
+
+      //compute scale
+      //todo get higher values higher priority... for now just average value is build
+
+      for(unsigned int i = 0; i < mapValues.size(); ++i)
+      {
+         scale += (astar_f_type)mapValues[i] / (double)255;
+      }
+
+      scale /= mapValues.size();
+
+      return scale * _costmap_weight;
    }
 
    void getChildNodes(std::vector<Astar_child>& vec, Pixel node);
@@ -133,17 +187,7 @@ private:
 
    void tracePath(Astar_node* node);
 
-   inline astar_f_type getGx(Astar_node* currNode, Astar_child child)
-   {
-      astar_f_type tmp = currNode->g + (child.isDiagonal ? _cost_long_step : _cost_short_step);
-      //uint8_t costMapVal = _costMapStack.at("dt")->getMapData()[this->pixelToIdx(child.pixel,
-      //                                                                           this->getGridMap()->getWidth())];
-      //value range: 0..1
 
-      //scale *= 0.1;
-      //tmp *=
-      return tmp;// * (scale + 1);
-   }
 
 private:
    //std::priority_queue<unsigned int> _openList;
@@ -158,6 +202,7 @@ private:
    astar_f_type _cost_short_step;
    astar_f_type _cost_long_step;
    astar_f_type _factor_dist;
+   astar_f_type _costmap_weight;
 
 };
 
