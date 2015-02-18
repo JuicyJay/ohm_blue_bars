@@ -18,7 +18,7 @@
 #include "PathFind/AStar_dt/Astar_dt.h"
 #include "PathFind/Map/MapOperations/MapOperations.h"
 
-#include <ohm_path_plan/PlanPathsSorted.h>
+#include <ohm_path_plan/PlanPaths.h>
 
 class PathPlan_AStar
 {
@@ -97,8 +97,8 @@ private:    //functions
     void subCallback_map(const nav_msgs::OccupancyGrid& msg);
     void subCallback_target(const geometry_msgs::PoseStamped& msg);
 
-    bool srvCallback_plan_sorted(ohm_path_plan::PlanPathsSortedRequest& req,
-                                 ohm_path_plan::PlanPathsSortedResponse& res);
+    bool srvCallback_plan_sorted(ohm_path_plan::PlanPathsRequest& req,
+                                 ohm_path_plan::PlanPathsResponse& res);
 
 };
 

@@ -71,6 +71,8 @@ public:
     */
    void resetCostmaps();
 
+   double getPathLenght(std::vector<Point2D> path);
+
    //void setRobotRadius(const double rad) { _robot_radius = rad; }
    //double getRobotRadius() const { return _robot_radius; }
 

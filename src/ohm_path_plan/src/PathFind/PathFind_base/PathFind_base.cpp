@@ -85,6 +85,29 @@ GridMap* PathFind_base::getGridMap() const
 //   delete[] tmp_map;
 //}
 
+
+double PathFind_base::getPathLenght(std::vector<Point2D> path)
+{
+   if(!path.size())
+      return 0.0;
+
+   double length = 0;
+   Point2D old;
+   old = path[0];
+   for(unsigned int i = 1; i < path.size(); ++i)
+   {
+      Point2D tmp;
+      tmp.x = path[i].x - old.x;
+      tmp.y = path[i].y - old.y;
+
+      length += ::sqrt(tmp.x * tmp.x + tmp.y * tmp.y);
+
+      old = path[i];
+   }
+   return length;
+}
+
+
 std::vector<Point2D> PathFind_base::computePathPoint(Point2D start, Point2D end)
 {
    std::vector<Pixel> pixelPath = this->computePath(_map->toPixel(start), _map->toPixel(end));

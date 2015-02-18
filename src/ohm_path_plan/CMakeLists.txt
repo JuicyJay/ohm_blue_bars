@@ -58,7 +58,7 @@ find_package(OpenCV REQUIRED)
 ## Generate services in the 'srv' folder
 add_service_files(
    FILES
-   PlanPathsSorted.srv
+   PlanPaths.srv
 #   Service2.srv
 )
 

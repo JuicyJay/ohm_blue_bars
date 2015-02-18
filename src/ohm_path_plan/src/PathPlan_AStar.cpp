@@ -259,12 +259,61 @@ std::vector<apps::Point2D> PathPlan_AStar::do_path_planning(apps::Astar_dt* plan
 }
 
 bool PathPlan_AStar::srvCallback_plan_sorted(
-      ohm_path_plan::PlanPathsSortedRequest& req,
-      ohm_path_plan::PlanPathsSortedResponse& res)
+      ohm_path_plan::PlanPathsRequest& req,
+      ohm_path_plan::PlanPathsResponse& res)
 {
 
-   //todo
+   ROS_INFO("Ohm_path_plan -> PlanPaths service called");
 
+   apps::Point2D pose;
+
+   pose.x = req.origin.pose.position.x;
+   pose.y = req.origin.pose.position.y;
+
+   //obvious::Timer timer;
+   //timer.reset();
+
+   apps::Point2D origin;
+   origin.x = _map.info.origin.position.x;
+   origin.y = _map.info.origin.position.y;
+
+
+
+
+
+   apps::Astar_dt* astar_planer = new apps::Astar_dt(NULL);
+   astar_planer->setWallValue(WALL_VALUE);
+   astar_planer->setAstarParam(_cost_short_step,
+                               _cost_long_step,
+                               _factor_dist,
+                               _costmap_weight);
+   astar_planer->setGridMap(new apps::GridMap((uint8_t*) &_map.data[0],
+                                               _map.info.width,
+                                               _map.info.height,
+                                               _map.info.resolution,
+                                               origin));
+   this->do_map_operations(astar_planer);
+
+   res.lengths.resize(req.targets.size());
+
+   for(unsigned int i = 0; i < req.targets.size(); ++i)
+   {
+      apps::Point2D end;
+      end.x = req.targets[i].pose.position.x;
+      end.y = req.targets[i].pose.position.y;
+
+      std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
+
+      if(path.size() == 0)
+      {//no path found
+         res.lengths[i] = -1;
+      }
+      else
+      {
+         res.lengths[i] = astar_planer->getPathLenght(path);
+      }
+
+   }
 
    return true;
 }
