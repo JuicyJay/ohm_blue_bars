@@ -42,6 +42,7 @@ public:
     inline bool valid(void) const { return _valid; }
     inline float length(void) const { return _length; }
     inline Orientation orientation(void) const { return _orientation; }
+    inline float distance(void) const { return _distance; }
 
     inline void setResolution(const float res) { _resolution = res; }
     inline void setOrigin(const geometry_msgs::Point& origin) { _origin = origin; }

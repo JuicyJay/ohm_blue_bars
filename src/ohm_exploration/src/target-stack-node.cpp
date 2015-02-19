@@ -64,11 +64,14 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
     {
         for (unsigned int i = 0; i < paths.response.lengths.size(); ++i)
 	{
-            receivedWalls[i].setDistance(paths.response.lengths[i]);
+            receivedWalls[i].setDistance(paths.response.lengths[i] < 0.0 ? std::numeric_limits<float>::max() :  paths.response.lengths[i]);
 	    ROS_INFO("distance to wall %u is %f.", i, paths.response.lengths[i]);
 	}
 
         std::sort(receivedWalls.begin(), receivedWalls.end());
+
+	for (unsigned int i = 0; i < receivedWalls.size(); ++i)
+	  ROS_INFO("distance to wall %u is %f.", i, receivedWalls[i].distance());
     }
     else
     {

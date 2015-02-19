@@ -47,6 +47,15 @@ void Inspect::process(void)
     if ((ros::Time::now() - _stamp).toSec() > 2.0f)
     {
         ROS_INFO("Inspect state alrady lives 2 seconds. Now its time to kill it.");
+
+	/* Set sensor head mode back to mode NONE. */
+        ohm_sensor_head::Mode mode;
+        mode.request.mode = ohm_sensor_head::Mode::Request::NONE;
+
+        if (!_srvHeadMode.call(mode))
+           ROS_ERROR("Can't call change mode service of the sensor head node.");
+
+        /* Set the state after and kill myself.*/
         Context::getInstance()->setState(new Explore);
         delete this;
         return;

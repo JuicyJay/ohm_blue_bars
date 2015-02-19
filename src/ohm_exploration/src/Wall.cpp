@@ -13,7 +13,8 @@ Wall::Wall(const PointVector& points)
       _id(++s_id),
       _center(0.0f, 0.0f),
       _resolution(1.0f),
-      _orientation(None)
+      _orientation(None),
+      _distance(-1.0f)
 {
 //    std::cout << __PRETTY_FUNCTION__ << std::endl;
 //    std::cout << "points = " << _points.size() << std::endl;
@@ -65,7 +66,8 @@ Wall::Wall(const ohm_exploration::Wall& wall)
       _resolution(1.0f),
 //      _orientation(static_cast<Orientation>(wall.orientation)),
       _valid(true),
-      _length(wall.length)
+      _length(wall.length),
+      _distance(-1.0f)
 {
     this->setOrientation(static_cast<Orientation>(wall.orientation));
 }
@@ -79,7 +81,8 @@ Wall::Wall(const Wall& wall)
       _origin(wall._origin),
       _orientation(wall._orientation),
       _valid(wall._valid),
-      _length(wall._length)
+      _length(wall._length),
+      _distance(wall._distance)
 {
 
 }
