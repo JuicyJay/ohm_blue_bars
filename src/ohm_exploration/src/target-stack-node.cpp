@@ -14,7 +14,7 @@
 std::list<Wall> _haveToInspect;
 std::vector<Target> _targets;
 ros::ServiceClient _srvPlanPaths;
-tf::TransformListener _listener;
+tf::TransformListener* _listener = 0;
 std::string _tfSource, _tfTarget;
 
 void callbackWalls(const ohm_exploration::WallArray& walls)
@@ -41,7 +41,7 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
 
     try
     {
-        _listener.lookupTransform(_tfSource, _tfTarget, ros::Time(0), transform);
+        _listener->lookupTransform(_tfSource, _tfTarget, ros::Time(0), transform);
     }
     catch (tf::TransformException ex)
     {
@@ -63,7 +63,10 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
     if (_srvPlanPaths.call(paths))
     {
         for (unsigned int i = 0; i < paths.response.lengths.size(); ++i)
+	{
             receivedWalls[i].setDistance(paths.response.lengths[i]);
+	    ROS_INFO("distance to wall %u is %f.", i, paths.response.lengths[i]);
+	}
 
         std::sort(receivedWalls.begin(), receivedWalls.end());
     }
@@ -143,6 +146,7 @@ int main(int argc, char** argv)
     std::string topic;
     ros::NodeHandle para("~");
     ros::NodeHandle nh;
+    _listener = new tf::TransformListener;
 
     para.param<std::string>("topic_walls", topic, "exploration/walls");
     ros::Subscriber subWalls(nh.subscribe(topic, 2, callbackWalls));
@@ -152,6 +156,10 @@ int main(int argc, char** argv)
     ros::ServiceServer srvMarkTarget(nh.advertiseService(topic, callbackMarkTarget));
     para.param<std::string>("service_plan_paths", topic, "path_plan/plan_paths");
     _srvPlanPaths = nh.serviceClient<ohm_path_plan::PlanPaths>(topic);
+    para.param<std::string>("tf_source", _tfSource, "map");
+    para.param<std::string>("tf_target", _tfTarget, "base_footprint");
 
     ros::spin();
+
+    delete _listener;
 }
