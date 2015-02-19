@@ -32,6 +32,8 @@ private:    //dataelements
     ros::Subscriber _subMap;
     ros::Subscriber _subTargetPose;
 
+    ros::ServiceServer _srv_plan_paths;
+
     ros::ServiceServer _servicePlan;
 
     tf::TransformListener _tf_listnener;

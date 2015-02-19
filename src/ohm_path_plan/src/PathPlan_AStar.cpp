@@ -20,6 +20,7 @@ PathPlan_AStar::PathPlan_AStar() :
    std::string frame_id;
    std::string tf_map_frame;
    std::string tf_robot_frame;
+   std::string srv_plan_paths;
 
    double robot_radius;
    double dt_radius;
@@ -33,6 +34,7 @@ PathPlan_AStar::PathPlan_AStar() :
    privNh.param("sub_target",            sub_target,     std::string("/move_base_simple/goal"));
    privNh.param("sub_pose",              sub_pose,       std::string("robot0/pose"));
    privNh.param("pub_path",              pub_path,       std::string("path"));
+   privNh.param("srv_plan_paths",        srv_plan_paths, std::string("path_plan/srv_plan_paths"));
    privNh.param("frame_id",              frame_id,       std::string("map"));
    privNh.param("tf_map_frame",           tf_map_frame,           std::string("map"));
    privNh.param("tf_robot_frame",         tf_robot_frame,         std::string("base_footprint"));
@@ -63,6 +65,9 @@ PathPlan_AStar::PathPlan_AStar() :
    //inti subscriber
    _subMap        = _nh.subscribe(sub_map, 1, &PathPlan_AStar::subCallback_map, this);
    _subTargetPose = _nh.subscribe(sub_target, 1, &PathPlan_AStar::subCallback_target, this);
+
+   //init services
+   _srv_plan_paths = _nh.advertiseService(srv_plan_paths, &PathPlan_AStar::srvCallback_plan_sorted, this);
 
    _gotMap = false;
    //_gotPose = false;
@@ -265,10 +270,16 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
 
    ROS_INFO("Ohm_path_plan -> PlanPaths service called");
 
+   if(!_gotMap)
+   {
+      ROS_WARN("Called service to plan path... but no map given yet");
+      return false;
+   }
+
    apps::Point2D pose;
 
-   pose.x = req.origin.pose.position.x;
-   pose.y = req.origin.pose.position.y;
+   pose.x = req.origin.position.x;
+   pose.y = req.origin.position.y;
 
    //obvious::Timer timer;
    //timer.reset();
@@ -299,8 +310,8 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
    for(unsigned int i = 0; i < req.targets.size(); ++i)
    {
       apps::Point2D end;
-      end.x = req.targets[i].pose.position.x;
-      end.y = req.targets[i].pose.position.y;
+      end.x = req.targets[i].position.x;
+      end.y = req.targets[i].position.y;
 
       std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
 

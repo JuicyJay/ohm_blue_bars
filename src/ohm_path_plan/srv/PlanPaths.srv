@@ -1,5 +1,5 @@
-geometry_msgs/PoseStamped     origin
-geometry_msgs/PoseStamped[]   targets
+geometry_msgs/Pose     origin
+geometry_msgs/Pose[]   targets
 ---
 float64[]            lengths
 #geometry_msgs/PoseStamped[]   sorted_targets
