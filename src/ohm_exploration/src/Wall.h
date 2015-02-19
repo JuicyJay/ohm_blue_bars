@@ -41,17 +41,19 @@ public:
     inline float resolution(void) const { return _resolution; }
     inline bool valid(void) const { return _valid; }
     inline float length(void) const { return _length; }
+    inline Orientation orientation(void) const { return _orientation; }
 
     inline void setResolution(const float res) { _resolution = res; }
     inline void setOrigin(const geometry_msgs::Point& origin) { _origin = origin; }
     void setOrientation(const Orientation orientation);
-    inline Orientation orientation(void) const { return _orientation; }
+    inline void setDistance(const float distance) { _distance = distance; }
 
     visualization_msgs::Marker getMarkerMessage(void) const;
     ohm_exploration::Wall getWallMessage(void) const;
 
     /* compare operator for std::sort */
     bool operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const;
+    inline bool operator<(const Wall& wall) const { return _distance < wall._distance; }
 
 private:
     Line _model;
@@ -63,6 +65,7 @@ private:
     Orientation _orientation;
     bool _valid;
     float _length;
+    float _distance;
 
     static unsigned int s_id;
 };

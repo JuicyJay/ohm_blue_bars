@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
                     message_generation
                     std_msgs
                     geometry_msgs
+                    ohm_path_plan
                     )
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
