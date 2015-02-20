@@ -18,8 +18,9 @@ PathAnalyser_base::PathAnalyser_base() :
       _path_lenth(0),
       _path_lenth_rest(0),
       _reached_final_goal(false)
-{
 
+{
+   _do_end_rotate = true;
 }
 
 

@@ -9,6 +9,6 @@ int main(int argc, char *argv[])
     ros::NodeHandle nh("~");
 
     PathControl node;
-    node.start(200);
+    node.start(25);
 
 }

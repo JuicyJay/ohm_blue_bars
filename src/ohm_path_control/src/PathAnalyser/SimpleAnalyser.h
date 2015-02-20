@@ -15,6 +15,7 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <tinyxml2.h>
+#include <limits>
 
 using namespace Eigen;
 

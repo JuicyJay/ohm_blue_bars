@@ -74,6 +74,9 @@ public:
     */
    static Vector3d quaternion_to_orientationVec(Quaternion<double> q) { return q * Vector3d(1,0,0); }
 
+   void setDoEndRotate(const bool doEndRotate) { _do_end_rotate = doEndRotate; }
+   bool isDoEndRotate() { return _do_end_rotate; }
+
 protected: //dataelements
    std::vector<analyser::pose> _path;  ///< current path to analyse
 
@@ -90,12 +93,14 @@ protected:  //functions
    void setReachedFinalGoal(bool reachedFinalGoal) { _reached_final_goal = reachedFinalGoal; }
    double getPathLengthRest() const { return _path_lenth_rest; }
 
+
 private:
    unsigned int _currentGoal_index;
    double _dist_to_current_goal;       ///< must set in analyse() by user of this baseclass
    double _path_lenth;
    double _path_lenth_rest;
    bool _reached_final_goal;           ///< must set in analyse() by user of this baseclass
+   bool _do_end_rotate;
    //for eigen
 //public:
    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW

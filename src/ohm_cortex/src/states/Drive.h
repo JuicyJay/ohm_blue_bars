@@ -22,6 +22,7 @@
 #include "Inspect.h"
 
 #include <Eigen/Dense>
+#include <limits>
 
 /**
  * @namespace autonohm

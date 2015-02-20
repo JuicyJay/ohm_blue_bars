@@ -92,6 +92,16 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
       p = this->currentGoal().orientation;
       p.z() = 0;
 
+
+      //if orientation is nan than dont rotate .... just exit
+      if(!this->isDoEndRotate())
+      {
+         this->setReachedFinalGoal(true);
+         diff_scale.angular = 0;
+         diff_scale.linear = 0;
+         return diff_scale;
+      }
+
       //printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
 
    }

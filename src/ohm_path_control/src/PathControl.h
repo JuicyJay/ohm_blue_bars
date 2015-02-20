@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
+#include <limits>
 
 #include "PathAnalyser/PathAnalyser_base.h"
 #include "Controller/Controller_base.h"
@@ -29,7 +30,9 @@ private:    //dataelements
     ros::Publisher _pub_cmd_vel;
     ros::Publisher _pubState;
     ros::Subscriber _sub_path;
-    ros::Subscriber _sub_pose;
+    //ros::Subscriber _sub_pose;
+    ros::Subscriber _sub_em_stop;
+    ros::Subscriber _sub_pause;
 
     tf::TransformListener _tf_listnener;
 
@@ -89,6 +92,10 @@ private:    //functions
      * @param msg -> ros msg
      */
     void subPath_callback(const nav_msgs::Path& msg);
+
+    void subEmStop_callback(const std_msgs::Bool& msg);
+
+    void subPause_callback(const std_msgs::Bool& msg);
 };
 
 #endif /* TEMPLATE_H_ */

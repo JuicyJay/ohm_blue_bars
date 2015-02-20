@@ -12,6 +12,8 @@ PathControl::PathControl() : _rate(0)
     std::string pub_name_cmd_vel;
     std::string pub_name_state;
     std::string sub_name_path;
+    std::string sub_name_em_stop;
+    std::string sub_name_pause;
     //std::string sub_name_pose;
     std::string config_file_controller;
     std::string config_file_analyser;
@@ -21,6 +23,8 @@ PathControl::PathControl() : _rate(0)
     privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("vel/teleop"));
     privNh.param("pub_name_state",         pub_name_state,         std::string("path_control/state"));
     privNh.param("sub_name_path",          sub_name_path,          std::string("path"));
+    privNh.param("sub_name_em_stop",       sub_name_em_stop,       std::string("path_control/emergency_stop"));
+    privNh.param("sub_name_pause",         sub_name_pause,         std::string("path_control/pause"));
     //privNh.param("sub_name_pose",          sub_name_pose,          std::string("pose"));
     privNh.param("config_file_controller", config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
     privNh.param("config_file_analyser",   config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
@@ -81,12 +85,12 @@ void PathControl::run()
 
     while(ros::ok())
     {
-        //do stuff;
+       //do stuff;
 
        this->doPathControl();
 
-        ros::spinOnce();
-        _rate->sleep();
+       ros::spinOnce();
+       _rate->sleep();
     }
 }
 
@@ -171,6 +175,30 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
       tmp_pose.orientation = analyser::PathAnalyser_base::quaternion_to_orientationVec(tmp_q);
       path.push_back(tmp_pose);
    }
+
+   //prove last path element of nan
+   if(msg.poses[msg.poses.size() - 1].pose.orientation.w == std::numeric_limits::quiet_NaN() ||
+      msg.poses[msg.poses.size() - 1].pose.orientation.x == std::numeric_limits::quiet_NaN() ||
+      msg.poses[msg.poses.size() - 1].pose.orientation.y == std::numeric_limits::quiet_NaN() ||
+      msg.poses[msg.poses.size() - 1].pose.orientation.z == std::numeric_limits::quiet_NaN()    )
+   {
+      //if none is nan ... than set to norotate
+      _pathAnalyser->setDoEndRotate(false);
+   }
+   else
+   {
+      _pathAnalyser->setDoEndRotate(true);
+   }
+
+
    _pathAnalyser->setPath(path);
    _enable_analyse = true;
+}
+
+void PathControl::subEmStop_callback(const std_msgs::Bool& msg)
+{
+}
+
+void PathControl::subPause_callback(const std_msgs::Bool& msg)
+{
 }

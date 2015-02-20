@@ -108,23 +108,32 @@ void Drive::process(void)
    //now pubish to pathcontroll and begin moving until target reached
    if(_mode == drive::NO_TARGET_ORI)
    {//change last wp orientation
-      if(_path.poses.size() >= 2)
-      {
-         geometry_msgs::Point p_last = _path.poses[_path.poses.size() - 1].pose.position;
-         geometry_msgs::Point p_blast = _path.poses[_path.poses.size() - 2].pose.position;
-         Eigen::Vector3d l(p_last.x, p_last.y, p_last.z);   //last
-         Eigen::Vector3d bl(p_blast.x, p_blast.y, p_blast.z);  //before last
 
-         Eigen::Quaternion<double> q;
-         q = q.FromTwoVectors(Eigen::Vector3d(1,0,0), l-bl);
+      geometry_msgs::Quaternion ori;
+      ori.x = std::numeric_limits::quiet_NaN();
+      ori.y = std::numeric_limits::quiet_NaN();
+      ori.z = std::numeric_limits::quiet_NaN();
+      ori.w = std::numeric_limits::quiet_NaN();
 
-         geometry_msgs::Quaternion ori;
-         ori.x = q.x();
-         ori.y = q.y();
-         ori.z = q.z();
-         ori.w = q.w();
-         _path.poses[_path.poses.size() - 1].pose.orientation = ori;
-      }
+      _path.poses[_path.poses.size() - 1].pose.orientation = ori;
+//
+//      if(_path.poses.size() >= 2)
+//      {
+//         geometry_msgs::Point p_last = _path.poses[_path.poses.size() - 1].pose.position;
+//         geometry_msgs::Point p_blast = _path.poses[_path.poses.size() - 2].pose.position;
+//         Eigen::Vector3d l(p_last.x, p_last.y, p_last.z);   //last
+//         Eigen::Vector3d bl(p_blast.x, p_blast.y, p_blast.z);  //before last
+//
+//         Eigen::Quaternion<double> q;
+//         q = q.FromTwoVectors(Eigen::Vector3d(1,0,0), l-bl);
+//
+//         geometry_msgs::Quaternion ori;
+//         ori.x = q.x();
+//         ori.y = q.y();
+//         ori.z = q.z();
+//         ori.w = q.w();
+//         _path.poses[_path.poses.size() - 1].pose.orientation = ori;
+//      }
    }
    _pubPath.publish(_path);
 
