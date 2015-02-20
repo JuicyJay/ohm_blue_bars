@@ -203,6 +203,12 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
       path.push_back(tmp_pose);
    }
 
+
+   ROS_INFO("--_> OUTPUT: %f, %f, %f, %f",
+         msg.poses[msg.poses.size() - 1].pose.orientation.w,
+         msg.poses[msg.poses.size() - 1].pose.orientation.x,
+         msg.poses[msg.poses.size() - 1].pose.orientation.y,
+         msg.poses[msg.poses.size() - 1].pose.orientation.z);
    //prove last path element of nan
    if(msg.poses[msg.poses.size() - 1].pose.orientation.w == std::numeric_limits<double>::quiet_NaN() ||
       msg.poses[msg.poses.size() - 1].pose.orientation.x == std::numeric_limits<double>::quiet_NaN() ||
