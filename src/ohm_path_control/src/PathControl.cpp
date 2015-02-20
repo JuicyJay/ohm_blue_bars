@@ -41,11 +41,15 @@ PathControl::PathControl() : _rate(0)
     //inti subscriber
     _sub_path = _nh.subscribe(sub_name_path , 1, &PathControl::subPath_callback, this);
     //_sub_pose = _nh.subscribe(sub_name_pose , 1, &PathControl::subPose_callback, this);
+    _sub_em_stop = _nh.subscribe(sub_name_em_stop, 1, &PathControl::subEmStop_callback, this);
+    _sub_pause = _nh.subscribe(sub_name_pause, 1, &PathControl::subPause_callback, this);
 
     _pathAnalyser = new analyser::SimpleAnalyser(config_file_analyser);
     _controller = new controller::ParabolaTransfere(config_file_controller);
 
     _enable_analyse = false;
+    _pause = false;
+    _em_stop = false;
 }
 
 PathControl::~PathControl()
@@ -96,6 +100,23 @@ void PathControl::run()
 
 void PathControl::doPathControl(void)
 {
+   if(_em_stop)
+   {
+      ROS_WARN("EMERNGENCY_STOP activated!!!! moving canceld");
+
+      geometry_msgs::Twist msgTwist;
+      msgTwist.angular.z = 0;
+      msgTwist.linear.x = 0;
+
+      _pub_cmd_vel.publish(msgTwist);
+
+      //delete path:
+      std::vector<analyser::pose> path;
+      //set empty path
+      _pathAnalyser->setPath(path);
+
+      return;
+   }
    if(!_enable_analyse)
    {
       return;
@@ -150,6 +171,12 @@ void PathControl::doPathControl(void)
 //      //_enable_analyse = false;
 //   }
 
+   if(_pause)
+   {
+      msgTwist.angular.z = 0;
+      msgTwist.linear.x = 0;
+   }
+
    _pubState.publish(reachedTarget);
    _pub_cmd_vel.publish(msgTwist);
 }
@@ -157,7 +184,7 @@ void PathControl::doPathControl(void)
 void PathControl::subPath_callback(const nav_msgs::Path& msg)
 {
    std::vector<analyser::pose> path;
-
+   ROS_INFO("GOT Path");
 
    //set path
    for(unsigned int i=0; i<msg.poses.size(); i++)
@@ -192,13 +219,16 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
 
 
    _pathAnalyser->setPath(path);
+   ROS_INFO("Enable analyser...");
    _enable_analyse = true;
 }
 
 void PathControl::subEmStop_callback(const std_msgs::Bool& msg)
 {
+   _em_stop = msg.data;
 }
 
 void PathControl::subPause_callback(const std_msgs::Bool& msg)
 {
+   _pause = msg.data;
 }

@@ -46,6 +46,9 @@ private:    //dataelements
 
     bool _enable_analyse;
 
+    bool _pause;
+    bool _em_stop;
+
     std::string _tf_map_frame;
     std::string _tf_robot_frame;
 
@@ -93,8 +96,18 @@ private:    //functions
      */
     void subPath_callback(const nav_msgs::Path& msg);
 
+    /**
+     * @brief if msg == true... then emergency_stop is called -> cancel moving.... need new path
+     *
+     * @param msg
+     */
     void subEmStop_callback(const std_msgs::Bool& msg);
 
+    /**
+     * @brief if msg == true... then pause is activated.... stop moving untill msg == false
+     *
+     * @param msg
+     */
     void subPause_callback(const std_msgs::Bool& msg);
 };
 
