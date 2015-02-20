@@ -177,10 +177,10 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
    }
 
    //prove last path element of nan
-   if(msg.poses[msg.poses.size() - 1].pose.orientation.w == std::numeric_limits::quiet_NaN() ||
-      msg.poses[msg.poses.size() - 1].pose.orientation.x == std::numeric_limits::quiet_NaN() ||
-      msg.poses[msg.poses.size() - 1].pose.orientation.y == std::numeric_limits::quiet_NaN() ||
-      msg.poses[msg.poses.size() - 1].pose.orientation.z == std::numeric_limits::quiet_NaN()    )
+   if(msg.poses[msg.poses.size() - 1].pose.orientation.w == std::numeric_limits<double>::quiet_NaN() ||
+      msg.poses[msg.poses.size() - 1].pose.orientation.x == std::numeric_limits<double>::quiet_NaN() ||
+      msg.poses[msg.poses.size() - 1].pose.orientation.y == std::numeric_limits<double>::quiet_NaN() ||
+      msg.poses[msg.poses.size() - 1].pose.orientation.z == std::numeric_limits<double>::quiet_NaN()    )
    {
       //if none is nan ... than set to norotate
       _pathAnalyser->setDoEndRotate(false);
