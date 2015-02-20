@@ -71,7 +71,7 @@ Wall::Wall(const ohm_exploration::Wall& wall)
 {
     this->setOrientation(static_cast<Orientation>(wall.orientation));
 }
-
+/*
 Wall::Wall(const Wall& wall)
     : _model(wall._model),
       _points(wall._points),
@@ -86,7 +86,7 @@ Wall::Wall(const Wall& wall)
 {
 
 }
-
+*/
 bool Wall::operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const
 {
     return (left - Eigen::Vector2i(0, _model.t())).cast<float>().norm() <
