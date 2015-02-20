@@ -17,21 +17,52 @@ ros::ServiceClient _srvPlanPaths;
 tf::TransformListener* _listener = 0;
 std::string _tfSource, _tfTarget;
 
+Wall takeClosestWallFromList(std::list<Wall>& walls, const Pose& origin)
+{
+    ohm_path_plan::PlanPaths paths;
+
+    for (std::list<Wall>::const_iterator wall(walls.begin()); wall != walls.end(); ++wall)
+    {
+        const Eigen::Vector3f center(wall->center().x(), wall->center().y(), 0.0f);
+        const Eigen::Vector3f n(wall->model().n().x(), wall->model().n().y(), 0.0f);
+        const Pose pose(center + n * 0.5f, -n);
+
+        paths.request.targets.push_back(pose.toRos());
+    }
+
+
+    if (!_srvPlanPaths.call(paths))
+    {
+        ROS_ERROR("Cannot call the path plan node.");
+        return Wall();
+    }
+
+    if (paths.response.lengths.size() != walls.size())
+    {
+        ROS_ERROR("Not enough distances received from the path plan node.");
+        return Wall();
+    }
+
+    std::vector<double>::const_iterator distance(paths.response.lengths.begin());
+    for (std::list<Wall>::iterator wall(walls.begin()); wall != walls.end(); ++wall, ++distance)
+        wall->setDistance(*distance);
+
+    walls.sort();
+    Wall wall(walls.front());
+    walls.pop_front();
+    return wall;
+}
+
 void callbackWalls(const ohm_exploration::WallArray& walls)
 {
     /* Use the center of the walls to create targets and get the corresponding lenghts. */
     ohm_path_plan::PlanPaths paths;
-    std::vector<Wall> receivedWalls;
+    std::list<Wall> receivedWalls;
 
     for (std::vector<ohm_exploration::Wall>::const_iterator wall(walls.walls.begin());
          wall < walls.walls.end();
          ++wall)
     {
-        const Eigen::Vector3f center(wall->center.x, wall->center.y, 0.0f);
-        const Eigen::Vector3f n(wall->n.x, wall->n.y, 0.0f);
-        const Pose pose(center + n * 0.5f, -n);
-
-        paths.request.targets.push_back(pose.toRos());
         receivedWalls.push_back(Wall(*wall));
     }
 
@@ -49,47 +80,95 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
         ROS_INFO("Will use coordinate (0, 0, 0).");
     }
 
-    paths.request.origin.position.x = transform.getOrigin().x();
-    paths.request.origin.position.y = transform.getOrigin().y();
-    paths.request.origin.position.z = transform.getOrigin().z();
-
-    paths.request.origin.orientation.w = transform.getRotation().w();
-    paths.request.origin.orientation.x = transform.getRotation().x();
-    paths.request.origin.orientation.y = transform.getRotation().y();
-    paths.request.origin.orientation.z = transform.getRotation().z();
+    const Pose origin(Eigen::Vector3f(transform.getOrigin().x(),
+                                      transform.getOrigin().y(),
+                                      transform.getOrigin().z()),
+                      Eigen::Vector3f(1.0f, 0.0f, 0.0f));
 
 
-    /* Ask the navigation node for the distances of each path. */
-    if (_srvPlanPaths.call(paths))
+    Wall wall(takeClosestWallFromList(receivedWalls, origin));
+
+    while (wall.valid())
     {
-        for (unsigned int i = 0; i < paths.response.lengths.size(); ++i)
-	{
-            receivedWalls[i].setDistance(paths.response.lengths[i] < 0.0 ? std::numeric_limits<float>::max() :  paths.response.lengths[i]);
-	    ROS_INFO("distance to wall %u is %f.", i, paths.response.lengths[i]);
-	}
+        _haveToInspect.push_back(wall);
 
-        std::sort(receivedWalls.begin(), receivedWalls.end());
+        const Eigen::Vector3f center(wall.center().x(), wall.center().y(), 0.0f);
+        const Eigen::Vector3f n(wall.model().n().x(), wall.model().n().y(), 0.0f);
+        const Pose pose(center + n * 0.5f, -n);
 
-	for (unsigned int i = 0; i < receivedWalls.size(); ++i)
-	  ROS_INFO("distance to wall %u is %f.", i, receivedWalls[i].distance());
+        wall = takeClosestWallFromList(receivedWalls, pose);
     }
-    else
-    {
-        ROS_ERROR("Cannot call the navigation node.");
-        ROS_INFO("Will use the unsorted targets.");
-    }
+}
 
-
-    /* Put all targets to the have to inspect list */
-    _haveToInspect.insert(_haveToInspect.end(), receivedWalls.begin(), receivedWalls.end());
-
+/* Backup */
+//void callbackWalls(const ohm_exploration::WallArray& walls)
+//{
+//    /* Use the center of the walls to create targets and get the corresponding lenghts. */
+//    ohm_path_plan::PlanPaths paths;
+//    std::vector<Wall> receivedWalls;
+//
 //    for (std::vector<ohm_exploration::Wall>::const_iterator wall(walls.walls.begin());
 //         wall < walls.walls.end();
 //         ++wall)
 //    {
-//        _haveToInspect.push_back(Wall(*wall));
+//        const Eigen::Vector3f center(wall->center.x, wall->center.y, 0.0f);
+//        const Eigen::Vector3f n(wall->n.x, wall->n.y, 0.0f);
+//        const Pose pose(center + n * 0.5f, -n);
+//
+//        paths.request.targets.push_back(pose.toRos());
+//        receivedWalls.push_back(Wall(*wall));
 //    }
-}
+//
+//
+//    /* Get the current robot pose. */
+//    tf::StampedTransform transform;
+//
+//    try
+//    {
+//        _listener->lookupTransform(_tfSource, _tfTarget, ros::Time(0), transform);
+//    }
+//    catch (tf::TransformException ex)
+//    {
+//        ROS_ERROR("%s", ex.what());
+//        ROS_INFO("Will use coordinate (0, 0, 0).");
+//    }
+//
+//    paths.request.origin.position.x = transform.getOrigin().x();
+//    paths.request.origin.position.y = transform.getOrigin().y();
+//    paths.request.origin.position.z = transform.getOrigin().z();
+//
+//    paths.request.origin.orientation.w = transform.getRotation().w();
+//    paths.request.origin.orientation.x = transform.getRotation().x();
+//    paths.request.origin.orientation.y = transform.getRotation().y();
+//    paths.request.origin.orientation.z = transform.getRotation().z();
+//
+//
+//    /* Ask the navigation node for the distances of each path. */
+//    if (_srvPlanPaths.call(paths))
+//    {
+//        for (unsigned int i = 0; i < paths.response.lengths.size(); ++i)
+//	{
+//            receivedWalls[i].setDistance(paths.response.lengths[i] < 0.0 ?
+//                                         std::numeric_limits<float>::max() :
+//                                         paths.response.lengths[i]);
+//	    ROS_INFO("distance to wall %u is %f.", i, paths.response.lengths[i]);
+//	}
+//
+//        std::sort(receivedWalls.begin(), receivedWalls.end());
+//
+//	for (unsigned int i = 0; i < receivedWalls.size(); ++i)
+//	  ROS_INFO("distance to wall %u is %f.", i, receivedWalls[i].distance());
+//    }
+//    else
+//    {
+//        ROS_ERROR("Cannot call the navigation node.");
+//        ROS_INFO("Will use the unsorted targets.");
+//    }
+//
+//
+//    /* Put all targets to the have to inspect list */
+//    _haveToInspect.insert(_haveToInspect.end(), receivedWalls.begin(), receivedWalls.end());
+//}
 
 bool callbackMarkTarget(ohm_exploration::MarkTarget::Request& req, ohm_exploration::MarkTarget::Response& res)
 {

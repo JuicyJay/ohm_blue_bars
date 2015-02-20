@@ -28,10 +28,10 @@ public:
         All   = 0xff
     };
 
-    Wall(void) { }
+    Wall(void) : _valid(false) { }
     Wall(const PointVector& points);
     Wall(const ohm_exploration::Wall& wall);
-    Wall(const Wall& wall);
+    //    Wall(const Wall& wall);
 
     inline const Line& model(void) const { return _model; }
     inline const PointVector& points(void) const { return _points; }
