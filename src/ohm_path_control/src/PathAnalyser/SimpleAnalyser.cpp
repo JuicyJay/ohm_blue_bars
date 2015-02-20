@@ -96,8 +96,7 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    {
       //set new target (to get corregt target orientation)
       //std::cout << "reached last Pose" << std::endl;
-      p = this->currentGoal().orientation;
-      p.z() = 0;
+
 
 
       //if orientation is nan than dont rotate .... just exit
@@ -108,6 +107,9 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
          diff_scale.linear = 0;
          return diff_scale;
       }
+
+      p = this->currentGoal().orientation;
+      p.z() = 0;
 
       //printf("p: (%f, %f, %f)\n", p.x(), p.y(), p.z());
 

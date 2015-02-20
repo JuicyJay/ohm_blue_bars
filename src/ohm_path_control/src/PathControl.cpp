@@ -210,10 +210,12 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
       msg.poses[msg.poses.size() - 1].pose.orientation.z == std::numeric_limits<double>::quiet_NaN()    )
    {
       //if none is nan ... than set to norotate
+      ROS_INFO("Disable Rotate");
       _pathAnalyser->setDoEndRotate(false);
    }
    else
    {
+      ROS_INFO("Enable Rotate");
       _pathAnalyser->setDoEndRotate(true);
    }
 
