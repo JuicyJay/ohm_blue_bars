@@ -110,10 +110,10 @@ void Drive::process(void)
    {//change last wp orientation
 
       geometry_msgs::Quaternion ori;
-      ori.x = std::numeric_limits::quiet_NaN();
-      ori.y = std::numeric_limits::quiet_NaN();
-      ori.z = std::numeric_limits::quiet_NaN();
-      ori.w = std::numeric_limits::quiet_NaN();
+      ori.x = std::numeric_limits<double>::quiet_NaN();
+      ori.y = std::numeric_limits<double>::quiet_NaN();
+      ori.z = std::numeric_limits<double>::quiet_NaN();
+      ori.w = std::numeric_limits<double>::quiet_NaN();
 
       _path.poses[_path.poses.size() - 1].pose.orientation = ori;
 //
