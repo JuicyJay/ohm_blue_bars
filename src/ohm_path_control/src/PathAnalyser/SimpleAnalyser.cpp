@@ -49,11 +49,11 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
    diff_scale.angular = 0;
    diff_scale.linear = 0;
 
-   if(_path.size() == 0)
-   {//path with length 0 given... do nothing... return 0:
-      this->setReachedFinalGoal(true);
-      return diff_scale;
-   }
+   //if(_path.size() == 0)
+   //{//path with length 0 given... do nothing... return 0:
+    //  this->setReachedFinalGoal(true);
+   //   return diff_scale;
+   //}
 
    if(this->isReachedFinalGoal())
    {

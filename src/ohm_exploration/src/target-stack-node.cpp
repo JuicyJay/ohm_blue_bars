@@ -19,7 +19,11 @@ std::string _tfSource, _tfTarget;
 
 Wall takeClosestWallFromList(std::list<Wall>& walls, const Pose& origin)
 {
+    if (!walls.size())
+      return Wall();
+
     ohm_path_plan::PlanPaths paths;
+    paths.request.origin = origin.toRos();
 
     for (std::list<Wall>::const_iterator wall(walls.begin()); wall != walls.end(); ++wall)
     {
@@ -45,9 +49,15 @@ Wall takeClosestWallFromList(std::list<Wall>& walls, const Pose& origin)
 
     std::vector<double>::const_iterator distance(paths.response.lengths.begin());
     for (std::list<Wall>::iterator wall(walls.begin()); wall != walls.end(); ++wall, ++distance)
-        wall->setDistance(*distance);
+      wall->setDistance(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
 
     walls.sort();
+
+    for (std::list<Wall>::const_iterator wall(walls.begin()); wall != walls.end(); ++wall)
+      {
+	ROS_INFO("Wall %i is %f m away.", wall->id(), wall->distance());
+      }
+
     Wall wall(walls.front());
     walls.pop_front();
     return wall;
@@ -68,6 +78,7 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
 
 
     /* Get the current robot pose. */
+    ROS_INFO("Get robot pose.");
     tf::StampedTransform transform;
 
     try
@@ -85,7 +96,8 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
                                       transform.getOrigin().z()),
                       Eigen::Vector3f(1.0f, 0.0f, 0.0f));
 
-
+    /* Estimate the best path. */
+    ROS_INFO("Take closest with origin.");
     Wall wall(takeClosestWallFromList(receivedWalls, origin));
 
     while (wall.valid())
@@ -95,7 +107,7 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
         const Eigen::Vector3f center(wall.center().x(), wall.center().y(), 0.0f);
         const Eigen::Vector3f n(wall.model().n().x(), wall.model().n().y(), 0.0f);
         const Pose pose(center + n * 0.5f, -n);
-
+	ROS_INFO_STREAM("Take closest with pose: " << pose.position);
         wall = takeClosestWallFromList(receivedWalls, pose);
     }
 }

@@ -1,7 +1,7 @@
 #include "Target.h"
 
 namespace {
-const float POSE_DISTANCE = 0.5f;
+const float POSE_DISTANCE = 0.4f;
 }
 
 #include <iostream>
