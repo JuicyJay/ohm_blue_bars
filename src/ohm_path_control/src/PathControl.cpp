@@ -210,10 +210,10 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
          msg.poses[msg.poses.size() - 1].pose.orientation.y,
          msg.poses[msg.poses.size() - 1].pose.orientation.z);
    //prove last path element of nan
-   if(msg.poses[msg.poses.size() - 1].pose.orientation.w == std::numeric_limits<double>::quiet_NaN() ||
-      msg.poses[msg.poses.size() - 1].pose.orientation.x == std::numeric_limits<double>::quiet_NaN() ||
-      msg.poses[msg.poses.size() - 1].pose.orientation.y == std::numeric_limits<double>::quiet_NaN() ||
-      msg.poses[msg.poses.size() - 1].pose.orientation.z == std::numeric_limits<double>::quiet_NaN()    )
+   if(isnan(msg.poses[msg.poses.size() - 1].pose.orientation.w) ||
+      isnan(msg.poses[msg.poses.size() - 1].pose.orientation.x) ||
+      isnan(msg.poses[msg.poses.size() - 1].pose.orientation.y) ||
+      isnan(msg.poses[msg.poses.size() - 1].pose.orientation.z)   )
    {
       //if none is nan ... than set to norotate
       ROS_INFO("Disable Rotate");
