@@ -68,7 +68,7 @@ void PathControl::start(const unsigned int rate)
     do{
        try {
           ros::Time time = ros::Time::now();
-          _tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(20));
+          _tf_listnener.waitForTransform(_tf_map_frame, _tf_robot_frame, time, ros::Duration(1));
           rdy = true;
 
        } catch (tf::TransformException& e)
@@ -77,7 +77,10 @@ void PathControl::start(const unsigned int rate)
           return;
        }
     }while(!rdy);
-
+   
+   
+   
+    ROS_INFO("Ohm_pathControl ->   ############ start running!!!!");
     this->run();
 }
 
@@ -90,9 +93,8 @@ void PathControl::run()
     while(ros::ok())
     {
        //do stuff;
-
        this->doPathControl();
-
+       
        ros::spinOnce();
        _rate->sleep();
     }
