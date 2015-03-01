@@ -1,3 +1,12 @@
+/************************************************************************************************************
+ * Class Rect: Is a simple representation of a rectangle that makes the life easier.
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___RECT_H___
 #define ___RECT_H___
 

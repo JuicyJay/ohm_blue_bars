@@ -1,3 +1,14 @@
+/************************************************************************************************************
+ * Class Wall: This class represents a wall on the occupancy grid. The wall class can be constructed by a
+ * set of points. If you received walls as ROS message then use this class for a better handling. And of course
+ * this class is still messy like.
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___WALL_H___
 #define ___WALL_H___
 

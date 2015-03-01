@@ -32,8 +32,7 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 
 void FindWall::search(std::vector<Wall>& walls)
 {
-//    std::cout << __PRETTY_FUNCTION__ << std::endl;
-
+    /* Go through all set orientations and search for new walls. */
     for (unsigned int i = 0; i < _orientations.size(); ++i)
     {
         Wall wall;
@@ -41,9 +40,6 @@ void FindWall::search(std::vector<Wall>& walls)
 
         while (_ransac.estimateWall(wall))
         {
-//            std::cout << "will work with " << _points[i].size() << " points." << std::endl;
-//            std::cout << wall << std::endl;
-
             if (wall.valid())
             {
                 wall.setResolution(_mapMetaData.resolution);
@@ -59,9 +55,8 @@ void FindWall::search(std::vector<Wall>& walls)
         }
     }
 
-//    std::cout << "before mark walls." << std::endl;
+    /* Mark all found valid walls. This enures the walls can not be found again in the future. */
     _featureMap.markWalls(walls);
-//    std::cout << "will exit from method search." << std::endl;
 }
 
 void FindWall::removePoints(const PointVector& remove, PointVector& points)
@@ -70,12 +65,8 @@ void FindWall::removePoints(const PointVector& remove, PointVector& points)
     PointVector rest;
 
     for (unsigned int i = 0; i < remove.size(); ++i)
-    {
         for (unsigned int j = 0; j < points.size(); ++j)
-        {
             mask[j] = mask[j] & (points[j] != remove[i]);
-        }
-    }
 
     for (unsigned int i = 0; i < mask.size(); ++i)
         if (mask[i])

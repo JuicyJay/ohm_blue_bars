@@ -1,5 +1,6 @@
 #include "Map.h"
 
+/*
 Map::Map(const unsigned int w, const unsigned int h, const float resolution)
     : _shared(false),
       _stride(w),
@@ -8,6 +9,20 @@ Map::Map(const unsigned int w, const unsigned int h, const float resolution)
       _width(w),
       _height(h),
       _resolution(resolution),
+      _origin(0.0f, 0.0f)
+{
+
+}
+*/
+
+Map::Map(void)
+    : _shared(false),
+      _stride(0),
+      _offset(0),
+      _data(0),
+      _width(0),
+      _height(0),
+      _resolution(1.0f),
       _origin(0.0f, 0.0f)
 {
 
@@ -31,23 +46,23 @@ Map::Map(Map& map, const Rect& roi)
 {
     if (roi.isNull())
     {
-        _stride = map._stride;
-        _offset = map._offset;
-        _data = map._data;
-        _width = map._width;
-        _height = map._height;
+        _stride     = map._stride;
+        _offset     = map._offset;
+        _data       = map._data;
+        _width      = map._width;
+        _height     = map._height;
         _resolution = map._resolution;
-        _origin = map._origin;
+        _origin     = map._origin;
     }
     else
     {
-        _stride = map._width;
-        _offset = map._width * roi.y() + roi.x();
-        _data = map._data;
-        _width = roi.width();
-        _height = roi.height();
+        _stride     = map._width;
+        _offset     = map._width * roi.y() + roi.x();
+        _data       = map._data;
+        _width      = roi.width();
+        _height     = roi.height();
         _resolution = map._resolution;
-        _origin = map._origin + Eigen::Vector2f(roi.x(), roi.y()) * _resolution;
+        _origin     = map._origin + Eigen::Vector2f(roi.x(), roi.y()) * _resolution;
     }
 }
 

@@ -1,3 +1,12 @@
+/************************************************************************************************************
+ * Class FindWall.
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___FIND_WALL_H___
 #define ___FIND_WALL_H___
 
@@ -22,10 +31,11 @@ public:
 private:
     void removePoints(const PointVector& remove, PointVector& points);
 
-    std::vector<PointVector> _points;
+    std::vector<PointVector>       _points;
     std::vector<Wall::Orientation> _orientations;
-    nav_msgs::MapMetaData _mapMetaData;
-    Ransac _ransac;
+    nav_msgs::MapMetaData          _mapMetaData;
+
+    Ransac     _ransac;
     FeatureMap _featureMap;
 };
 

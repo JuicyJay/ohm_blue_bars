@@ -1,3 +1,12 @@
+/************************************************************************************************************
+ * Struct Pose: At the moment only for copying data to the ROS framework.
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___POSE_H___
 #define ___POSE_H___
 

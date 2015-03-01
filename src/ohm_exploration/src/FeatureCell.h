@@ -1,3 +1,12 @@
+/************************************************************************************************************
+ * Struct FeatureCell.
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___FEATURE_CELL_H___
 #define ___FEATURE_CELL_H___
 
@@ -33,7 +42,9 @@ struct FeatureCell
 
 inline std::ostream& operator<<(std::ostream& os, const FeatureCell& cell)
 {
-    os << "FeatureCell: boder = " << cell.border << " saw = " << cell.saw << " orientation = " << cell.orientation;
+    os << "FeatureCell: boder = " << cell.border << " saw = " << cell.saw << " orientation = "
+       << cell.orientation;
+
     return os;
 }
 

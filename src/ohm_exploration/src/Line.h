@@ -1,8 +1,13 @@
-/**
-* @file   Line.h
-* @author Christian Merkl
-*
-*/
+/************************************************************************************************************
+ * Class Line: This class represents a line. The line can be constructed using two points or with the
+ * parameter m and t.
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___LINE_H___
 #define ___LINE_H___
 
@@ -67,10 +72,10 @@ public:
 
     Line& operator=(const Line& line)
     {
-        _m = line._m;
-        _t = line._t;
-        _r = line._r;
-        _n = line._n;
+        _m  = line._m;
+        _t  = line._t;
+        _r  = line._r;
+        _n  = line._n;
         _p1 = line._p1;
         _p2 = line._p2;
 
@@ -80,6 +85,7 @@ public:
 private:
     float _m;
     float _t;
+
     Eigen::Vector2f _r;
     Eigen::Vector2f _n;
     Eigen::Vector2f _p1;

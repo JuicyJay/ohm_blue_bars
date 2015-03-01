@@ -17,12 +17,12 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
 {
     if (!map.info.width || !map.info.height)
     {
-        ROS_ERROR_STREAM("FeatureMap::setMap(): map isn't valid. Width and height must not 0.");
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": map isn't valid. Width and height must not 0.");
         return;
     }
 
     _data.resize(map.info.height);
-    _width = map.info.width;
+    _width  = map.info.width;
     _height = map.info.height;
 
     for (unsigned int row = 0; row < _data.size(); ++row)
@@ -33,6 +33,20 @@ void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
 
 void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
 {
+    if (this->isNull())
+    {
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": feature map is not initialized. Please frist call setMap()"
+                         "before updateMap().");
+            return;
+    }
+    if (map.info.width != _data[0].size() || map.info.height != _data.size())
+    {
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": map has the wrong size. The size of the map is " <<
+                         map.info.width << " x " << map.info.height << " and of the feature map is " <<
+                         _data[0].size() << " x " << _data.size() << ".");
+        return;
+    }
+
     /* Check the changeovers in the map in positive x direction. */
     for (unsigned int row = 1; row < _data.size() - 1; ++row)
     {
@@ -207,8 +221,10 @@ void FeatureMap::markWalls(const std::vector<Wall>& walls)
         {
             for (Ray y(x.position().cast<float>(), wall->model().n(), thickness * 2.0f); y.next();)
             {
-                if (y.position().x() >= _width || y.position().y() >= _height)
+                if (y.position().x() >= static_cast<int>(_width) ||
+                    y.position().y() >= static_cast<int>(_height))
                 {
+                    /*
                     std::cout << "out of range: x = " << y.position().x()
                               << " y = " << y.position().y() << std::endl;
                     std::cout << "start: x = " << start.x() << " y = " << start.y() << std::endl;
@@ -218,8 +234,8 @@ void FeatureMap::markWalls(const std::vector<Wall>& walls)
 
                     for (unsigned int i = 0; i < wall->points().size(); ++i)
                         std::cout << "(" << wall->points()[i].x() << " " << wall->points()[i].y() << ")" << std::endl;
-//                    break;
-                    return;
+                    */
+                    break;
                 }
                 else
                 {
@@ -236,11 +252,6 @@ void FeatureMap::paintImage(cv::Mat& image, const FeatureCell must)
 
     for (int row = 0; row < image.rows; ++row)
         for (int col = 0; col < image.cols; ++col)
-        {
-//            image.at<uint8_t>(row, col) = _data[row][col] == must ? 0xff : 0x00;
             image.at<uint8_t>(row, col) = _data[row][col].saw > 0 ? 0xff : 0x00;
-//            std::cout << static_cast<int>(_data[row][col].saw) << " ";
-        }
-    std::cout << std::endl;
 }
 

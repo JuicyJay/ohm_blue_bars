@@ -1,8 +1,12 @@
-/**
-* @file   Ransac.h
-* @author Christian Merkl
-*
-*/
+/************************************************************************************************************
+ * Class Ransac:
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___RANSAC_H___
 #define ___RANSAC_H___
 

@@ -1,8 +1,12 @@
-/**
-* @file   LeastSquare.h
-* @author Christian Merkl
-*
-*/
+/************************************************************************************************************
+ * Class LeastSquare:
+ *
+ *  Created on: 01.12.2014
+ *      Author: Christian Merkl
+ *      E-Mail: christian.merkl@th-nuernberg.de
+ *     Licence: BSD
+ *
+ ************************************************************************************************************/
 #ifndef ___LEAST_SQUARE_H___
 #define ___LEAST_SQUARE_H___
 
