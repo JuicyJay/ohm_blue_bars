@@ -8,6 +8,8 @@
 
 unsigned int Wall::s_id = 0;
 
+/* TODO: The constructor works with magic numbers. It seems the wall class dosen't work with all possible occupancy
+   grids. */
 Wall::Wall(const PointVector& points)
     : _points(points),
       _id(++s_id),
@@ -71,22 +73,7 @@ Wall::Wall(const ohm_exploration::Wall& wall)
 {
     this->setOrientation(static_cast<Orientation>(wall.orientation));
 }
-/*
-Wall::Wall(const Wall& wall)
-    : _model(wall._model),
-      _points(wall._points),
-      _id(wall._id),
-      _center(wall._center),
-      _resolution(wall._resolution),
-      _origin(wall._origin),
-      _orientation(wall._orientation),
-      _valid(wall._valid),
-      _length(wall._length),
-      _distance(wall._distance)
-{
 
-}
-*/
 bool Wall::operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const
 {
     return (left - Eigen::Vector2i(0, _model.t())).cast<float>().norm() <
@@ -97,16 +84,24 @@ void Wall::setOrientation(const Orientation orientation)
 {
     _orientation = orientation;
 
-    // to do: correct normal if they is in wrong direction.
+    /* to do: correct normal if they is in wrong direction.
+       May be this will work... */
     switch (orientation)
     {
     case Up:
+        if (_model.n().y() > 0.0f) _model.flipNormal();
+        break;
+
     case Right:
+        if (_model.n().x() < 0.0f) _model.flipNormal();
         break;
 
     case Down:
+        if (_model.n().y() < 0.0f) _model.flipNormal();
+        break;
+
     case Left:
-        _model.flipNormal();
+        if (_model.n().x() > 0.0f) _model.flipNormal();
         break;
 
     default:

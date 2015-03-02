@@ -13,7 +13,7 @@ void LeastSquare::estimateLine(const PointVector& points, Line& line)
         return;
     }
 
-    Eigen::Vector2d avg(0, 0);
+    Eigen::Vector2d avg(0.0, 0.0);
 
     for (PointVector::const_iterator point(points.begin()); point < points.end(); ++point)
     {
@@ -22,8 +22,8 @@ void LeastSquare::estimateLine(const PointVector& points, Line& line)
 
     avg /= points.size();
 
-    double a = 0.0f;
-    double b = 0.0f;
+    double a = 0.0;
+    double b = 0.0;
 
     for (PointVector::const_iterator point(points.begin()); point < points.end(); ++point)
     {
