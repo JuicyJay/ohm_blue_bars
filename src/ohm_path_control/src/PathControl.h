@@ -30,19 +30,14 @@ private:    //dataelements
     ros::Publisher _pub_cmd_vel;
     ros::Publisher _pubState;
     ros::Subscriber _sub_path;
-    //ros::Subscriber _sub_pose;
     ros::Subscriber _sub_em_stop;
     ros::Subscriber _sub_pause;
 
     tf::TransformListener _tf_listnener;
 
-    //path
-    //std::vector<Vector3d> _path;
-    //Vector3d _pose;
 
     analyser::PathAnalyser_base* _pathAnalyser;
     controller::Controller_base* _controller;
-
 
     bool _enable_analyse;
 

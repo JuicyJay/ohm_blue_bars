@@ -53,8 +53,8 @@ private: // functions
 private:
     ros::NodeHandle* _nh;
     ros::Publisher _state_pub;
-    ros::Publisher _pubPath;
-    ros::Publisher _pubTarget;
+    static ros::Publisher* _pubPath;
+    static ros::Publisher* _pubTarget;
 
     ros::Subscriber _subPath;
     ros::Subscriber _subState;

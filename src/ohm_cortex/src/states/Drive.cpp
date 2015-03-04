@@ -8,6 +8,9 @@
 
 namespace autonohm {
 
+ros::Publisher* Drive::_pubPath = NULL;
+ros::Publisher* Drive::_pubTarget = NULL;
+
 Drive::Drive(const geometry_msgs::Pose& target)
     : _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
@@ -23,8 +26,16 @@ Drive::Drive(const geometry_msgs::Pose& target)
    _state_pub.publish(msg);
 
    //add publisher
-   _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/georg/target", 1);
-   _pubPath   = _nh->advertise<nav_msgs::Path>("/georg/path", 1);
+   if(_pubTarget == NULL)
+   {
+      _pubTarget = new ros::Publisher;
+      *_pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/georg/target", 1);
+   }
+   if(_pubPath == NULL)
+   {
+      _pubPath = new ros::Publisher;
+      *_pubPath   = _nh->advertise<nav_msgs::Path>("/georg/path", 1);
+   }
 
    //add subscriber:
    _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
@@ -54,8 +65,17 @@ Drive::Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orie
    _state_pub.publish(msg);
 
    //add publisher
-   _pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/georg/target", 1);
-   _pubPath   = _nh->advertise<nav_msgs::Path>("/georg/path", 1);
+   //add publisher
+   if(_pubTarget == NULL)
+   {
+      _pubTarget = new ros::Publisher;
+      *_pubTarget = _nh->advertise<geometry_msgs::PoseStamped>("/georg/target", 1);
+   }
+   if(_pubPath == NULL)
+   {
+      _pubPath = new ros::Publisher;
+      *_pubPath   = _nh->advertise<nav_msgs::Path>("/georg/path", 1);
+   }
 
    //add subscriber:
    _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
@@ -77,14 +97,14 @@ Drive::~Drive(void)
 void Drive::process(void)
 {
    ROS_INFO("ohm_cortex: Drive -> Prove to Subscripber");
-   if(_pubTarget.getNumSubscribers() == 0 || _pubPath.getNumSubscribers() == 0)
+   if(_pubTarget->getNumSubscribers() == 0 || _pubPath->getNumSubscribers() == 0)
    {
       ROS_INFO("ohm_cortex: Drive -> -- NO Subscriber");
       return;
    }
 
    //publish target
-   _pubTarget.publish(_targetPose);
+   _pubTarget->publish(_targetPose);
 
    //wait for path:
    do{
@@ -135,7 +155,7 @@ void Drive::process(void)
 //         _path.poses[_path.poses.size() - 1].pose.orientation = ori;
 //      }
    }
-   _pubPath.publish(_path);
+   _pubPath->publish(_path);
 
    ROS_INFO("ohm_cortex: Drive -> Wait for arival");
    do{
