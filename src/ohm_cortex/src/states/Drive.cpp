@@ -80,7 +80,7 @@ Drive::Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orie
    //add subscriber:
    _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
    _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
-   _old_state = true;
+   _old_state = false;
    _reached_target = false;
    _got_path = false;
 
@@ -194,6 +194,7 @@ void Drive::subState_callback(const std_msgs::Bool& msg)
    //get rising edge
    if(!_old_state && tmp)
    {
+      ROS_INFO("ohm_cortex: Drive -> #################################################Reached target");
       _reached_target = true;
    }
    _old_state = tmp;
