@@ -69,6 +69,7 @@ private:
     bool _reached_target;
     bool _got_path;
 
+
 };
 
 } // end namespace autonohm
