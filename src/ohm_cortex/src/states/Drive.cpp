@@ -40,7 +40,7 @@ Drive::Drive(const geometry_msgs::Pose& target)
    //add subscriber:
    _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
    _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
-   _old_state = true;
+   _old_state = false;
    _reached_target = false;
    _got_path = false;
 

@@ -88,13 +88,13 @@ analyser::diff_scale SimpleAnalyser::analyse(analyser::pose current_pose)
          _reachedLastPose = true;
          break;
       }
-      else if(this->isLastGoal())
-      {
-         this->setReachedFinalGoal(true);
-         diff_scale.angular = 0;
-         diff_scale.linear = 0;
-         return diff_scale;
-      }
+//      else if(this->isLastGoal())
+//      {
+//         this->setReachedFinalGoal(true);
+//         diff_scale.angular = 0;
+//         diff_scale.linear = 0;
+//         return diff_scale;
+//      }
    }
 
    if(_reachedLastPose)
