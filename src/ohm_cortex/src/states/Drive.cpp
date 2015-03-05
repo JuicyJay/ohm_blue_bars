@@ -19,6 +19,7 @@ Drive::Drive(const geometry_msgs::Pose& target)
    /* Publish current state for debugging. */
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
 
+   _state = drive::WAIT_FOR_SUB;
    _mode = drive::DEFAULT;
 
    std_msgs::String msg;
@@ -57,6 +58,7 @@ Drive::Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orie
    /* Publish current state for debugging. */
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
 
+   _state = drive::WAIT_FOR_SUB;
    _mode = drive::NO_TARGET_ORI;
    _targetOrientation = orientation;
 
@@ -88,6 +90,8 @@ Drive::Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orie
    _targetPose.pose.position = target;
    _targetPose.pose.orientation = orientation;
    //std::cout << "target = (" << target.x << ", " << target.y << ")" << std::endl;
+
+
 }
 
 Drive::~Drive(void)
@@ -96,87 +100,89 @@ Drive::~Drive(void)
 
 void Drive::process(void)
 {
-   ROS_INFO("ohm_cortex: Drive -> Prove to Subscripber");
-   if(_pubTarget->getNumSubscribers() == 0 || _pubPath->getNumSubscribers() == 0)
-   {
-      ROS_INFO("ohm_cortex: Drive -> -- NO Subscriber");
-      return;
+   switch (_state) {
+
+      case drive::WAIT_FOR_SUB:
+         ROS_INFO("ohm_cortex: Drive -> Prove to Subscripber");
+         if(_pubTarget->getNumSubscribers() == 0 || _pubPath->getNumSubscribers() == 0)
+         {
+            ROS_INFO("ohm_cortex: Drive -> -- NO Subscriber");
+            return;
+         }
+
+         _state = drive::PUB_TAEGET;
+         break;
+      case drive::PUB_TAEGET:
+         //publish target
+         _pubTarget->publish(_targetPose);
+
+         _state = drive::WAIT_FOR_PATH;
+         break;
+      case drive::WAIT_FOR_PATH:
+
+         //wait for path:
+         if(!_got_path)
+            return;
+
+         ROS_INFO("ohm_cortex: Drive -> Got Path: %d",(int)_path.poses.size());
+         _state = drive::PUB_PATH;
+         break;
+      case drive::PUB_PATH:
+         //prove path
+         if(_path.poses.size() == 0)
+         {
+            ROS_INFO("ohm_cortex: Drive -> No Path found ... return to ExloreState");
+            Context::getInstance()->setState(new Explore);
+            delete this;
+            return;
+         }
+
+         ROS_INFO("ohm_cortex: Drive -> Transmitt Path");
+         //got path:
+         //now pubish to pathcontroll and begin moving until target reached
+         if(_mode == drive::NO_TARGET_ORI)
+         {//change last wp orientation
+
+            geometry_msgs::Quaternion ori;
+            ori.x = std::numeric_limits<double>::quiet_NaN();
+            ori.y = std::numeric_limits<double>::quiet_NaN();
+            ori.z = std::numeric_limits<double>::quiet_NaN();
+            ori.w = std::numeric_limits<double>::quiet_NaN();
+
+            _path.poses[_path.poses.size() - 1].pose.orientation = ori;
+         }
+         _pubPath->publish(_path);
+
+         ROS_INFO("ohm_cortex: Drive -> Wait for arival");
+         _state = drive::WAIT_FOR_ARIVAL;
+         break;
+      case drive::WAIT_FOR_ARIVAL:
+         if(!_reached_target)
+            return;
+         ROS_INFO("ohm_cortex: Drive ->  Arrived!!!!");
+
+         _state = drive::DESTROY;
+         break;
+      case drive::DESTROY:
+         if(_mode == drive::NO_TARGET_ORI)
+         {//next inspect
+            ROS_INFO("ohm_cortex: Drive -> Call Inspect");
+            Context::getInstance()->setState(new Inspect(_targetOrientation));
+         }
+         else
+         {//next explore
+            ROS_INFO("ohm_cortex: Drive -> Call Explore");
+            Context::getInstance()->setState(new Explore);
+         }
+         _state = drive::NONE;
+         delete this;
+         break;
+      default:
+         return;
+         break;
+
    }
 
-   //publish target
-   _pubTarget->publish(_targetPose);
-
-   //wait for path:
-   do{
-      ros::spinOnce();
-      usleep(5000); // sleep 5 ms
-   }
-   while(!_got_path);
-   ROS_INFO("ohm_cortex: Drive -> Got Path: %d",(int)_path.poses.size());
-
-   //prove path
-   if(_path.poses.size() == 0)
-   {
-      ROS_INFO("ohm_cortex: Drive -> No Path found ... return to ExloreState");
-      Context::getInstance()->setState(new Explore);
-      delete this;
-      return;
-   }
-
-   ROS_INFO("ohm_cortex: Drive -> Transmitt Path");
-   //got path:
-   //now pubish to pathcontroll and begin moving until target reached
-   if(_mode == drive::NO_TARGET_ORI)
-   {//change last wp orientation
-
-      geometry_msgs::Quaternion ori;
-      ori.x = std::numeric_limits<double>::quiet_NaN();
-      ori.y = std::numeric_limits<double>::quiet_NaN();
-      ori.z = std::numeric_limits<double>::quiet_NaN();
-      ori.w = std::numeric_limits<double>::quiet_NaN();
-
-      _path.poses[_path.poses.size() - 1].pose.orientation = ori;
-//
-//      if(_path.poses.size() >= 2)
-//      {
-//         geometry_msgs::Point p_last = _path.poses[_path.poses.size() - 1].pose.position;
-//         geometry_msgs::Point p_blast = _path.poses[_path.poses.size() - 2].pose.position;
-//         Eigen::Vector3d l(p_last.x, p_last.y, p_last.z);   //last
-//         Eigen::Vector3d bl(p_blast.x, p_blast.y, p_blast.z);  //before last
-//
-//         Eigen::Quaternion<double> q;
-//         q = q.FromTwoVectors(Eigen::Vector3d(1,0,0), l-bl);
-//
-//         geometry_msgs::Quaternion ori;
-//         ori.x = q.x();
-//         ori.y = q.y();
-//         ori.z = q.z();
-//         ori.w = q.w();
-//         _path.poses[_path.poses.size() - 1].pose.orientation = ori;
-//      }
-   }
-   _pubPath->publish(_path);
-
-   ROS_INFO("ohm_cortex: Drive -> Wait for arival");
-   do{
-      ros::spinOnce();
-      usleep(5000); // sleep 5 ms
-   }
-   while(!_reached_target);
-
-   ROS_INFO("ohm_cortex: Drive ->  Arrived!!!!");
-
-   if(_mode == drive::NO_TARGET_ORI)
-   {//next inspect
-      ROS_INFO("ohm_cortex: Drive -> Call Inspect");
-      Context::getInstance()->setState(new Inspect(_targetOrientation));
-   }
-   else
-   {//next explore
-      ROS_INFO("ohm_cortex: Drive -> Call Explore");
-      Context::getInstance()->setState(new Explore);
-   }
-   delete this;
    return;
 }
 

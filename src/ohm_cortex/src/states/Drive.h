@@ -34,6 +34,15 @@ enum enumMode{
    DEFAULT = 0,    //robot will rotate to target orientation
    NO_TARGET_ORI   //robot will not rotate to target orientation -> will rotate to orientation (from before last wp to last wp)
 };
+enum enumState{
+   WAIT_FOR_SUB = 0,
+   PUB_TAEGET,
+   WAIT_FOR_PATH,
+   PUB_PATH,
+   WAIT_FOR_ARIVAL,
+   DESTROY,
+   NONE
+};
 }
 class Drive : public IState
 {
@@ -64,6 +73,7 @@ private:
     nav_msgs::Path _path;
 
     drive::enumMode _mode;
+    drive::enumState _state;
 
     bool _old_state;
     bool _reached_target;
