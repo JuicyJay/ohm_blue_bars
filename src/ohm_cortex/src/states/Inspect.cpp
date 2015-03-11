@@ -52,8 +52,8 @@ void Inspect::process(void)
         ohm_sensor_head::Mode mode;
         mode.request.mode = ohm_sensor_head::Mode::Request::NONE;
 
-        if (!_srvHeadMode.call(mode))
-           ROS_ERROR("Can't call change mode service of the sensor head node.");
+	//        if (!_srvHeadMode.call(mode))
+	//           ROS_ERROR("Can't call change mode service of the sensor head node.");
 
         /* Set the state after and kill myself.*/
         Context::getInstance()->setState(new Explore);

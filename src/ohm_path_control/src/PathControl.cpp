@@ -212,12 +212,13 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
    _pathAnalyser->setPath(path);
    ROS_INFO("ohm_path_control -> Enable analyser...");
    _enable_analyse = true;
-   ROS_INFO("Publish State Flase");
+   ROS_INFO("ohm_path_control -> Publish State Flase");
    std_msgs::Bool reachedTarget;
    reachedTarget.data = false;
-   for(unsigned int i = 0; i < 30; ++i)
+   for(unsigned int i = 0; i < 50; ++i)
    {
       _pubState.publish(reachedTarget);
+      usleep(10000);
    }
 }
 
