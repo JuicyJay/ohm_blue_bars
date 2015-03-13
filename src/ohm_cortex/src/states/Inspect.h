@@ -13,7 +13,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/QuaternionStamped.h>
-
+#include <ohm_victim/VictimArray.h>
 /**
  * @namespace autonohm
  */
@@ -22,7 +22,7 @@ namespace autonohm {
 /**
  * @class   Inspekt
  * @author  Christian Merkl
- * @date    28.01.2015
+ * @date    11.03.2015
  */
 class Inspect : public IState
 {
@@ -32,14 +32,19 @@ public:
 
     virtual void process(void);
 
+    void callbackVictim(const ohm_victim::VictimArray& vicitms);
+
 private:
     ros::NodeHandle* _nh;
     ros::Publisher _state_pub;
-    ros::ServiceClient _srvHeadMode;
     ros::Publisher _pubDirection;
+    ros::Subscriber _subVictim;
+    ros::ServiceClient _srvHeadMode;
+    ros::ServiceClient _srvVictimControl;
 
     ros::Time _stamp;
     const geometry_msgs::Quaternion _orientation;
+    bool _foundVictim;
 };
 
 } /* namespace autonohm */
