@@ -13,7 +13,7 @@
 #include <ros/ros.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/QuaternionStamped.h>
-#include <ohm_victim/VictimArray.h>
+#include <ohm_perception/Victim.h>
 /**
  * @namespace autonohm
  */
@@ -32,7 +32,7 @@ public:
 
     virtual void process(void);
 
-    void callbackVictim(const ohm_victim::VictimArray& vicitms);
+    void callbackVictim(const ohm_perception::Victim& vicitm);
 
 private:
     ros::NodeHandle* _nh;

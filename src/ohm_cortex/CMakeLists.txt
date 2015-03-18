@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
 #    ohm_frontier_exploration
     ohm_sensor_head
     ohm_srvs
+    ohm_perception
     )
 
 find_package(cmake_modules REQUIRED)
