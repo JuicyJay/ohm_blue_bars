@@ -26,6 +26,7 @@ Inspect::Inspect(const geometry_msgs::Quaternion& orientation)
 
 
     /* Sensor head control. */
+    _pubDirection = _nh->advertise<geometry_msgs::QuaternionStamped>("/georg/goal/sensor_head", 2);
    _srvHeadMode = _nh->serviceClient<ohm_sensor_head::Mode>("/georg/mode");
 
    ohm_sensor_head::Mode mode;
@@ -39,8 +40,8 @@ Inspect::Inspect(const geometry_msgs::Quaternion& orientation)
    ohm_srvs::NodeControl control;
 
    control.request.action = ohm_srvs::NodeControl::Request::START;
-   _srvVictimControl = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/victim_detection/control");
-   _subVictim = _nh->subscribe("/georg/victim/request", 2, &Inspect::callbackVictim, this);
+   _srvVictimControl = _nh->serviceClient<ohm_srvs::NodeControl>("/victim_detection/control");
+   _subVictim = _nh->subscribe("/victim/request", 2, &Inspect::callbackVictim, this);
 
    if (!_srvVictimControl.call(control))
        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim detection node control service.");
