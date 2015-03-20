@@ -5,14 +5,11 @@
 #include "FoundVictimCandidate.h"
 
 #include <ohm_srvs/NodeControl.h>
-#include <ohm_sensor_head/Mode.h>
-#include <geometry_msgs/QuaternionStamped.h>
 
 namespace autonohm {
 
-Inspect::Inspect(const geometry_msgs::Quaternion& orientation)
+Inspect::Inspect(void)
     : _nh(autonohm::Context::getInstance()->getNodeHandle()),
-      _orientation(orientation),
       _foundVictim(false)
 {
     /* Debug publications. */
@@ -23,17 +20,6 @@ Inspect::Inspect(const geometry_msgs::Quaternion& orientation)
     std_msgs::String msg;
     msg.data = "inspect";
     _state_pub.publish(msg);
-
-
-    /* Sensor head control. */
-    _pubDirection = _nh->advertise<geometry_msgs::QuaternionStamped>("/georg/goal/sensor_head", 2);
-   _srvHeadMode = _nh->serviceClient<ohm_sensor_head::Mode>("/georg/mode");
-
-   ohm_sensor_head::Mode mode;
-   mode.request.mode = ohm_sensor_head::Mode::Request::BIND_DIRECTION;
-
-   if (!_srvHeadMode.call(mode))
-       ROS_ERROR("Can't call change mode service of the sensor head node.");
 
 
    /* Victim Stuff. */
@@ -77,30 +63,11 @@ void Inspect::process(void)
     {
         ROS_INFO("Inspect state already lives 2 seconds. Now its time to kill it.");
 
-	/* Set sensor head mode back to mode NONE. */
-        ohm_sensor_head::Mode mode;
-        mode.request.mode = ohm_sensor_head::Mode::Request::NONE;
-
-	//        if (!_srvHeadMode.call(mode))
-	//           ROS_ERROR("Can't call change mode service of the sensor head node.");
-
         /* Set the state after and kill myself.*/
         Context::getInstance()->setState(new Explore);
         delete this;
         return;
     }
-
-
-    geometry_msgs::QuaternionStamped direction;
-    static unsigned int seq = 0;
-
-    direction.header.stamp = ros::Time::now();
-    direction.header.seq = ++seq;
-    direction.header.frame_id = "map";
-
-    direction.quaternion = _orientation;
-
-    _pubDirection.publish(direction);
 }
 
 void Inspect::callbackVictim(const ohm_perception::Victim& victims)

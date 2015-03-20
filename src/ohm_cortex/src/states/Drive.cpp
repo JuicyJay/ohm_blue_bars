@@ -5,6 +5,8 @@
  *      Author: Knueppl (Christian Merkl)
  */
 #include "Drive.h"
+#include "Explore.h"
+#include "LookAtTarget.h"
 
 namespace autonohm {
 
@@ -167,7 +169,7 @@ void Drive::process(void)
          if(_mode == drive::NO_TARGET_ORI)
          {//next inspect
             ROS_INFO("ohm_cortex: Drive -> Call Inspect");
-            Context::getInstance()->setState(new Inspect(_targetOrientation));
+            Context::getInstance()->setState(new LookAtTarget(_targetOrientation));
          }
          else
          {//next explore

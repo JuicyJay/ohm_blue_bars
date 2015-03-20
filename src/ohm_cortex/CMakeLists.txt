@@ -97,6 +97,7 @@ add_executable(statemachine
                src/states/TargetStack.cpp
 #               src/states/FrontierExplore.cpp
                src/states/FoundVictimCandidate.cpp
+               src/states/LookAtTarget.cpp
                )
 
 add_executable(viz                   src/viz/viz_node.cpp           ${QT_SOURCES} ${QT_MOC_HPP} ${QT_FORMS_HPP})

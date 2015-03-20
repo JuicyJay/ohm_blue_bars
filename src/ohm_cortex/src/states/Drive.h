@@ -18,9 +18,6 @@
 #include <nav_msgs/Path.h>
 #include <std_msgs/Bool.h>
 
-#include "Explore.h"
-#include "Inspect.h"
-
 #include <Eigen/Dense>
 #include <limits>
 
