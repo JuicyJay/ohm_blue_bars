@@ -2,7 +2,7 @@
 #include "Inspect.h"
 #include "../Context.h"
 
-#include <ohm_sensor_head/Mode.h>
+#include <ohm_actors/SensorHeadMode.h>
 #include <geometry_msgs/QuaternionStamped.h>
 
 namespace autonohm {
@@ -23,10 +23,10 @@ LookAtTarget::LookAtTarget(const geometry_msgs::Quaternion& orientation)
 
     /* Sensor head control. */
     _pubDirection = _nh->advertise<geometry_msgs::QuaternionStamped>("/georg/goal/sensor_head", 2);
-    _srvHeadMode = _nh->serviceClient<ohm_sensor_head::Mode>("/georg/mode");
+    _srvHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/mode");
 
-    ohm_sensor_head::Mode mode;
-    mode.request.mode = ohm_sensor_head::Mode::Request::BIND_DIRECTION;
+    ohm_actors::SensorHeadMode mode;
+    mode.request.mode = ohm_actors::SensorHeadMode::Request::BIND_DIRECTION;
 
     if (!_srvHeadMode.call(mode))
         ROS_ERROR("Can't call change mode service of the sensor head node.");
@@ -39,8 +39,8 @@ LookAtTarget::LookAtTarget(const geometry_msgs::Quaternion& orientation)
 LookAtTarget::~LookAtTarget(void)
 {
     /* Set sensor head mode back to mode NONE. */
-    ohm_sensor_head::Mode mode;
-    mode.request.mode = ohm_sensor_head::Mode::Request::NONE;
+    ohm_actors::SensorHeadMode mode;
+    mode.request.mode = ohm_actors::SensorHeadMode::Request::NONE;
 
     //        if (!_srvHeadMode.call(mode))
     //           ROS_ERROR("Can't call change mode service of the sensor head node.");

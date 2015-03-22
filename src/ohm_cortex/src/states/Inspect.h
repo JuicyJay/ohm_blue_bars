@@ -31,12 +31,10 @@ public:
 
     virtual void process(void);
 
-    void callbackVictim(const ohm_perception::Victim& vicitm);
-
 private:
     ros::NodeHandle* _nh;
     ros::Publisher _state_pub;
-    ros::Subscriber _subVictim;
+    ros::ServiceClient _srvVictimStack;
     ros::ServiceClient _srvVictimControl;
 
     ros::Time _stamp;

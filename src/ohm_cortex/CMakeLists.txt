@@ -13,9 +13,9 @@ find_package(catkin REQUIRED COMPONENTS
     actionlib
     ohm_exploration
 #    ohm_frontier_exploration
-    ohm_sensor_head
     ohm_srvs
     ohm_perception
+    ohm_actors
     )
 
 find_package(cmake_modules REQUIRED)

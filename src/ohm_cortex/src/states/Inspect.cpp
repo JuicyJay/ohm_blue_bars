@@ -5,6 +5,7 @@
 #include "FoundVictimCandidate.h"
 
 #include <ohm_srvs/NodeControl.h>
+#include <ohm_perception/GetVictim.h>
 
 namespace autonohm {
 
@@ -27,7 +28,7 @@ Inspect::Inspect(void)
 
    control.request.action = ohm_srvs::NodeControl::Request::START;
    _srvVictimControl = _nh->serviceClient<ohm_srvs::NodeControl>("/victim_detection/control");
-   _subVictim = _nh->subscribe("/victim/request", 2, &Inspect::callbackVictim, this);
+   _srvVictimStack = _nh->serviceClient<ohm_perception::GetVictim>("victim/get_victim");
 
    if (!_srvVictimControl.call(control))
        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim detection node control service.");
@@ -50,16 +51,19 @@ Inspect::~Inspect(void)
 
 void Inspect::process(void)
 {
-    if (_foundVictim)
+    ohm_perception::GetVictim service;
+    service.request.id = ohm_perception::GetVictim::Request::LAST;
+
+    if (_srvVictimStack.call(service))
     {
         ROS_INFO("Found a victim candidate.");
 
-        Context::getInstance()->setState(new FoundVictimCandidate);
+        Context::getInstance()->setState(new FoundVictimCandidate(service.response.victim.pose.position));
         delete this;
         return;
     }
 
-    if ((ros::Time::now() - _stamp).toSec() > 3.0f)
+    if ((ros::Time::now() - _stamp).toSec() > 2.0f)
     {
         ROS_INFO("Inspect state already lives 2 seconds. Now its time to kill it.");
 
@@ -68,11 +72,6 @@ void Inspect::process(void)
         delete this;
         return;
     }
-}
-
-void Inspect::callbackVictim(const ohm_perception::Victim& victims)
-{
-    _foundVictim = true;
 }
 
 } /* namespace autonohm */
