@@ -71,28 +71,19 @@ analyser::diff_scale BasicAnalyser::analyse(analyser::pose current_pose)
    {
       this->nextGoal();
 
-
       p = this->currentGoal().position - pos;
       p.z() = 0;
-
 
       if(this->isLastGoal())
       {
          _curr_target_radius = _target_radius_last;
       }
 
-      if(this->isLastGoal() && (p.norm() < _target_radius_last))
+      if(this->isLastGoal() && (p.norm() < _curr_target_radius))
       {
          _reachedLastPose = true;
          break;
       }
-      //else if(this->isLastGoal())
-      //{
-      //   this->local_reachedFinalGoal(true);
-      //   diff_scale.angular = 0;
-      //   diff_scale.linear = 0;
-      //   return diff_scale;
-      //}
    }
 
    if(_reachedLastPose)
