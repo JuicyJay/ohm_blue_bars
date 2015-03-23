@@ -26,9 +26,9 @@ FoundVictimCandidate::FoundVictimCandidate(const geometry_msgs::Point& goal)
     /* Change mode of the sensor head to look at point. */
     ohm_actors::SensorHeadMode mode;
     mode.request.mode = ohm_actors::SensorHeadMode::Request::LOOK_AT_POINT;
-    _srvSensorHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/mode");
+    _srvSensorHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/sensor_head/mode");
     _subVictimResponse = _nh->subscribe("victim/response", 2, &FoundVictimCandidate::callbackVictimResponse, this);
-    _pubGoal = _nh->advertise<geometry_msgs::Point>("/goal/sensor_head", 2);
+    _pubGoal = _nh->advertise<geometry_msgs::Point>("/georg/goal/sensor_head", 2);
 
     if (!_srvSensorHeadMode.call(mode))
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the service sensor head mode.");

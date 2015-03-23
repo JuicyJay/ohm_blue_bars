@@ -23,7 +23,7 @@ LookAtTarget::LookAtTarget(const geometry_msgs::Quaternion& orientation)
 
     /* Sensor head control. */
     _pubDirection = _nh->advertise<geometry_msgs::QuaternionStamped>("/georg/goal/sensor_head", 2);
-    _srvHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/mode");
+    _srvHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/sensor_head/mode");
 
     ohm_actors::SensorHeadMode mode;
     mode.request.mode = ohm_actors::SensorHeadMode::Request::BIND_DIRECTION;
