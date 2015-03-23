@@ -94,8 +94,6 @@ void PathPlan_AStar::run()
 
 void PathPlan_AStar::subCallback_map(const nav_msgs::OccupancyGrid& msg)
 {
-   std::cout << "got map: " << msg.info.width << " x " << msg.info.height
-         << std::endl;
    _map = msg;
 
    _gotMap = true;
@@ -114,7 +112,7 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
       return;
    }
    //do pathplan
-   ROS_INFO("ohm_path_plan -> Do Pathplan");
+   //ROS_INFO("ohm_path_plan -> Do Planning");
 
    //get tf (current pos)
    tf::StampedTransform tf;
@@ -158,7 +156,7 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
                                                origin));
 
    this->do_map_operations(astar_planer);
-   ROS_INFO("ohm_path_plan ->  Do planning");
+
    std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
 
    //save map and dt map
@@ -167,7 +165,6 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
       this->debug_save_as_img("/tmp/dt_map.png",tmp_map,path);
    this->debug_save_as_img("/tmp/map.png",astar_planer->getGridMap(), path);
 
-   ROS_INFO("ohm_path_plan ->  clear mem");
    //clear mem
    delete astar_planer->getGridMap();
    delete astar_planer->getCostmap("dt");
