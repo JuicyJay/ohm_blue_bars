@@ -198,12 +198,10 @@ void Drive::subPath_callback(const nav_msgs::Path& msg)
 
 void Drive::subState_callback(const std_msgs::Bool& msg)
 {
-   ROS_INFO("ohm_cortex: Drive -> Get state %s",msg.data ? "true" : "false");
    bool tmp = msg.data;
    //get rising edge
    if(!_old_state && tmp)
    {
-      ROS_INFO("ohm_cortex: Drive -> #################################################Reached target");
       _reached_target = true;
    }
    _old_state = tmp;

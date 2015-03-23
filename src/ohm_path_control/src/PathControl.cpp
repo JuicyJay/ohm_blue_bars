@@ -75,9 +75,6 @@ void PathControl::start(const unsigned int rate)
        }
     }while(!rdy);
    
-   
-   
-    ROS_INFO("ohm_path_control ->    ############ start running!!!!");
     this->run();
 }
 
@@ -210,9 +207,7 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
 
 
    _pathAnalyser->setPath(path);
-   ROS_INFO("ohm_path_control -> Enable analyser...");
    _enable_analyse = true;
-   ROS_INFO("ohm_path_control -> Publish State Flase");
    std_msgs::Bool reachedTarget;
    reachedTarget.data = false;
    for(unsigned int i = 0; i < 50; ++i)
