@@ -28,7 +28,7 @@ Inspect::Inspect(void)
 
    control.request.action = ohm_srvs::NodeControl::Request::START;
    _srvVictimControl = _nh->serviceClient<ohm_srvs::NodeControl>("/victim_detection/control");
-   _srvVictimStack = _nh->serviceClient<ohm_perception::GetVictim>("victim/get_victim");
+   _srvVictimStack = _nh->serviceClient<ohm_perception::GetVictim>("/victim/get_victim");
 
    if (!_srvVictimControl.call(control))
        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim detection node control service.");
@@ -62,7 +62,6 @@ void Inspect::process(void)
         delete this;
         return;
     }
-
     if ((ros::Time::now() - _stamp).toSec() > 2.0f)
     {
         ROS_INFO("Inspect state already lives 2 seconds. Now its time to kill it.");

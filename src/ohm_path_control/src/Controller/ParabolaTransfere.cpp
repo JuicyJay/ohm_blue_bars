@@ -6,6 +6,8 @@
  */
 
 #include "ParabolaTransfere.h"
+#include <string>
+#include <iostream>
 
 namespace controller
 {

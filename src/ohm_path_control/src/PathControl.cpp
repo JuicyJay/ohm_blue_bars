@@ -1,6 +1,7 @@
 
 #include "PathControl.h"
 #include "PathAnalyser/SimpleAnalyser.h"
+#include "PathAnalyser/BasicAnalyser.h"
 #include "Controller/ParabolaTransfere.h"
 
 PathControl::PathControl() : _rate(0)
@@ -41,7 +42,8 @@ PathControl::PathControl() : _rate(0)
     _sub_em_stop = _nh.subscribe(sub_name_em_stop, 1, &PathControl::subEmStop_callback, this);
     _sub_pause = _nh.subscribe(sub_name_pause, 1, &PathControl::subPause_callback, this);
 
-    _pathAnalyser = new analyser::SimpleAnalyser(config_file_analyser);
+    //_pathAnalyser = new analyser::SimpleAnalyser(config_file_analyser);
+    _pathAnalyser = new analyser::BasicAnalyser(config_file_analyser);
     _controller = new controller::ParabolaTransfere(config_file_controller);
 
     _enable_analyse = false;
