@@ -3,7 +3,6 @@
 
 #include "../IState.h"
 
-#include <geometry_msgs/Point.h>
 #include <ohm_perception/Victim.h>
 
 /**
@@ -17,7 +16,7 @@ public:
     /**
      * Default constructor
      */
-    FoundVictimCandidate(const geometry_msgs::Point& goal);
+    FoundVictimCandidate(const ohm_perception::Victim& goal);
     /**
      * Default destructor
      */
@@ -41,7 +40,7 @@ private:
 
     ros::Time _stamp;
     bool _response;
-    const geometry_msgs::Point _goal;
+    const ohm_perception::Victim _goal;
 };
 
 } // end namespace autonohm

@@ -58,7 +58,7 @@ void Inspect::process(void)
     {
         ROS_INFO("Found a victim candidate.");
 
-        Context::getInstance()->setState(new FoundVictimCandidate(service.response.victim.pose.position));
+        Context::getInstance()->setState(new FoundVictimCandidate(service.response.victim));
         delete this;
         return;
     }

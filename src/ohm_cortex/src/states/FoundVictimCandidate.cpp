@@ -8,7 +8,7 @@
 
 namespace autonohm {
 
-FoundVictimCandidate::FoundVictimCandidate(const geometry_msgs::Point& goal)
+FoundVictimCandidate::FoundVictimCandidate(const ohm_perception::Victim& goal)
     : _nh(autonohm::Context::getInstance()->getNodeHandle()),
       _goal(goal),
       _response(false)
@@ -27,7 +27,7 @@ FoundVictimCandidate::FoundVictimCandidate(const geometry_msgs::Point& goal)
     ohm_actors::SensorHeadMode mode;
     mode.request.mode = ohm_actors::SensorHeadMode::Request::LOOK_AT_POINT;
     _srvSensorHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/sensor_head/mode");
-    _subVictimResponse = _nh->subscribe("victim/response", 2, &FoundVictimCandidate::callbackVictimResponse, this);
+    _subVictimResponse = _nh->subscribe("/victim/response", 2, &FoundVictimCandidate::callbackVictimResponse, this);
     _pubGoal = _nh->advertise<geometry_msgs::Point>("/georg/goal/sensor_head", 2);
 
     if (!_srvSensorHeadMode.call(mode))
@@ -64,7 +64,7 @@ void FoundVictimCandidate::process(void)
         return;
     }
 
-    _pubGoal.publish(_goal);
+    _pubGoal.publish(_goal.pose.position);
 }
 
 void FoundVictimCandidate::callbackVictimResponse(const ohm_perception::Victim& msg)
