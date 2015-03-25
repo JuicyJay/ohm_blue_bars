@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
     ohm_srvs
     ohm_perception
     ohm_actors
+    ohm_autonomy
     )
 
 find_package(cmake_modules REQUIRED)

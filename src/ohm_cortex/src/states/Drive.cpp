@@ -14,7 +14,8 @@ ros::Publisher* Drive::_pubPath = NULL;
 ros::Publisher* Drive::_pubTarget = NULL;
 
 Drive::Drive(const geometry_msgs::Pose& target)
-    : _nh(autonohm::Context::getInstance()->getNodeHandle())
+    : _nh(autonohm::Context::getInstance()->getNodeHandle()),
+      _stateAfter(0)
 {
    ROS_INFO("New state is Drive -> default... just drive.");
 
@@ -52,8 +53,9 @@ Drive::Drive(const geometry_msgs::Pose& target)
    std::cout << "target = (" << target.position.x << ", " << target.position.y << ")" << std::endl;
 }
 
-Drive::Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orientation)
-      : _nh(autonohm::Context::getInstance()->getNodeHandle())
+Drive::Drive(const geometry_msgs::Point& target, const geometry_msgs::Quaternion& orientation, IState* stateAfter)
+    : _nh(autonohm::Context::getInstance()->getNodeHandle()),
+      _stateAfter(stateAfter)
 {
    ROS_INFO("New state is Drive -> mode: no rotate, Inspect");
 
@@ -169,7 +171,7 @@ void Drive::process(void)
          if(_mode == drive::NO_TARGET_ORI)
          {//next inspect
             ROS_INFO("ohm_cortex: Drive -> Call Inspect");
-            Context::getInstance()->setState(new LookAtTarget(_targetOrientation));
+            Context::getInstance()->setState(_stateAfter ? _stateAfter : new LookAtTarget(_targetOrientation));
          }
          else
          {//next explore

@@ -4,6 +4,8 @@
 #include "../IState.h"
 
 #include <ohm_perception/Victim.h>
+#include <ohm_perception/GetVictim.h>
+#include <ohm_autonomy/MoveRobot.h>
 
 /**
  * @namespace autonohm
@@ -29,17 +31,17 @@ public:
 
 private:
 
-    void callbackVictimResponse(const ohm_perception::Victim& msg);
+    void callbackMoveRobot(const ohm_autonomy::MoveRobot& msg);
 
     ros::NodeHandle* _nh;
 
     ros::Publisher _state_pub;
     ros::Publisher _pubGoal;
-    ros::Subscriber _subVictimResponse;
+    ros::Subscriber _subMoveRobot;
     ros::ServiceClient _srvSensorHeadMode;
+    ros::ServiceClient _srvVictimStack;
 
     ros::Time _stamp;
-    bool _response;
     const ohm_perception::Victim _goal;
 };
 

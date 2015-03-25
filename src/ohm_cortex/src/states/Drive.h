@@ -45,7 +45,7 @@ class Drive : public IState
 {
 public:
     Drive(const geometry_msgs::Pose& target);
-    Drive(const geometry_msgs::Point& target, geometry_msgs::Quaternion& orientation);
+    Drive(const geometry_msgs::Point& target, const geometry_msgs::Quaternion& orientation, IState* stateAfter = 0);
 
     virtual ~Drive(void);
     virtual void process(void);
@@ -76,7 +76,7 @@ private:
     bool _reached_target;
     bool _got_path;
 
-
+    IState* _stateAfter;
 };
 
 } // end namespace autonohm

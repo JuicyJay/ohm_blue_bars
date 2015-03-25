@@ -2,16 +2,18 @@
 #include "../Context.h"
 #include "Explore.h"
 #include "Inspect.h"
+#include "Drive.h"
 
 #include <std_msgs/String.h>
 #include <ohm_actors/SensorHeadMode.h>
+
+#include <Eigen/Geometry>
 
 namespace autonohm {
 
 FoundVictimCandidate::FoundVictimCandidate(const ohm_perception::Victim& goal)
     : _nh(autonohm::Context::getInstance()->getNodeHandle()),
-      _goal(goal),
-      _response(false)
+      _goal(goal)
 {
     /* Debug publications. */
     ROS_INFO("New state is FoundVictimCandidate.");
@@ -27,12 +29,17 @@ FoundVictimCandidate::FoundVictimCandidate(const ohm_perception::Victim& goal)
     ohm_actors::SensorHeadMode mode;
     mode.request.mode = ohm_actors::SensorHeadMode::Request::LOOK_AT_POINT;
     _srvSensorHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/sensor_head/mode");
-    _subVictimResponse = _nh->subscribe("/victim/response", 2, &FoundVictimCandidate::callbackVictimResponse, this);
     _pubGoal = _nh->advertise<geometry_msgs::Point>("/georg/goal/sensor_head", 2);
 
     if (!_srvSensorHeadMode.call(mode))
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the service sensor head mode.");
 
+
+    /* Service for to can call the victim stack node. */
+    _srvVictimStack = _nh->serviceClient<ohm_perception::GetVictim>("/victim/get_victim");
+
+    /* And create a subcriber for roboter movements. */
+    _subMoveRobot = _nh->subscribe("/georg/move_direction", 2, &FoundVictimCandidate::callbackMoveRobot, this);
 
     /* Take a time stamp. */
     _stamp = ros::Time::now();
@@ -56,20 +63,48 @@ void FoundVictimCandidate::process(void)
         delete this;
         return;
     }
-    if (_response)
-    {
-        ROS_INFO("State FoundVictimCandidate: leaving.");
-        Context::getInstance()->setState(new Inspect);
-        delete this;
-        return;
-    }
 
     _pubGoal.publish(_goal.pose.position);
 }
 
-void FoundVictimCandidate::callbackVictimResponse(const ohm_perception::Victim& msg)
+void FoundVictimCandidate::callbackMoveRobot(const ohm_autonomy::MoveRobot& msg)
 {
-    _response = true;
+    const Eigen::Quaternionf orientation(_goal.pose.orientation.w,
+                                   _goal.pose.orientation.x,
+                                   _goal.pose.orientation.y,
+                                   _goal.pose.orientation.z);
+    const Eigen::Vector3f n(orientation * Eigen::Vector3f::UnitX());
+    const Eigen::Vector3f center(_goal.pose.position.x, _goal.pose.position.y, _goal.pose.position.z);
+
+    switch (msg.direction)
+    {
+    case ohm_autonomy::MoveRobot::LEFT:
+        {
+            const Eigen::Vector3f v(orientation * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitZ()) *
+                                    Eigen::Vector3f::UnitX());
+            const Eigen::Vector3f p(center + n * 0.6f + v * 0.3f);
+            geometry_msgs::Point position;
+
+            position.x = p.x();
+            position.y = p.y();
+            position.z = p.z();
+            Context::getInstance()->setState(new Drive(position, _goal.pose.orientation, this));
+        }
+        break;
+
+    case ohm_autonomy::MoveRobot::RIGHT:
+        break;
+
+    case ohm_autonomy::MoveRobot::CLOSER:
+        break;
+
+    case ohm_autonomy::MoveRobot::FARTHER:
+        break;
+
+    default:
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": direction not implemented.");
+        break;
+    }
 }
 
 } // end namespace autonohm
