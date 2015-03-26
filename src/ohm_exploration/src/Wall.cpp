@@ -61,7 +61,7 @@ Wall::Wall(const PointVector& points)
 //    std::cout << std::endl;
 }
 
-Wall::Wall(const ohm_exploration::Wall& wall)
+Wall::Wall(const ohm_autonomy::Wall& wall)
     : _model(Eigen::Vector2f(0.0f, 0.0f), Eigen::Vector2f(wall.v.x, wall.v.y)),
       _id(wall.id),
       _center(Eigen::Vector2f(wall.center.x, wall.center.y)),
@@ -274,9 +274,9 @@ visualization_msgs::Marker Wall::getMarkerMessage(void) const
     return marker;
 }
 
-ohm_exploration::Wall Wall::getWallMessage(void) const
+ohm_autonomy::Wall Wall::getWallMessage(void) const
 {
-    ohm_exploration::Wall msg;
+    ohm_autonomy::Wall msg;
 
     msg.id          = _id;
     msg.orientation = _orientation;

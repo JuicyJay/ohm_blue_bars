@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
                     std_msgs
                     geometry_msgs
                     ohm_path_plan
+                    ohm_autonomy
                     )
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
@@ -49,18 +50,18 @@ find_package(OpenCV REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-   FILES
-   Wall.msg
-   WallArray.msg
-   )
+#add_message_files(
+#   FILES
+#   Wall.msg
+#   WallArray.msg
+#   )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-   FILES
-   GetTarget.srv
-   MarkTarget.srv
-   )
+#add_service_files(
+#   FILES
+#   GetTarget.srv
+#   MarkTarget.srv
+#   )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -70,11 +71,11 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-   DEPENDENCIES
-   std_msgs
-   geometry_msgs
-   )
+#generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+#   geometry_msgs
+#   )
 
 ###################################
 ## catkin specific configuration ##
@@ -146,6 +147,7 @@ add_executable(target-stack
                src/Wall.cpp
                src/LeastSquare.cpp
                src/Target.cpp
+               src/TargetFactory.cpp
                src/target-stack-node.cpp
                )
 

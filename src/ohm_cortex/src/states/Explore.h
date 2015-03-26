@@ -42,11 +42,10 @@ public:
     virtual void process(void);
 
 private:
-    ros::NodeHandle*  _nh;
-    ros::Publisher    _state_pub;
-    ros::ServiceClient _srvGetTarget;
-    ros::ServiceClient _srvMarkTarget;
+    ros::NodeHandle*   _nh;
+    ros::Publisher     _state_pub;
     ros::ServiceClient _srvTrigger;
+    ros::ServiceClient _srvMarkTarget;
 };
 
 } /* namespace autonohm */
