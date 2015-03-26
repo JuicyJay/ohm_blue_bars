@@ -3,6 +3,7 @@
 #include "Explore.h"
 #include "Inspect.h"
 #include "Drive.h"
+#include "../GetTransformation.h"
 
 #include <std_msgs/String.h>
 #include <ohm_actors/SensorHeadMode.h>
@@ -52,19 +53,35 @@ FoundVictimCandidate::~FoundVictimCandidate(void)
 
 void FoundVictimCandidate::process(void)
 {
-    //    ROS_INFO("Found Victim!!!");
+//    if ((ros::Time::now() - _stamp).toSec() > 20.0f)
+//    {
+//        ROS_INFO("Found Victim Candidate state already lives 20 seconds. Now its time to kill it.");
+//
+//        /* Set the state after and kill myself.*/
+//        Context::getInstance()->setState(new Inspect);
+//        delete this;
+//        return;
+//    }
 
-    if ((ros::Time::now() - _stamp).toSec() > 20.0f)
+    _pubGoal.publish(_goal.pose.position);
+
+
+    /* Check if the victim was classified. */
+    ohm_perception::GetVictim stack;
+    stack.request.id = _goal.id;
+
+    if (!_srvVictimStack.call(stack))
     {
-        ROS_INFO("Found Victim Candidate state already lives 20 seconds. Now its time to kill it.");
-
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the service GetVictim of the victim stack.");
+        return;
+    }
+    if (stack.response.victim.checked)
+    {
         /* Set the state after and kill myself.*/
         Context::getInstance()->setState(new Inspect);
         delete this;
         return;
     }
-
-    _pubGoal.publish(_goal.pose.position);
 }
 
 void FoundVictimCandidate::callbackMoveRobot(const ohm_autonomy::MoveRobot& msg)
@@ -74,7 +91,8 @@ void FoundVictimCandidate::callbackMoveRobot(const ohm_autonomy::MoveRobot& msg)
                                    _goal.pose.orientation.y,
                                    _goal.pose.orientation.z);
     const Eigen::Vector3f n(orientation * Eigen::Vector3f::UnitX());
-    const Eigen::Vector3f center(_goal.pose.position.x, _goal.pose.position.y, _goal.pose.position.z);
+    GetTransformation* tf = GetTransformation::instance();
+    tf->lookUpTransform("map", "georg/base");
 
     switch (msg.direction)
     {
@@ -82,7 +100,7 @@ void FoundVictimCandidate::callbackMoveRobot(const ohm_autonomy::MoveRobot& msg)
         {
             const Eigen::Vector3f v(orientation * Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitZ()) *
                                     Eigen::Vector3f::UnitX());
-            const Eigen::Vector3f p(center + n * 0.6f + v * 0.3f);
+            const Eigen::Vector3f p(tf->position() + v * 0.3f);
             geometry_msgs::Point position;
 
             position.x = p.x();
@@ -93,6 +111,17 @@ void FoundVictimCandidate::callbackMoveRobot(const ohm_autonomy::MoveRobot& msg)
         break;
 
     case ohm_autonomy::MoveRobot::RIGHT:
+        {
+            const Eigen::Vector3f v(orientation * Eigen::AngleAxisf(-M_PI_2, Eigen::Vector3f::UnitZ()) *
+                                    Eigen::Vector3f::UnitX());
+            const Eigen::Vector3f p(tf->position() + v * 0.3f);
+            geometry_msgs::Point position;
+
+            position.x = p.x();
+            position.y = p.y();
+            position.z = p.z();
+            Context::getInstance()->setState(new Drive(position, _goal.pose.orientation, this));
+        }
         break;
 
     case ohm_autonomy::MoveRobot::CLOSER:

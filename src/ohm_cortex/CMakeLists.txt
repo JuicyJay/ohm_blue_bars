@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
     ohm_perception
     ohm_actors
     ohm_autonomy
+    tf
     )
 
 find_package(cmake_modules REQUIRED)
@@ -62,24 +63,6 @@ generate_messages()
 
 catkin_package()
 
-## Declare a cpp library
-#add_library(ohm_cortex
-#  src/Context.cpp
-#  src/states/StatePing.cpp
-#  src/states/StatePong.cpp
-#  src/states/Teleoperated.cpp
-#  src/states/RejectVictim.cpp
-#  src/states/ConfirmVictim.cpp
-#  src/states/Waiting.cpp
-#  src/states/Inspect.cpp
-#  src/states/Approach.cpp
-#  src/states/Explore.cpp
-#  src/states/Drive.cpp
-#  src/states/Init.cpp
-#  src/states/TargetStack.cpp
-#  src/states/FrontierExplore.cpp
-#)
-
 ## Declare a cpp executable
 add_executable(statemachine
                src/ohm_statemachine.cpp
@@ -99,6 +82,7 @@ add_executable(statemachine
 #               src/states/FrontierExplore.cpp
                src/states/FoundVictimCandidate.cpp
                src/states/LookAtTarget.cpp
+               src/GetTransformation.cpp
                )
 
 add_executable(viz                   src/viz/viz_node.cpp           ${QT_SOURCES} ${QT_MOC_HPP} ${QT_FORMS_HPP})
@@ -110,8 +94,6 @@ add_dependencies(statemachine ohm_cortex_generate_messages_cpp ohm_path_plan)
 ## Specify libraries to link a library or executable target against
 target_link_libraries(statemachine
    ${catkin_LIBRARIES}
-   #ohm_path_plan
-#   ohm_cortex
 )
 
 target_link_libraries(viz ${QT_LIBRARIES} ${catkin_LIBRARIES})

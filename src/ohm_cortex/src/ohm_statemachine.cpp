@@ -17,7 +17,7 @@
 
 
 #include "ohm_cortex/Force.h"
-
+#include "GetTransformation.h"
 
 bool force(ohm_cortex::Force::Request& req, ohm_cortex::Force::Response& res);
 
@@ -37,6 +37,9 @@ int main(int argc, char** argv)
 
    // Set init state
    context->setState(new autonohm::Init);
+
+   // Init the tf listener.
+   GetTransformation::instance();
 
    ros::Rate r(10.0);
 
