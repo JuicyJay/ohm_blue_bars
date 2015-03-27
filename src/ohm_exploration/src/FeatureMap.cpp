@@ -39,7 +39,7 @@ void FeatureMap::updateMap(const Map& map)
                          "before updateMap().");
         return;
     }
-    if (map.width() != _data[0].size() || map.height() != _data.size())
+    if (map.width() > _data[0].size() || map.height() > _data.size())
     {
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": map has the wrong size. The size of the map is " <<
                          map.width() << " x " << map.height() << " and of the feature map is " <<

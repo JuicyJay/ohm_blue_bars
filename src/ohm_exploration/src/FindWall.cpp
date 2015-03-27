@@ -21,12 +21,19 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& occu)
 {
     nav_msgs::OccupancyGrid hack;
     hack = occu;
-    const Map map(hack);
 
     if (_featureMap.isNull())
+    {
+        const Map map(hack);
         _featureMap.setMap(map);
+    }
     else
+    {
+        const Rect roi(hack.info.width / 2, hack.info.height / 2, 200, 200);
+	Map hack2(hack);
+        const Map map(hack2, roi);
         _featureMap.updateMap(map);
+    }
 
     for (unsigned int i = 0; i < _orientations.size(); ++i)
         _featureMap.exportPoints(_points[i], _orientations[i]);
