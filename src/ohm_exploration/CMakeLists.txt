@@ -125,6 +125,7 @@ add_executable(wall-finder
                src/Wall.cpp
                src/FeatureMap.cpp
                src/Ray.cpp
+               src/Map.cpp
                )
 
 add_executable(goal-factory

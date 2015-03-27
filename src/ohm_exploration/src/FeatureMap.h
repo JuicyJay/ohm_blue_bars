@@ -12,20 +12,21 @@
 
 #include <vector>
 
-#include <nav_msgs/OccupancyGrid.h>
+//#include <nav_msgs/OccupancyGrid.h>
 
 #include <opencv2/opencv.hpp>
 
 #include "FeatureCell.h"
 #include "Wall.h"
+#include "Map.h"
 
 class FeatureMap
 {
 public:
     FeatureMap(void);
 
-    void setMap(const nav_msgs::OccupancyGrid& map);
-    void updateMap(const nav_msgs::OccupancyGrid& map);
+    void setMap(const Map& map);
+    void updateMap(const Map& map);
 
     void exportPoints(PointVector& points, const Wall::Orientation orientation = Wall::All);
     void markWalls(const std::vector<Wall>& walls);

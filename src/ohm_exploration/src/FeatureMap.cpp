@@ -13,25 +13,25 @@ FeatureMap::FeatureMap(void)
 
 }
 
-void FeatureMap::setMap(const nav_msgs::OccupancyGrid& map)
+void FeatureMap::setMap(const Map& map)
 {
-    if (!map.info.width || !map.info.height)
+    if (map.isNull())
     {
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": map isn't valid. Width and height must not 0.");
         return;
     }
 
-    _data.resize(map.info.height);
-    _width  = map.info.width;
-    _height = map.info.height;
+    _data.resize(map.height());
+    _width  = map.width();
+    _height = map.height();
 
     for (unsigned int row = 0; row < _data.size(); ++row)
-        _data[row].resize(map.info.width);
+        _data[row].resize(map.width());
 
     this->updateMap(map);
 }
 
-void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
+void FeatureMap::updateMap(const Map& map)
 {
     if (this->isNull())
     {
@@ -39,33 +39,36 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
                          "before updateMap().");
         return;
     }
-    if (map.info.width != _data[0].size() || map.info.height != _data.size())
+    if (map.width() != _data[0].size() || map.height() != _data.size())
     {
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": map has the wrong size. The size of the map is " <<
-                         map.info.width << " x " << map.info.height << " and of the feature map is " <<
+                         map.width() << " x " << map.height() << " and of the feature map is " <<
                          _data[0].size() << " x " << _data.size() << ".");
         return;
     }
 
     /* Check the changeovers in the map in positive x direction. */
-    for (unsigned int row = 1; row < _data.size() - 1; ++row)
+    for (unsigned int row = 1; row < map.height() - 1; ++row)
     {
-        const unsigned int offset = map.info.width * row;
+//        const unsigned int offset = map.info.width * row;
         bool changeover = false;
         unsigned int depth = 0;
-        int8_t last = map.data[offset];
+//        int8_t last = map.data[offset];
+        int8_t last = map(0, row);
 
-        for (unsigned int col = 1; col < _data[row].size(); ++col)
+        for (unsigned int col = 1; col < map.width(); ++col)
         {
-            const int8_t current = map.data[offset + col];
+//            const int8_t current = map.data[offset + col];
+            const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-                if (map.data[map.info.width * (row - 1) + col] > 0 &&
-                    map.data[map.info.width * (row + 1) + col] > 0)
+//                if (map.data[map.info.width * (row - 1) + col] > 0 &&
+//                    map.data[map.info.width * (row + 1) + col] > 0)
+                if (map(col, row - 1) > 0 && map(col, row + 1))
                 {
                     changeover = true;
-                    _data[row][col].orientation |= Wall::Left;
+                    _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Left;
                     depth = 0;
                 }
             }
@@ -74,7 +77,7 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
                 if (++depth >= _wallDepth)
                     changeover = false;
 
-                _data[row][col].orientation |= Wall::Left;
+                _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Left;
             }
             else if (changeover && current < 0)
             {
@@ -87,24 +90,27 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
 
 
     /* Check the changeovers in the map in negative x direction. */
-    for (unsigned int row = map.info.height - 2; row > 0; --row)
+    for (unsigned int row = map.height() - 2; row > 0; --row)
     {
-        const unsigned int offset = map.info.width * row;
-        int8_t last = map.data[offset + map.info.width - 1];
+//        const unsigned int offset = map.info.width * row;
+//        int8_t last = map.data[offset + map.info.width - 1];
+        int8_t last = map(map.width() - 1, row);
         unsigned int depth = 0;
         bool changeover = false;
 
-        for (unsigned int col = map.info.width - 2; col > 0; --col)
+        for (unsigned int col = map.width() - 2; col > 0; --col)
         {
-            const int8_t current = map.data[offset + col];
+//            const int8_t current = map.data[offset + col];
+            const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-                if (map.data[map.info.width * (row - 1) + col] > 0 &&
-                    map.data[map.info.width * (row + 1) + col] > 0)
+//                if (map.data[map.info.width * (row - 1) + col] > 0 &&
+//                    map.data[map.info.width * (row + 1) + col] > 0)
+                if (map(col, row - 1) > 0 && map(col, row + 1))
                 {
                     changeover = true;
-                    _data[row][col].orientation |= Wall::Right;
+                    _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Right;
                     depth = 0;
                 }
             }
@@ -113,7 +119,7 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
                 if (++depth >= _wallDepth)
                     changeover = false;
 
-                _data[row][col].orientation |= Wall::Right;
+                _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Right;
             }
             else if (changeover && current < 0)
             {
@@ -126,23 +132,26 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
 
 
     /* Check the changeover in the map in positve y direction. */
-    for (unsigned int col = 1; col < map.info.width - 1; ++col)
+    for (unsigned int col = 1; col < map.width() - 1; ++col)
     {
-        int8_t last = map.data[col];
+//        int8_t last = map.data[col];
+        int8_t last = map(col, 0);
         unsigned int depth = 0;
         bool changeover = false;
 
-        for (unsigned int row = 1; row < map.info.height - 1; ++row)
+        for (unsigned int row = 1; row < map.height() - 1; ++row)
         {
-            const int8_t current = map.data[map.info.width * row + col];
+//            const int8_t current = map.data[map.info.width * row + col];
+            const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-                if (map.data[map.info.width * row + (col - 1)] > 0 &&
-                    map.data[map.info.width * row + (col + 1)] > 0)
+//                if (map.data[map.info.width * row + (col - 1)] > 0 &&
+//                    map.data[map.info.width * row + (col + 1)] > 0)
+                if (map(col - 1, row) > 0 && map(col + 1, row))
                 {
                     changeover = true;
-                    _data[row][col].orientation |= Wall::Up;
+                    _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Up;
                     depth = 0;
                 }
             }
@@ -151,7 +160,7 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
                 if (++depth >= _wallDepth)
                     changeover = false;
 
-                _data[row][col].orientation |= Wall::Up;
+                _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Up;
             }
             else if (changeover && current < 0)
             {
@@ -164,23 +173,26 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
 
 
     /* Check the changeover in the map in negative y direction. */
-    for (unsigned int col = 1; col < map.info.width - 2; ++col)
+    for (unsigned int col = 1; col < map.width() - 2; ++col)
     {
-        int8_t last = map.data[map.info.width * (map.info.height - 1) + col];
+//        int8_t last = map.data[map.info.width * (map.info.height - 1) + col];
+        int8_t last = map(col, map.height() - 1);
         unsigned int depth = 0;
         bool changeover = false;
 
-        for (unsigned int row = map.info.height - 2; row > 0; --row)
+        for (unsigned int row = map.height() - 2; row > 0; --row)
         {
-            const int8_t current = map.data[map.info.width * row + col];
+//            const int8_t current = map.data[map.info.width * row + col];
+            const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-                if (map.data[map.info.width * row + (col - 1)] > 0 &&
-                    map.data[map.info.width * row + (col + 1)] > 0)
+//                if (map.data[map.info.width * row + (col - 1)] > 0 &&
+//                    map.data[map.info.width * row + (col + 1)] > 0)
+                if (map(col - 1, row) > 0 && map(col + 1, row))
                 {
                     changeover = true;
-                    _data[row][col].orientation |= Wall::Down;
+                    _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Down;
                     depth = 0;
                 }
             }
@@ -189,7 +201,7 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
                 if (++depth >= _wallDepth)
                     changeover = false;
 
-                _data[row][col].orientation |= Wall::Down;
+                _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Down;
             }
             else if (changeover && current < 0)
             {
