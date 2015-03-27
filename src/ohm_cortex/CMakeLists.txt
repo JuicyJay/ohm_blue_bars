@@ -89,7 +89,7 @@ add_executable(viz                   src/viz/viz_node.cpp           ${QT_SOURCES
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(statemachine ohm_cortex_generate_messages_cpp ohm_path_plan)
+# add_dependencies(statemachine ohm_cortex_generate_messages_cpp ohm_path_plan)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(statemachine

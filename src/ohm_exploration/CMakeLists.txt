@@ -153,9 +153,9 @@ add_executable(target-stack
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(wall-finder ohm_exploration_generate_messages_cpp)
-add_dependencies(target-stack ohm_exploration_generate_messages_cpp)
-add_dependencies(goal-factory ohm_exploration_generate_messages_cpp)
+# add_dependencies(wall-finder ohm_exploration_generate_messages_cpp)
+# add_dependencies(target-stack ohm_exploration_generate_messages_cpp)
+# add_dependencies(goal-factory ohm_exploration_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(exploration
