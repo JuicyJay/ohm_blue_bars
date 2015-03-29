@@ -25,8 +25,8 @@ class FeatureMap
 public:
     FeatureMap(void);
 
-    void setMap(const Map& map);
-    void updateMap(const Map& map);
+    void setMap(const ConstMap& map);
+    void updateMap(const ConstMap& map);
 
     void exportPoints(PointVector& points, const Wall::Orientation orientation = Wall::All);
     void markWalls(const std::vector<Wall>& walls);

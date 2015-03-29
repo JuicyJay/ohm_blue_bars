@@ -24,7 +24,6 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     Map(const unsigned int w = 0, const unsigned int h = 0, const float res = 0.01f);
-    Map(void);
     Map(nav_msgs::OccupancyGrid& map);
     Map(Map& map, const Rect& roi = Rect());
     virtual ~Map(void);
@@ -46,17 +45,33 @@ public:
         return (*_data)[y * _stride + x + _offset];
     }
 
-private:
+protected:
     bool                 _shared;
     unsigned int         _stride;
     unsigned int         _offset;
-    std::vector<int8_t>* _data;
 
     unsigned int    _width;
     unsigned int    _height;
     float           _resolution;
     Eigen::Vector2f _origin;
     Rect            _roi;
+
+private:
+    std::vector<int8_t>* _data;
+};
+
+class ConstMap : public Map
+{
+public:
+    ConstMap(const nav_msgs::OccupancyGrid& map, const Rect& roi = Rect());
+
+    inline const int8_t& operator()(const unsigned int x, const unsigned int y) const
+    {
+        return (*_data)[y * _stride + x + _offset];
+    }
+
+private:
+    const std::vector<int8_t>* _data;
 };
 
 #endif

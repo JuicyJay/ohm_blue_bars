@@ -17,28 +17,18 @@ FindWall::FindWall(void)
     _orientations.push_back(Wall::Right);
 }
 
-void FindWall::setMap(const nav_msgs::OccupancyGrid& occu)
+void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 {
-    nav_msgs::OccupancyGrid hack;
-    hack = occu;
+    _featureMap.setMap(ConstMap(map));
+    _mapMetaData = map.info;
+}
 
-    if (_featureMap.isNull())
-    {
-        const Map map(hack);
-        _featureMap.setMap(map);
-    }
-    else
-    {
-        const Rect roi(hack.info.width / 2, hack.info.height / 2 - 200, 400, 400);
-	Map hack2(hack);
-        const Map map(hack2, roi);
-        _featureMap.updateMap(map);
-    }
+void FindWall::updateMap(const nav_msgs::OccupancyGrid& map, const Rect& roi)
+{
+    _featureMap.updateMap(ConstMap(map, roi));
 
     for (unsigned int i = 0; i < _orientations.size(); ++i)
         _featureMap.exportPoints(_points[i], _orientations[i]);
-
-    _mapMetaData = occu.info;
 }
 
 void FindWall::search(std::vector<Wall>& walls)

@@ -13,7 +13,7 @@ FeatureMap::FeatureMap(void)
 
 }
 
-void FeatureMap::setMap(const Map& map)
+void FeatureMap::setMap(const ConstMap& map)
 {
     if (map.isNull())
     {
@@ -31,7 +31,7 @@ void FeatureMap::setMap(const Map& map)
     this->updateMap(map);
 }
 
-void FeatureMap::updateMap(const Map& map)
+void FeatureMap::updateMap(const ConstMap& map)
 {
     if (this->isNull())
     {

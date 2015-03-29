@@ -21,6 +21,7 @@ std::vector<Wall> _walls;
 ros::Publisher _pubWallMarkers;
 ros::Publisher _pubWalls;
 bool _armed = false;
+bool _initialized = false;
 
 bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
 {
@@ -31,16 +32,26 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
 
 void callbackMap(const nav_msgs::OccupancyGrid& map)
 {
+    if (!_initialized)
+    {
+        _wallFinder.setMap(map);
+        _initialized = true;
+        return;
+    }
+
     if (!_armed)
         return;
 
+
+    /* Update the map in wallFinder and then looking for walls. */
     std::vector<Wall> walls;
     _armed = false;
-    _wallFinder.setMap(map);
+    _wallFinder.updateMap(map);
     _wallFinder.search(walls);
     _walls.insert(_walls.end(), walls.begin(), walls.end());
 
-    /* send walls */
+
+    /* Send found walls. */
     ohm_autonomy::WallArray msgWalls;
 
     for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
@@ -48,12 +59,17 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
 
     _pubWalls.publish(msgWalls);
 
-    visualization_msgs::MarkerArray msg;
 
-    for (std::vector<Wall>::const_iterator wall(_walls.begin()); wall < _walls.end(); ++wall)
-        msg.markers.push_back(wall->getMarkerMessage());
+    /* Publish markers to show it in rviz. */
+    if (_pubWallMarkers.getNumSubscribers())
+    {
+        visualization_msgs::MarkerArray msg;
 
-    _pubWallMarkers.publish(msg);
+        for (std::vector<Wall>::const_iterator wall(_walls.begin()); wall < _walls.end(); ++wall)
+            msg.markers.push_back(wall->getMarkerMessage());
+
+        _pubWallMarkers.publish(msg);
+    }
 }
 
 int main(int argc, char** argv)
