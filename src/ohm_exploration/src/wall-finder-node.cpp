@@ -11,6 +11,7 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <std_srvs/Empty.h>
+#include <nav_msgs/GetMap.h>
 
 #include "FindWall.h"
 
@@ -20,33 +21,29 @@ FindWall _wallFinder;
 std::vector<Wall> _walls;
 ros::Publisher _pubWallMarkers;
 ros::Publisher _pubWalls;
-bool _armed = false;
+ros::ServiceClient _srvGetMap;
 bool _initialized = false;
 
 bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
 {
-    _armed = true;
+    nav_msgs::GetMap service;
 
-    return true;
-}
-
-void callbackMap(const nav_msgs::OccupancyGrid& map)
-{
-    if (!_initialized)
+    if (!_srvGetMap.call(service))
     {
-        _wallFinder.setMap(map);
-        _initialized = true;
-        return;
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the service get map. Will not search walls.");
+        return false;
     }
 
-    if (!_armed)
-        return;
+    if (!_initialized)
+    {
+        _wallFinder.setMap(service.response.map);
+        _initialized = true;
+    }
 
 
     /* Update the map in wallFinder and then looking for walls. */
     std::vector<Wall> walls;
-    _armed = false;
-    _wallFinder.updateMap(map);
+    _wallFinder.updateMap(service.response.map);
     _wallFinder.search(walls);
     _walls.insert(_walls.end(), walls.begin(), walls.end());
 
@@ -70,6 +67,8 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
 
         _pubWallMarkers.publish(msg);
     }
+
+    return true;
 }
 
 int main(int argc, char** argv)
@@ -81,7 +80,9 @@ int main(int argc, char** argv)
 
     para.param<std::string>("service_trigger", topic, "exploration/wall_finder/trigger");
     ros::ServiceServer srvTrigger(nh.advertiseService(topic, callbackTrigger));
-    ros::Subscriber subMap(nh.subscribe("map", 1, callbackMap));
+    para.param<std::string>("service_get_map", topic, "map");
+    _srvGetMap = nh.serviceClient<nav_msgs::GetMap>(topic);
+
     _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>("exploration/wall_markers", 2);
     _pubWalls = nh.advertise<ohm_autonomy::WallArray>("exploration/walls", 2);
 
