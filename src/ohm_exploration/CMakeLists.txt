@@ -111,11 +111,6 @@ include_directories(${EIGEN_INCLUDE_DIRS}
 # )
 
 ## Declare a cpp executable
-add_executable(exploration
-               src/exploration-node.cpp
-               src/SensorPublisher.cpp
-               src/Grid.cpp
-               )
 
 add_executable(wall-finder
                src/wall-finder-node.cpp
@@ -126,17 +121,6 @@ add_executable(wall-finder
                src/FeatureMap.cpp
                src/Ray.cpp
                src/Map.cpp
-               )
-
-add_executable(goal-factory
-               src/goal-factory-node.cpp
-               src/FindWall.cpp
-               src/LeastSquare.cpp
-               src/Ransac.cpp
-               src/Wall.cpp
-               src/FeatureMap.cpp
-               src/Map.cpp
-               src/Ray.cpp
                )
 
 add_executable(map-roi
@@ -159,16 +143,8 @@ add_executable(target-stack
 # add_dependencies(goal-factory ohm_exploration_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(exploration
-                      ${catkin_LIBRARIES}
-                      )
 
 target_link_libraries(wall-finder
-                      ${catkin_LIBRARIES}
-                      ${OpenCV_LIBRARIES}
-                      )
-
-target_link_libraries(goal-factory
                       ${catkin_LIBRARIES}
                       ${OpenCV_LIBRARIES}
                       )
