@@ -16,6 +16,8 @@
 
 #include <Eigen/Core>
 
+#include <opencv2/opencv.hpp>
+
 #include "Wall.h"
 #include "Ransac.h"
 #include "FeatureMap.h"
@@ -27,6 +29,7 @@ public:
 
     void setMap(const nav_msgs::OccupancyGrid& map);
     void search(std::vector<Wall>& walls);
+    cv::Mat getImageFromMap(void) const;
 
 private:
     void removePoints(const PointVector& remove, PointVector& points);

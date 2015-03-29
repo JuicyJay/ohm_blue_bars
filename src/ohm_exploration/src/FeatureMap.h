@@ -31,7 +31,7 @@ public:
     void exportPoints(PointVector& points, const Wall::Orientation orientation = Wall::All);
     void markWalls(const std::vector<Wall>& walls);
 
-    void paintImage(cv::Mat& image, const FeatureCell must);
+    void paintImage(cv::Mat& image, const FeatureCell must) const;
 
     inline unsigned int width(void) const { return _width; }
     inline unsigned int height(void) const { return _height; }

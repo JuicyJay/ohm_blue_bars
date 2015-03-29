@@ -29,7 +29,7 @@ void FindWall::setMap(const nav_msgs::OccupancyGrid& occu)
     }
     else
     {
-        const Rect roi(hack.info.width / 2, hack.info.height / 2, 200, 200);
+        const Rect roi(hack.info.width / 2, hack.info.height / 2 - 200, 400, 400);
 	Map hack2(hack);
         const Map map(hack2, roi);
         _featureMap.updateMap(map);
@@ -68,6 +68,15 @@ void FindWall::search(std::vector<Wall>& walls)
 
     /* Mark all found valid walls. This enures the walls can not be found again in the future. */
     _featureMap.markWalls(walls);
+}
+
+cv::Mat FindWall::getImageFromMap(void) const
+{
+    cv::Mat image;
+
+    _featureMap.paintImage(image, FeatureCell(true, true, Wall::All));
+
+    return image;
 }
 
 void FindWall::removePoints(const PointVector& remove, PointVector& points)

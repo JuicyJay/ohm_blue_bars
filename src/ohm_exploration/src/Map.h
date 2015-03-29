@@ -33,8 +33,8 @@ public:
     inline unsigned int height(void) const { return _height; }
     inline float resolution(void) const { return _resolution; }
     inline const Eigen::Vector2f& origin(void) const { return _origin; }
-    inline bool hasRoi(void) const { return _rect.isNull(); }
-    inline const Rect& roi(void) const { return _rect; }
+    inline bool hasRoi(void) const { return _roi.isNull(); }
+    inline const Rect& roi(void) const { return _roi; }
     inline bool isNull(void) const { return !_width || !_height; }
 
     inline int8_t& operator()(const unsigned int x, const unsigned int y)
@@ -56,7 +56,7 @@ private:
     unsigned int    _height;
     float           _resolution;
     Eigen::Vector2f _origin;
-    Rect            _rect;
+    Rect            _roi;
 };
 
 #endif

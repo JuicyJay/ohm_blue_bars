@@ -63,14 +63,11 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     std::string topic;
 
-    para.param<std::string>("topic_map", topic, "/map");
-    ros::Subscriber subMap(nh.subscribe(topic, 1, callbackMap));
     para.param<std::string>("service_trigger", topic, "exploration/wall_finder/trigger");
     ros::ServiceServer srvTrigger(nh.advertiseService(topic, callbackTrigger));
-    para.param<std::string>("topic_markers", topic, "exploration/wall_markers");
-    _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>(topic, 2);
-    para.param<std::string>("topic_walls", topic, "exploration/walls");
-    _pubWalls = nh.advertise<ohm_autonomy::WallArray>(topic, 2);
+    ros::Subscriber subMap(nh.subscribe("map", 1, callbackMap));
+    _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>("exploration/wall_markers", 2);
+    _pubWalls = nh.advertise<ohm_autonomy::WallArray>("exploration/walls", 2);
 
     ros::spin();
 }

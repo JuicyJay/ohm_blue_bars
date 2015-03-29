@@ -47,25 +47,21 @@ void FeatureMap::updateMap(const Map& map)
         return;
     }
 
+
     /* Check the changeovers in the map in positive x direction. */
     for (unsigned int row = 1; row < map.height() - 1; ++row)
     {
-//        const unsigned int offset = map.info.width * row;
         bool changeover = false;
         unsigned int depth = 0;
-//        int8_t last = map.data[offset];
         int8_t last = map(0, row);
 
         for (unsigned int col = 1; col < map.width(); ++col)
         {
-//            const int8_t current = map.data[offset + col];
             const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-//                if (map.data[map.info.width * (row - 1) + col] > 0 &&
-//                    map.data[map.info.width * (row + 1) + col] > 0)
-                if (map(col, row - 1) > 0 && map(col, row + 1))
+                if (map(col, row - 1) > 0 && map(col, row + 1) > 0)
                 {
                     changeover = true;
                     _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Left;
@@ -92,22 +88,17 @@ void FeatureMap::updateMap(const Map& map)
     /* Check the changeovers in the map in negative x direction. */
     for (unsigned int row = map.height() - 2; row > 0; --row)
     {
-//        const unsigned int offset = map.info.width * row;
-//        int8_t last = map.data[offset + map.info.width - 1];
         int8_t last = map(map.width() - 1, row);
         unsigned int depth = 0;
         bool changeover = false;
 
         for (unsigned int col = map.width() - 2; col > 0; --col)
         {
-//            const int8_t current = map.data[offset + col];
             const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-//                if (map.data[map.info.width * (row - 1) + col] > 0 &&
-//                    map.data[map.info.width * (row + 1) + col] > 0)
-                if (map(col, row - 1) > 0 && map(col, row + 1))
+                if (map(col, row - 1) > 0 && map(col, row + 1) > 0)
                 {
                     changeover = true;
                     _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Right;
@@ -134,21 +125,17 @@ void FeatureMap::updateMap(const Map& map)
     /* Check the changeover in the map in positve y direction. */
     for (unsigned int col = 1; col < map.width() - 1; ++col)
     {
-//        int8_t last = map.data[col];
         int8_t last = map(col, 0);
         unsigned int depth = 0;
         bool changeover = false;
 
         for (unsigned int row = 1; row < map.height() - 1; ++row)
         {
-//            const int8_t current = map.data[map.info.width * row + col];
             const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-//                if (map.data[map.info.width * row + (col - 1)] > 0 &&
-//                    map.data[map.info.width * row + (col + 1)] > 0)
-                if (map(col - 1, row) > 0 && map(col + 1, row))
+                if (map(col - 1, row) > 0 && map(col + 1, row) > 0)
                 {
                     changeover = true;
                     _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Up;
@@ -175,21 +162,17 @@ void FeatureMap::updateMap(const Map& map)
     /* Check the changeover in the map in negative y direction. */
     for (unsigned int col = 1; col < map.width() - 2; ++col)
     {
-//        int8_t last = map.data[map.info.width * (map.info.height - 1) + col];
         int8_t last = map(col, map.height() - 1);
         unsigned int depth = 0;
         bool changeover = false;
 
         for (unsigned int row = map.height() - 2; row > 0; --row)
         {
-//            const int8_t current = map.data[map.info.width * row + col];
             const int8_t current = map(col, row);
 
             if (!last && current > 0)
             {
-//                if (map.data[map.info.width * row + (col - 1)] > 0 &&
-//                    map.data[map.info.width * row + (col + 1)] > 0)
-                if (map(col - 1, row) > 0 && map(col + 1, row))
+                if (map(col - 1, row) > 0 && map(col + 1, row) > 0)
                 {
                     changeover = true;
                     _data[row + map.roi().y()][col + map.roi().x()].orientation |= Wall::Down;
@@ -257,12 +240,23 @@ void FeatureMap::markWalls(const std::vector<Wall>& walls)
     }
 }
 
-void FeatureMap::paintImage(cv::Mat& image, const FeatureCell must)
+void FeatureMap::paintImage(cv::Mat& image, const FeatureCell must) const
 {
     image.create(_height, _width, CV_8UC1);
 
     for (int row = 0; row < image.rows; ++row)
+    {
         for (int col = 0; col < image.cols; ++col)
-            image.at<uint8_t>(row, col) = _data[row][col].saw > 0 ? 0xff : 0x00;
+        {
+            if (_data[row][col].saw > 0)
+            {
+                image.at<uint8_t>(row, col) = 0xff;
+            }
+            else
+            {
+                image.at<uint8_t>(row, col) = 0x00;
+            }
+        }
+    }
 }
 

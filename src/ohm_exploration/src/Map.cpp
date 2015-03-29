@@ -41,9 +41,20 @@ Map::Map(nav_msgs::OccupancyGrid& map)
 }
 
 Map::Map(Map& map, const Rect& roi)
-    : _shared(true)
+    : _shared(true),
+      _roi(roi)
 {
-    if (roi.isNull())
+    if (!_roi.isNull())
+    {
+        _stride     = map._width;
+        _offset     = map._width * _roi.y() + _roi.x();
+        _data       = map._data;
+        _width      = _roi.width();
+        _height     = _roi.height();
+        _resolution = map._resolution;
+        _origin     = map._origin + Eigen::Vector2f(_roi.x(), _roi.y()) * _resolution;
+    }
+    else
     {
         _stride     = map._stride;
         _offset     = map._offset;
@@ -52,16 +63,6 @@ Map::Map(Map& map, const Rect& roi)
         _height     = map._height;
         _resolution = map._resolution;
         _origin     = map._origin;
-    }
-    else
-    {
-        _stride     = map._width;
-        _offset     = map._width * roi.y() + roi.x();
-        _data       = map._data;
-        _width      = roi.width();
-        _height     = roi.height();
-        _resolution = map._resolution;
-        _origin     = map._origin + Eigen::Vector2f(roi.x(), roi.y()) * _resolution;
     }
 }
 
