@@ -110,9 +110,20 @@ void FrontierExplorationNode::findFrontiers(void)
    if(_frontierFinder->isInitialized())
    {
       _frontierFinder->calculateFrontiers();
-      _frontiers = _frontierFinder->getFrontiers();
 
-      this->publishFrontiers();
+      ROS_INFO("----------- Frontier Finder --------------- NUM_FRONTIER: %d", _frontierFinder->getFrontiers().size());
+
+      //_frontiers = _frontierFinder->getFrontiers();
+
+      if(_frontierFinder->getFrontiers().size())
+      {
+         // look for best frontier
+         _frontierController->setWeightedFrontiers(_frontierFinder->getWeightedFrontiers());
+         _frontierController->findBestFrontier();
+         _frontierController->getWeightedFrontiers();
+         _frontiers = _frontierController->getWeightedFrontiers();
+         //this->publishFrontiers();
+      }
    }
    else
    {
@@ -129,22 +140,18 @@ void FrontierExplorationNode::publishFrontiers(void)
    geometry_msgs::PoseArray frontierMarkers;
    frontierMarkers.header.stamp    = ros::Time::now();
    frontierMarkers.header.seq      = seq++;
-   frontierMarkers.header.frame_id = "/map";
+   frontierMarkers.header.frame_id = "/sim_map";
 
    // fill message
-   for(std::vector<Frontier>::iterator it=_frontiers.begin() ; it != _frontiers.end() ; ++it)
-      frontierMarkers.poses.push_back(*it);
+   for(unsigned int i = 0; i < _frontiers.size(); ++i)
+      frontierMarkers.poses.push_back(_frontiers[i].frontier);
 
    // publish message
    _frontier_pub.publish(frontierMarkers);
    _frontier_grid_pub.publish(_frontierFinder->getFrontierLayer());
 
-//   // look for best frontier
-   _frontierController->setWeightedFrontiers(_frontierFinder->getWeightedFrontiers());
-   _frontierController->findBestFrontier();
-
    // visualization
-   _viz.setFrontiers(_frontiers);
+   _viz.setFrontiers(        _frontierFinder->getFrontiers());
    _viz.setBestFrontier(     _frontierController->getBestFrontier());
    _viz.setWeightedFrontiers(_frontierController->getWeightedFrontiers());
    _viz.publish();

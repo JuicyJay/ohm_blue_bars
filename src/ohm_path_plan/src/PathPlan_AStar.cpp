@@ -21,6 +21,7 @@ PathPlan_AStar::PathPlan_AStar() :
    std::string tf_map_frame;
    std::string tf_robot_frame;
    std::string srv_plan_paths;
+   std::string srv_plan_path;
 
    double robot_radius;
    double dt_radius;
@@ -35,6 +36,7 @@ PathPlan_AStar::PathPlan_AStar() :
    privNh.param("sub_pose",              sub_pose,       std::string("robot0/pose"));
    privNh.param("pub_path",              pub_path,       std::string("path"));
    privNh.param("srv_plan_paths",        srv_plan_paths, std::string("path_plan/srv_plan_paths"));
+   privNh.param("srv_plan_path",         srv_plan_path,  std::string("path_plan/srv_plan_path"));
    privNh.param("frame_id",              frame_id,       std::string("map"));
    privNh.param("tf_map_frame",           tf_map_frame,           std::string("map"));
    privNh.param("tf_robot_frame",         tf_robot_frame,         std::string("base_footprint"));
@@ -68,6 +70,8 @@ PathPlan_AStar::PathPlan_AStar() :
 
    //init services
    _srv_plan_paths = _nh.advertiseService(srv_plan_paths, &PathPlan_AStar::srvCallback_plan_sorted, this);
+   _srv_plan_path  = _nh.advertiseService(srv_plan_path, &PathPlan_AStar::srvCallback_plan_path,this);
+
 
    _gotMap = false;
    //_gotPose = false;
@@ -322,6 +326,74 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
       }
 
    }
+
+   return true;
+}
+
+
+bool PathPlan_AStar::srvCallback_plan_path(
+      ohm_path_plan::PlanPathRequest& req,
+      ohm_path_plan::PlanPathResponse& res)
+{
+   ROS_INFO("Ohm_path_plan -> PlanPaths service called");
+
+   if(!_gotMap)
+   {
+      ROS_WARN("Called service to plan path... but no map given yet");
+      return false;
+   }
+
+   apps::Point2D pose;
+
+   pose.x = req.origin.position.x;
+   pose.y = req.origin.position.y;
+
+   //obvious::Timer timer;
+   //timer.reset();
+
+   apps::Point2D origin;
+   origin.x = _map.info.origin.position.x;
+   origin.y = _map.info.origin.position.y;
+
+
+
+
+
+   apps::Astar_dt* astar_planer = new apps::Astar_dt(NULL);
+   astar_planer->setWallValue(WALL_VALUE);
+   astar_planer->setAstarParam(_cost_short_step,
+                               _cost_long_step,
+                               _factor_dist,
+                               _costmap_weight);
+   astar_planer->setGridMap(new apps::GridMap((uint8_t*) &_map.data[0],
+                                               _map.info.width,
+                                               _map.info.height,
+                                               _map.info.resolution,
+                                               origin));
+   this->do_map_operations(astar_planer);
+
+   res.length = 0;
+
+   apps::Point2D end;
+   end.x = req.target.position.x;
+   end.y = req.target.position.y;
+
+   std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
+
+   geometry_msgs::PoseStamped target_pose;
+   target_pose.pose = req.target;
+
+   res.path = this->toRosPath(path,target_pose);
+
+   if(path.size() == 0)
+   {//no path found
+      res.length = -1;
+   }
+   else
+   {
+      res.length = astar_planer->getPathLenght(path);
+   }
+
 
    return true;
 }

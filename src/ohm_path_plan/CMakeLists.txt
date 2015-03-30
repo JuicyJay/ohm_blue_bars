@@ -59,6 +59,7 @@ find_package(OpenCV REQUIRED)
 add_service_files(
    FILES
    PlanPaths.srv
+   PlanPath.srv
 #   Service2.srv
 )
 

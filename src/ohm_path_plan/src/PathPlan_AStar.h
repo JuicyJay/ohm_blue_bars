@@ -19,6 +19,7 @@
 #include "PathFind/Map/MapOperations/MapOperations.h"
 
 #include <ohm_path_plan/PlanPaths.h>
+#include <ohm_path_plan/PlanPath.h>
 
 class PathPlan_AStar
 {
@@ -33,6 +34,7 @@ private:    //dataelements
     ros::Subscriber _subTargetPose;
 
     ros::ServiceServer _srv_plan_paths;
+    ros::ServiceServer _srv_plan_path;
 
     ros::ServiceServer _servicePlan;
 
@@ -101,6 +103,8 @@ private:    //functions
 
     bool srvCallback_plan_sorted(ohm_path_plan::PlanPathsRequest& req,
                                  ohm_path_plan::PlanPathsResponse& res);
+    bool srvCallback_plan_path(ohm_path_plan::PlanPathRequest& req,
+                               ohm_path_plan::PlanPathResponse& res);
 
 };
 

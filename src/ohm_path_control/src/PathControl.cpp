@@ -191,22 +191,25 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
    }
 
 
-   //prove last path element of nan
-   if(isnan(msg.poses[msg.poses.size() - 1].pose.orientation.w) ||
-      isnan(msg.poses[msg.poses.size() - 1].pose.orientation.x) ||
-      isnan(msg.poses[msg.poses.size() - 1].pose.orientation.y) ||
-      isnan(msg.poses[msg.poses.size() - 1].pose.orientation.z)   )
-   {
-      //if none is nan ... than set to norotate
-      ROS_INFO("ohm_path_control -> Disable Rotate");
-      _pathAnalyser->setDoEndRotate(false);
-   }
-   else
-   {
-      ROS_INFO("ohm_path_control -> Enable Rotate");
-      _pathAnalyser->setDoEndRotate(true);
-   }
 
+   //prove last path element of nan
+   if(msg.poses.size())
+   {
+      if(isnan(msg.poses[msg.poses.size() - 1].pose.orientation.w) ||
+         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.x) ||
+         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.y) ||
+         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.z)   )
+      {
+         //if none is nan ... than set to norotate
+         ROS_INFO("ohm_path_control -> Disable Rotate");
+         _pathAnalyser->setDoEndRotate(false);
+      }
+      else
+      {
+         ROS_INFO("ohm_path_control -> Enable Rotate");
+         _pathAnalyser->setDoEndRotate(true);
+      }
+   }
 
    _pathAnalyser->setPath(path);
    _enable_analyse = true;

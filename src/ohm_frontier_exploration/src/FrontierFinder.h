@@ -143,6 +143,15 @@ private:
                                           float originX = 0.0f, float originY = 0.0f,
                                           float resolution = 1.0);
 
+   /**
+    * Function to optimize frontier, which could be in unknown terrain.
+    * This is necessary, because the path planner.
+    * @param frontier
+    */
+   void optimizeFrontierIfInUnknown(Frontier& frontier);
+
+
+
 
    bool                             _initialized;
 

@@ -118,7 +118,7 @@ private:
    ros::ServiceServer               _best_target_service;
    ros::ServiceServer               _all_targets_service;
 
-   std::vector<Frontier>            _frontiers;
+   std::vector<WeightedFrontier>    _frontiers;
 
    frontier::Finder*                _frontierFinder;
    frontier::Visualization          _viz;

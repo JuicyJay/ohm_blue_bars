@@ -44,7 +44,7 @@ struct WeightedFrontier
    float          weight;
 
    bool operator<(const WeightedFrontier& f) const {
-      return weight < f.weight;
+      return weight > f.weight;
    }
 };
 
