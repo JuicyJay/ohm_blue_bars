@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
                     geometry_msgs
                     ohm_path_plan
                     ohm_autonomy
+                    ohm_common
                     )
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
@@ -136,6 +137,10 @@ add_executable(target-stack
                src/target-stack-node.cpp
                )
 
+add_executable(mission-planner
+               src/mission-planner-node.cpp
+               )
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(wall-finder ohm_exploration_generate_messages_cpp)
@@ -157,6 +162,9 @@ target_link_libraries(target-stack
                       ${catkin_LIBRARIES}
                       )
 
+target_link_libraries(mission-planner
+                      ${catkin_LIBRARIES}
+                      )
 #############
 ## Install ##
 #############
