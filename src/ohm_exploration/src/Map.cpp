@@ -1,6 +1,6 @@
 #include "Map.h"
 
-/*
+
 Map::Map(const unsigned int w, const unsigned int h, const float resolution)
     : _shared(false),
       _stride(w),
@@ -13,7 +13,6 @@ Map::Map(const unsigned int w, const unsigned int h, const float resolution)
 {
 
 }
-*/
 
 Map::Map(void)
     : _shared(false),

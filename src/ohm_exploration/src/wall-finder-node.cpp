@@ -1,4 +1,4 @@
-/************************************************************************************************************
+/***********************************************************************************************************
  * wall-finder-node.cpp
  *
  *  Created on: 01.12.2014
@@ -6,14 +6,15 @@
  *      E-Mail: christian.merkl@th-nuernberg.de
  *     Licence: BSD
  *
- ************************************************************************************************************/
+ ***********************************************************************************************************/
 #include <ros/ros.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <std_srvs/Empty.h>
 
 #include "FindWall.h"
-#include "ohm_exploration/WallArray.h"
+
+#include <ohm_autonomy/WallArray.h>
 
 FindWall _wallFinder;
 std::vector<Wall> _walls;
@@ -40,7 +41,7 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
     _walls.insert(_walls.end(), walls.begin(), walls.end());
 
     /* send walls */
-    ohm_exploration::WallArray msgWalls;
+    ohm_autonomy::WallArray msgWalls;
 
     for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
         msgWalls.walls.push_back(wall->getWallMessage());
@@ -69,7 +70,7 @@ int main(int argc, char** argv)
     para.param<std::string>("topic_markers", topic, "exploration/wall_markers");
     _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>(topic, 2);
     para.param<std::string>("topic_walls", topic, "exploration/walls");
-    _pubWalls = nh.advertise<ohm_exploration::WallArray>(topic, 2);
+    _pubWalls = nh.advertise<ohm_autonomy::WallArray>(topic, 2);
 
     ros::spin();
 }

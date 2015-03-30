@@ -37,7 +37,7 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
     {
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": feature map is not initialized. Please frist call setMap()"
                          "before updateMap().");
-            return;
+        return;
     }
     if (map.info.width != _data[0].size() || map.info.height != _data.size())
     {
@@ -198,7 +198,6 @@ void FeatureMap::updateMap(const nav_msgs::OccupancyGrid& map)
 
             last = current;
         }
-
     }
 }
 

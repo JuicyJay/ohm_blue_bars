@@ -1,75 +1,68 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_listener.h>
+#include <ohm_autonomy/WallArray.h>
+#include <ohm_autonomy/MarkTarget.h>
+#include <ohm_autonomy/GetTarget.h>
+#include <ohm_path_plan/PlanPaths.h>
 
 #include <list>
 
 #include "Wall.h"
 #include "Target.h"
-#include "ohm_exploration/WallArray.h"
-#include "ohm_exploration/MarkTarget.h"
-#include "ohm_exploration/GetTarget.h"
-#include "ohm_path_plan/PlanPaths.h"
+#include "TargetFactory.h"
 
-std::list<Wall> _haveToInspect;
+std::list<Target> _haveToInspect;
 std::vector<Target> _targets;
 ros::ServiceClient _srvPlanPaths;
 tf::TransformListener* _listener = 0;
 std::string _tfSource, _tfTarget;
 
-Wall takeClosestWallFromList(std::list<Wall>& walls, const Pose& origin)
+Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
 {
-    if (!walls.size())
-      return Wall();
+    if (!targets.size())
+        return Target();
 
     ohm_path_plan::PlanPaths paths;
     paths.request.origin = origin.toRos();
 
-    for (std::list<Wall>::const_iterator wall(walls.begin()); wall != walls.end(); ++wall)
-    {
-        const Eigen::Vector3f center(wall->center().x(), wall->center().y(), 0.0f);
-        const Eigen::Vector3f n(wall->model().n().x(), wall->model().n().y(), 0.0f);
-        const Pose pose(center + n * 0.5f, -n);
-
-        paths.request.targets.push_back(pose.toRos());
-    }
+    for (std::list<Target>::const_iterator target(targets.begin()); target != targets.end(); ++target)
+        paths.request.targets.push_back(target->pose().toRos());
 
 
     if (!_srvPlanPaths.call(paths))
     {
         ROS_ERROR("Cannot call the path plan node.");
-        return Wall();
+        return Target();
     }
 
-    if (paths.response.lengths.size() != walls.size())
+    if (paths.response.lengths.size() != targets.size())
     {
         ROS_ERROR("Not enough distances received from the path plan node.");
-        return Wall();
+        return Target();
     }
 
     std::vector<double>::const_iterator distance(paths.response.lengths.begin());
-    for (std::list<Wall>::iterator wall(walls.begin()); wall != walls.end(); ++wall, ++distance)
-      wall->setDistance(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
+    for (std::list<Target>::iterator target(targets.begin()); target != targets.end(); ++target, ++distance)
+        target->setDistance(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
 
-    walls.sort();
+    targets.sort();
 
-    for (std::list<Wall>::const_iterator wall(walls.begin()); wall != walls.end(); ++wall)
-      {
-	ROS_INFO("Wall %i is %f m away.", wall->id(), wall->distance());
-      }
+    for (std::list<Target>::const_iterator target(targets.begin()); target != targets.end(); ++target)
+	ROS_INFO("Target %i is %f m away.", target->id(), target->distance());
 
-    Wall wall(walls.front());
-    walls.pop_front();
-    return wall;
+    Target target(targets.front());
+    targets.pop_front();
+    return target;
 }
 
-void callbackWalls(const ohm_exploration::WallArray& walls)
+void callbackWalls(const ohm_autonomy::WallArray& walls)
 {
     /* Use the center of the walls to create targets and get the corresponding lenghts. */
     ohm_path_plan::PlanPaths paths;
-    std::list<Wall> receivedWalls;
+    std::vector<Wall> receivedWalls;
 
-    for (std::vector<ohm_exploration::Wall>::const_iterator wall(walls.walls.begin());
+    for (std::vector<ohm_autonomy::Wall>::const_iterator wall(walls.walls.begin());
          wall < walls.walls.end();
          ++wall)
     {
@@ -98,91 +91,21 @@ void callbackWalls(const ohm_exploration::WallArray& walls)
 
     /* Estimate the best path. */
     ROS_INFO("Take closest with origin.");
-    Wall wall(takeClosestWallFromList(receivedWalls, origin));
+    TargetFactory factory;
 
-    while (wall.valid())
+    factory.create(receivedWalls);
+    std::list<Target> targets(factory.targets().begin(), factory.targets().end());
+    Target target(takeClosestTargetFromList(targets, origin));
+
+    while (target.valid())
     {
-        _haveToInspect.push_back(wall);
-
-        const Eigen::Vector3f center(wall.center().x(), wall.center().y(), 0.0f);
-        const Eigen::Vector3f n(wall.model().n().x(), wall.model().n().y(), 0.0f);
-        const Pose pose(center + n * 0.5f, -n);
-	ROS_INFO_STREAM("Take closest with pose: " << pose.position);
-        wall = takeClosestWallFromList(receivedWalls, pose);
+        _haveToInspect.push_back(target);
+	ROS_INFO_STREAM("Take closest with position: " << target.pose().position);
+        target = takeClosestTargetFromList(targets, target.pose());
     }
 }
 
-/* Backup */
-//void callbackWalls(const ohm_exploration::WallArray& walls)
-//{
-//    /* Use the center of the walls to create targets and get the corresponding lenghts. */
-//    ohm_path_plan::PlanPaths paths;
-//    std::vector<Wall> receivedWalls;
-//
-//    for (std::vector<ohm_exploration::Wall>::const_iterator wall(walls.walls.begin());
-//         wall < walls.walls.end();
-//         ++wall)
-//    {
-//        const Eigen::Vector3f center(wall->center.x, wall->center.y, 0.0f);
-//        const Eigen::Vector3f n(wall->n.x, wall->n.y, 0.0f);
-//        const Pose pose(center + n * 0.5f, -n);
-//
-//        paths.request.targets.push_back(pose.toRos());
-//        receivedWalls.push_back(Wall(*wall));
-//    }
-//
-//
-//    /* Get the current robot pose. */
-//    tf::StampedTransform transform;
-//
-//    try
-//    {
-//        _listener->lookupTransform(_tfSource, _tfTarget, ros::Time(0), transform);
-//    }
-//    catch (tf::TransformException ex)
-//    {
-//        ROS_ERROR("%s", ex.what());
-//        ROS_INFO("Will use coordinate (0, 0, 0).");
-//    }
-//
-//    paths.request.origin.position.x = transform.getOrigin().x();
-//    paths.request.origin.position.y = transform.getOrigin().y();
-//    paths.request.origin.position.z = transform.getOrigin().z();
-//
-//    paths.request.origin.orientation.w = transform.getRotation().w();
-//    paths.request.origin.orientation.x = transform.getRotation().x();
-//    paths.request.origin.orientation.y = transform.getRotation().y();
-//    paths.request.origin.orientation.z = transform.getRotation().z();
-//
-//
-//    /* Ask the navigation node for the distances of each path. */
-//    if (_srvPlanPaths.call(paths))
-//    {
-//        for (unsigned int i = 0; i < paths.response.lengths.size(); ++i)
-//	{
-//            receivedWalls[i].setDistance(paths.response.lengths[i] < 0.0 ?
-//                                         std::numeric_limits<float>::max() :
-//                                         paths.response.lengths[i]);
-//	    ROS_INFO("distance to wall %u is %f.", i, paths.response.lengths[i]);
-//	}
-//
-//        std::sort(receivedWalls.begin(), receivedWalls.end());
-//
-//	for (unsigned int i = 0; i < receivedWalls.size(); ++i)
-//	  ROS_INFO("distance to wall %u is %f.", i, receivedWalls[i].distance());
-//    }
-//    else
-//    {
-//        ROS_ERROR("Cannot call the navigation node.");
-//        ROS_INFO("Will use the unsorted targets.");
-//    }
-//
-//
-//    /* Put all targets to the have to inspect list */
-//    _haveToInspect.insert(_haveToInspect.end(), receivedWalls.begin(), receivedWalls.end());
-//}
-
-bool callbackMarkTarget(ohm_exploration::MarkTarget::Request& req, ohm_exploration::MarkTarget::Response& res)
+bool callbackMarkTarget(ohm_autonomy::MarkTarget::Request& req, ohm_autonomy::MarkTarget::Response& res)
 {
     for (std::vector<Target>::iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
@@ -196,23 +119,20 @@ bool callbackMarkTarget(ohm_exploration::MarkTarget::Request& req, ohm_explorati
     return false;
 }
 
-bool callbackGetTarget(ohm_exploration::GetTarget::Request& req, ohm_exploration::GetTarget::Response& res)
+bool callbackGetTarget(ohm_autonomy::GetTarget::Request& req, ohm_autonomy::GetTarget::Response& res)
 {
     if (req.id < 0)
     {
         if (!_haveToInspect.size())
         {
-            ROS_ERROR("No walls in the stack!");
+            ROS_ERROR("No target in the stack!");
             return false;
         }
 
         _targets.push_back(_haveToInspect.front());
         _haveToInspect.pop_front();
-        res.poses.resize(_targets.back().poses().size());
+        res.pose = _targets.back().pose().toRos();
         res.id = _targets.back().id();
-
-        for (unsigned int i = 0; i < _targets.back().poses().size(); ++i)
-            res.poses[i] = _targets.back().poses()[i].toRos();
 
         return true;
     }
@@ -221,16 +141,12 @@ bool callbackGetTarget(ohm_exploration::GetTarget::Request& req, ohm_exploration
     {
         if (req.id == target->id())
         {
-            res.poses.resize(target->poses().size());
-
-            for (unsigned int i = 0; i < target->poses().size(); ++i)
-                res.poses[i] = target->poses()[i].toRos();
-
+            res.pose = target->pose().toRos();
             return true;
         }
     }
 
-    ROS_ERROR("Wall id not found.");
+    ROS_ERROR("Target id not found.");
     return false;
 }
 

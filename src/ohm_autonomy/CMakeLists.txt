@@ -6,6 +6,7 @@ project(ohm_autonomy)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -45,14 +46,16 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    MoveRobot.msg
+   Wall.msg
+   WallArray.msg
    )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+   FILES
+   MarkTarget.srv
+   GetTarget.srv
+   )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -63,8 +66,8 @@ add_message_files(
 
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
+   DEPENDENCIES
+   geometry_msgs
 )
 
 ###################################

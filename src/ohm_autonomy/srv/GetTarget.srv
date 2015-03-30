@@ -1,5 +1,6 @@
 # if id is less than 0 the oldest one will be returned.
+int64 NEXT = -1
 int64 id
 ---
 int64 id
-geometry_msgs/Pose[] poses
+geometry_msgs/Pose pose
