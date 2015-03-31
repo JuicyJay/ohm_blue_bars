@@ -38,6 +38,7 @@ Explore::Explore(void)
     /* Communication with the target stack node. */
     _srvTrigger    = _nh->serviceClient<std_srvs::Empty>("/georg/exploration/wall_finder/trigger");
     _srvMarkTarget = _nh->serviceClient<ohm_autonomy::MarkTarget>("/georg/exploration/mark_target");
+    _srvNextSection = _nh->serviceClient<std_srvs::Empty>("/georg/mission_planner/trigger/next_section");
 }
 
 
@@ -65,6 +66,14 @@ void Explore::process(void)
             delete this;
             return;
         }
+
+	if (!_srvNextSection.call(service))
+	  {
+	    ROS_ERROR("Can't trigger mission planner.");
+            Context::getInstance()->setState(new Init);
+            delete this;
+            return;
+	  }
 
         ROS_INFO("The wall-finder-node is be triggered. Will recall meself now.");
         Context::getInstance()->setState(new Explore);

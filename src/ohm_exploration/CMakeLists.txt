@@ -180,7 +180,7 @@ target_link_libraries(mission-planner
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS wall-finder target-stack
+install(TARGETS wall-finder target-stack mission-planner
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

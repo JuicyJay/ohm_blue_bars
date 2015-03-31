@@ -14,18 +14,25 @@
 #include <nav_msgs/GetMap.h>
 
 #include "FindWall.h"
+#include "Rect.h"
 
 #include <ohm_autonomy/WallArray.h>
+#include <ohm_common/MapRoi.h>
 
 FindWall _wallFinder;
 std::vector<Wall> _walls;
 ros::Publisher _pubWallMarkers;
 ros::Publisher _pubWalls;
+ros::Subscriber _subRoi;
 ros::ServiceClient _srvGetMap;
 bool _initialized = false;
+Rect _roi;
+float _resolution = 1.0f;
 
 bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
 {
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
+
     nav_msgs::GetMap service;
 
     if (!_srvGetMap.call(service))
@@ -38,12 +45,14 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
     {
         _wallFinder.setMap(service.response.map);
         _initialized = true;
+	_resolution = service.response.map.info.resolution;
     }
 
 
     /* Update the map in wallFinder and then looking for walls. */
     std::vector<Wall> walls;
-    _wallFinder.updateMap(service.response.map);
+    ROS_INFO("update map in wall finder.");
+    _wallFinder.updateMap(service.response.map, _roi);
     _wallFinder.search(walls);
     _walls.insert(_walls.end(), walls.begin(), walls.end());
 
@@ -71,6 +80,26 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
     return true;
 }
 
+void callbackRoi(const ohm_common::MapRoi& msg)
+{
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
+
+  if (!_initialized)
+    {
+      ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": no map received yet. Can not set the roi.");
+      return;
+    }
+
+  ROS_INFO("resolution = %f", _resolution);
+
+  _roi.setX(msg.origin.x / _resolution);
+  _roi.setY(msg.origin.y / _resolution);
+  _roi.setWidth(msg.width / _resolution);
+  _roi.setHeight(msg.height / _resolution);
+
+  ROS_INFO("set roi = (%d, %d, %d, %d)", _roi.x(), _roi.y(), _roi.width(), _roi.height());
+}
+
 int main(int argc, char** argv)
 {
     ros::init(argc, argv, "wall_finder");
@@ -85,6 +114,7 @@ int main(int argc, char** argv)
 
     _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>("exploration/wall_markers", 2);
     _pubWalls = nh.advertise<ohm_autonomy::WallArray>("exploration/walls", 2);
+    _subRoi = nh.subscribe("exploration/set_roi", 2, callbackRoi);
 
     ros::spin();
 }
