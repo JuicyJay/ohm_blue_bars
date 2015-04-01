@@ -40,6 +40,10 @@ public:
     inline unsigned int y(void) const { return _y; }
     inline unsigned int width(void) const { return _width; }
     inline unsigned int height(void) const { return _height; }
+    inline void setX(const unsigned int value) { _x = value; }
+    inline void setY(const unsigned int value) { _y = value; }
+    inline void setWidth(const unsigned int value) { _width = value; }
+    inline void setHeight(const unsigned int value) { _height = value; }
     inline Eigen::Vector2i pointLeftTop(void) const { return Eigen::Vector2i(_x, _y); }
     inline Eigen::Vector2i pointRightBottom(void) const { return Eigen::Vector2i(_x + _width, _y + _height); }
 

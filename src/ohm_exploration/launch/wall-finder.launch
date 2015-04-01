@@ -1,8 +1,9 @@
 <launch>
-  <node name="wall_finder" pkg="ohm_exploration" type="wall-finder">
-    <param name="topic_map"       type="string" value="/map"                           />
-    <param name="topic_markers"   type="string" value="exploration/wall_markers"       />
-    <param name="service_trigger" type="string" value="exploration/wall_finder/trigger"/>
-    <param name="topic_walls"     type="string" value="exploration/walls"              />
+  <node name="wall_finder" pkg="ohm_exploration" type="wall-finder" output="screen">
+    <param name="service_trigger" type="string" value="wall_finder/trigger"/>
+
+    <remap from="map"                      to="map"         />
+    <remap from="exploration/wall_markers" to="wall_markers"/>
+    <remap from="exploration/walls"        to="walls"       />
   </node>
 </launch>

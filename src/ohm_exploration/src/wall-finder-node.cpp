@@ -11,36 +11,53 @@
 #include <nav_msgs/OccupancyGrid.h>
 #include <visualization_msgs/MarkerArray.h>
 #include <std_srvs/Empty.h>
+#include <nav_msgs/GetMap.h>
 
 #include "FindWall.h"
+#include "Rect.h"
 
 #include <ohm_autonomy/WallArray.h>
+#include <ohm_common/MapRoi.h>
 
 FindWall _wallFinder;
 std::vector<Wall> _walls;
 ros::Publisher _pubWallMarkers;
 ros::Publisher _pubWalls;
-bool _armed = false;
+ros::Subscriber _subRoi;
+ros::ServiceClient _srvGetMap;
+bool _initialized = false;
+Rect _roi;
+float _resolution = 1.0f;
 
 bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
 {
-    _armed = true;
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
 
-    return true;
-}
+    nav_msgs::GetMap service;
 
-void callbackMap(const nav_msgs::OccupancyGrid& map)
-{
-    if (!_armed)
-        return;
+    if (!_srvGetMap.call(service))
+    {
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the service get map. Will not search walls.");
+        return false;
+    }
 
+    if (!_initialized)
+    {
+        _wallFinder.setMap(service.response.map);
+        _initialized = true;
+	_resolution = service.response.map.info.resolution;
+    }
+
+
+    /* Update the map in wallFinder and then looking for walls. */
     std::vector<Wall> walls;
-    _armed = false;
-    _wallFinder.setMap(map);
+    ROS_INFO("update map in wall finder.");
+    _wallFinder.updateMap(service.response.map, _roi);
     _wallFinder.search(walls);
     _walls.insert(_walls.end(), walls.begin(), walls.end());
 
-    /* send walls */
+
+    /* Send found walls. */
     ohm_autonomy::WallArray msgWalls;
 
     for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
@@ -48,12 +65,39 @@ void callbackMap(const nav_msgs::OccupancyGrid& map)
 
     _pubWalls.publish(msgWalls);
 
-    visualization_msgs::MarkerArray msg;
 
-    for (std::vector<Wall>::const_iterator wall(_walls.begin()); wall < _walls.end(); ++wall)
-        msg.markers.push_back(wall->getMarkerMessage());
+    /* Publish markers to show it in rviz. */
+    if (_pubWallMarkers.getNumSubscribers())
+    {
+        visualization_msgs::MarkerArray msg;
 
-    _pubWallMarkers.publish(msg);
+        for (std::vector<Wall>::const_iterator wall(_walls.begin()); wall < _walls.end(); ++wall)
+            msg.markers.push_back(wall->getMarkerMessage());
+
+        _pubWallMarkers.publish(msg);
+    }
+
+    return true;
+}
+
+void callbackRoi(const ohm_common::MapRoi& msg)
+{
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
+
+  if (!_initialized)
+    {
+      ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": no map received yet. Can not set the roi.");
+      return;
+    }
+
+  ROS_INFO("resolution = %f", _resolution);
+
+  _roi.setX(msg.origin.x / _resolution);
+  _roi.setY(msg.origin.y / _resolution);
+  _roi.setWidth(msg.width / _resolution);
+  _roi.setHeight(msg.height / _resolution);
+
+  ROS_INFO("set roi = (%d, %d, %d, %d)", _roi.x(), _roi.y(), _roi.width(), _roi.height());
 }
 
 int main(int argc, char** argv)
@@ -63,14 +107,14 @@ int main(int argc, char** argv)
     ros::NodeHandle nh;
     std::string topic;
 
-    para.param<std::string>("topic_map", topic, "/map");
-    ros::Subscriber subMap(nh.subscribe(topic, 1, callbackMap));
     para.param<std::string>("service_trigger", topic, "exploration/wall_finder/trigger");
     ros::ServiceServer srvTrigger(nh.advertiseService(topic, callbackTrigger));
-    para.param<std::string>("topic_markers", topic, "exploration/wall_markers");
-    _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>(topic, 2);
-    para.param<std::string>("topic_walls", topic, "exploration/walls");
-    _pubWalls = nh.advertise<ohm_autonomy::WallArray>(topic, 2);
+    para.param<std::string>("service_get_map", topic, "map");
+    _srvGetMap = nh.serviceClient<nav_msgs::GetMap>(topic);
+
+    _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>("exploration/wall_markers", 2);
+    _pubWalls = nh.advertise<ohm_autonomy::WallArray>("exploration/walls", 2);
+    _subRoi = nh.subscribe("exploration/set_roi", 2, callbackRoi);
 
     ros::spin();
 }
