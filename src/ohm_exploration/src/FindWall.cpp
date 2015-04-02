@@ -19,15 +19,16 @@ FindWall::FindWall(void)
 
 void FindWall::setMap(const nav_msgs::OccupancyGrid& map)
 {
-    if (_featureMap.isNull())
-        _featureMap.setMap(map);
-    else
-        _featureMap.updateMap(map);
+    _featureMap.setMap(ConstMap(map));
+    _mapMetaData = map.info;
+}
+
+void FindWall::updateMap(const nav_msgs::OccupancyGrid& map, const Rect& roi)
+{
+    _featureMap.updateMap(ConstMap(map, roi));
 
     for (unsigned int i = 0; i < _orientations.size(); ++i)
         _featureMap.exportPoints(_points[i], _orientations[i]);
-
-    _mapMetaData = map.info;
 }
 
 void FindWall::search(std::vector<Wall>& walls)
@@ -57,6 +58,15 @@ void FindWall::search(std::vector<Wall>& walls)
 
     /* Mark all found valid walls. This enures the walls can not be found again in the future. */
     _featureMap.markWalls(walls);
+}
+
+cv::Mat FindWall::getImageFromMap(void) const
+{
+    cv::Mat image;
+
+    _featureMap.paintImage(image, FeatureCell(true, true, Wall::All));
+
+    return image;
 }
 
 void FindWall::removePoints(const PointVector& remove, PointVector& points)

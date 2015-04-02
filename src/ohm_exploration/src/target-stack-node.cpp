@@ -169,6 +169,8 @@ int main(int argc, char** argv)
     para.param<std::string>("tf_source", _tfSource, "map");
     para.param<std::string>("tf_target", _tfTarget, "base_footprint");
 
+    ::sleep(5);
+
     ros::spin();
 
     delete _listener;

@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
                     geometry_msgs
                     ohm_path_plan
                     ohm_autonomy
+                    ohm_common
                     )
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
@@ -111,11 +112,6 @@ include_directories(${EIGEN_INCLUDE_DIRS}
 # )
 
 ## Declare a cpp executable
-add_executable(exploration
-               src/exploration-node.cpp
-               src/SensorPublisher.cpp
-               src/Grid.cpp
-               )
 
 add_executable(wall-finder
                src/wall-finder-node.cpp
@@ -125,17 +121,7 @@ add_executable(wall-finder
                src/Wall.cpp
                src/FeatureMap.cpp
                src/Ray.cpp
-               )
-
-add_executable(goal-factory
-               src/goal-factory-node.cpp
-               src/FindWall.cpp
-               src/LeastSquare.cpp
-               src/Ransac.cpp
-               src/Wall.cpp
-               src/FeatureMap.cpp
                src/Map.cpp
-               src/Ray.cpp
                )
 
 add_executable(map-roi
@@ -151,6 +137,10 @@ add_executable(target-stack
                src/target-stack-node.cpp
                )
 
+add_executable(mission-planner
+               src/mission-planner-node.cpp
+               )
+
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(wall-finder ohm_exploration_generate_messages_cpp)
@@ -158,16 +148,8 @@ add_executable(target-stack
 # add_dependencies(goal-factory ohm_exploration_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(exploration
-                      ${catkin_LIBRARIES}
-                      )
 
 target_link_libraries(wall-finder
-                      ${catkin_LIBRARIES}
-                      ${OpenCV_LIBRARIES}
-                      )
-
-target_link_libraries(goal-factory
                       ${catkin_LIBRARIES}
                       ${OpenCV_LIBRARIES}
                       )
@@ -180,6 +162,9 @@ target_link_libraries(target-stack
                       ${catkin_LIBRARIES}
                       )
 
+target_link_libraries(mission-planner
+                      ${catkin_LIBRARIES}
+                      )
 #############
 ## Install ##
 #############
@@ -195,7 +180,7 @@ target_link_libraries(target-stack
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS wall-finder target-stack
+install(TARGETS wall-finder target-stack mission-planner
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

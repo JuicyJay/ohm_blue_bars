@@ -16,6 +16,8 @@
 
 #include <Eigen/Core>
 
+#include <opencv2/opencv.hpp>
+
 #include "Wall.h"
 #include "Ransac.h"
 #include "FeatureMap.h"
@@ -26,7 +28,9 @@ public:
     FindWall(void);
 
     void setMap(const nav_msgs::OccupancyGrid& map);
+    void updateMap(const nav_msgs::OccupancyGrid& map, const Rect& roi = Rect());
     void search(std::vector<Wall>& walls);
+    cv::Mat getImageFromMap(void) const;
 
 private:
     void removePoints(const PointVector& remove, PointVector& points);
