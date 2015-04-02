@@ -83,10 +83,14 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
 
    // Service Server
    _best_target_service = private_nh.advertiseService("get_target", &FrontierExplorationNode::getFrontierServiceCB, this);
+   _transmitt_targets_service = private_nh.advertiseService("node_control", &FrontierExplorationNode::callback_srv_transmittTargets, this);
 
    _viz.setNodeHandle(_nh);
 
    _is_initialized = true;
+
+   //set runMode
+   _mode = frontier::STOP;
 
    // start node
    this->run();
@@ -163,8 +167,17 @@ void FrontierExplorationNode::mapCallback(const nav_msgs::OccupancyGrid& map)
    ROS_DEBUG_STREAM("received new map. ");
    _frontierFinder->setMap(map);
 
-   this->findFrontiers();
-   this->publishFrontiers();
+   if(_mode == frontier::RUN)
+   {
+      this->findFrontiers();
+      this->publishFrontiers();
+   }
+   else if(_mode == frontier::SINGLESHOT)
+   {
+      this->findFrontiers();
+      this->publishFrontiers();
+      _mode = frontier::STOP;
+   }
 }
 
 bool FrontierExplorationNode::getFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request& req,
@@ -177,6 +190,32 @@ bool FrontierExplorationNode::getFrontierServiceCB(ohm_frontier_exploration::Get
 
 void FrontierExplorationNode::publishMarkers(void)
 {
+}
+
+bool FrontierExplorationNode::callback_srv_transmittTargets(
+      ohm_srvs::NodeControl::Request& req,
+      ohm_srvs::NodeControl::Response& res)
+{
+   res.accepted = true;
+
+   if(req.action == req.START)
+   {
+      _mode = frontier::RUN;
+   }
+   else if(req.action == req.SINGLESHOT)
+   {
+      _mode = frontier::SINGLESHOT;
+   }
+   else if(req.action == req.STOP)
+   {
+      _mode = frontier::STOP;
+   }
+   else
+   {
+      res.accepted = false;
+   }
+
+   return true;
 }
 
 } /* namespace autonohm */
