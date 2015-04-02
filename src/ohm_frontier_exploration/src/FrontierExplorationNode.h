@@ -22,12 +22,23 @@
 
 #include "ohm_frontier_exploration/GetTarget.h"
 
+//trigger service
+#include "ohm_srvs/NodeControl.h"
+
 
 /**
  * @namespace autonohm
  */
 namespace autonohm
 {
+
+namespace frontier{
+enum enumMode{
+   RUN = 0,
+   SINGLESHOT,
+   STOP
+};
+}
 
 /**
  *
@@ -103,6 +114,15 @@ private:
    bool getAllFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request&  req,
                                 ohm_frontier_exploration::GetTarget::Response& res);
 
+   /**
+    * Service to trigger the transmission of the frontiers
+    * @param req
+    * @param res
+    * @return
+    */
+   bool callback_srv_transmittTargets(ohm_srvs::NodeControl::Request&  req,
+                                      ohm_srvs::NodeControl::Response& res);
+
    // MEMBERS
    static FrontierExplorationNode* _instance;
 
@@ -117,12 +137,15 @@ private:
 
    ros::ServiceServer               _best_target_service;
    ros::ServiceServer               _all_targets_service;
+   ros::ServiceServer               _transmitt_targets_service;
 
    std::vector<WeightedFrontier>    _frontiers;
 
    frontier::Finder*                _frontierFinder;
    frontier::Visualization          _viz;
    FrontierController*              _frontierController;
+
+   frontier::enumMode               _mode;
 
    bool                             _is_initialized;        //!< flag to check if node is initialized
    double                           _rate;                  //!< looprate to spin ros node
