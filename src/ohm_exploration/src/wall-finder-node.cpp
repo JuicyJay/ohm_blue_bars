@@ -28,11 +28,11 @@ ros::ServiceClient _srvGetMap;
 bool _initialized = false;
 Rect _roi;
 float _resolution = 1.0f;
+float _originMapX = 0.0f;
+float _originMapY = 0.0f;
 
 bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
 {
-  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
-
     nav_msgs::GetMap service;
 
     if (!_srvGetMap.call(service))
@@ -46,16 +46,16 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
         _wallFinder.setMap(service.response.map);
         _initialized = true;
 	_resolution = service.response.map.info.resolution;
+	_originMapX = service.response.map.info.origin.position.x;
+	_originMapY = service.response.map.info.origin.position.y;
     }
 
 
     /* Update the map in wallFinder and then looking for walls. */
     std::vector<Wall> walls;
-    ROS_INFO("update map in wall finder.");
     _wallFinder.updateMap(service.response.map, _roi);
     _wallFinder.search(walls);
     _walls.insert(_walls.end(), walls.begin(), walls.end());
-
 
     /* Send found walls. */
     ohm_autonomy::WallArray msgWalls;
@@ -82,18 +82,14 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
 
 void callbackRoi(const ohm_common::MapRoi& msg)
 {
-  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
-
   if (!_initialized)
     {
       ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": no map received yet. Can not set the roi.");
       return;
     }
 
-  ROS_INFO("resolution = %f", _resolution);
-
-  _roi.setX(msg.origin.x / _resolution);
-  _roi.setY(msg.origin.y / _resolution);
+  _roi.setX((msg.origin.x - _originMapX) / _resolution);
+  _roi.setY((msg.origin.y - _originMapY) / _resolution);
   _roi.setWidth(msg.width / _resolution);
   _roi.setHeight(msg.height / _resolution);
 

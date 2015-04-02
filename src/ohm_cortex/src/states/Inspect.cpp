@@ -27,7 +27,7 @@ Inspect::Inspect(void)
    ohm_srvs::NodeControl control;
 
    control.request.action = ohm_srvs::NodeControl::Request::START;
-   _srvVictimControl = _nh->serviceClient<ohm_srvs::NodeControl>("/victim_detection/control");
+   _srvVictimControl = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/victim_detection/control");
    _srvVictimStack = _nh->serviceClient<ohm_perception::GetVictim>("/victim/get_victim");
 
    if (!_srvVictimControl.call(control))

@@ -63,10 +63,11 @@ void Explore::process(void)
         {
             ROS_ERROR("Can't trigger the wall-finder-node. Will kill myself.");
             Context::getInstance()->setState(new Init);
+	    ::exit(1); // HACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             delete this;
             return;
         }
-	/*
+
 	if (!_srvNextSection.call(service))
 	  {
 	    ROS_ERROR("Can't trigger mission planner.");
@@ -74,7 +75,7 @@ void Explore::process(void)
             delete this;
             return;
 	  }
-	*/
+
         ROS_INFO("The wall-finder-node is be triggered. Will recall meself now.");
         Context::getInstance()->setState(new Explore);
         delete this;
