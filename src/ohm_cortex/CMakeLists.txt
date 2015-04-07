@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
     ohm_perception
     ohm_actors
     ohm_autonomy
+    ohm_teleop
     tf
     )
 
@@ -79,6 +80,31 @@ add_executable(statemachine
                src/states/Drive.cpp
                src/states/Init.cpp
                src/states/TargetStack.cpp
+               src/states/Teleoperated.cpp
+               src/states/Manipulator.cpp
+#               src/states/FrontierExplore.cpp
+               src/states/FoundVictimCandidate.cpp
+               src/states/LookAtTarget.cpp
+               src/GetTransformation.cpp
+               )
+               
+add_executable(simon_statemachine
+               src/ohm_simon_statemachine.cpp
+               src/Context.cpp
+               src/states/StatePing.cpp
+               src/states/StatePong.cpp
+               src/states/Teleoperated.cpp
+               src/states/RejectVictim.cpp
+               src/states/ConfirmVictim.cpp
+               src/states/Waiting.cpp
+               src/states/Inspect.cpp
+               src/states/Approach.cpp
+               src/states/Explore.cpp
+               src/states/Drive.cpp
+               src/states/Init.cpp
+               src/states/TargetStack.cpp
+               src/states/Teleoperated.cpp
+               src/states/Manipulator.cpp
 #               src/states/FrontierExplore.cpp
                src/states/FoundVictimCandidate.cpp
                src/states/LookAtTarget.cpp
@@ -93,6 +119,10 @@ add_executable(viz                   src/viz/viz_node.cpp           ${QT_SOURCES
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(statemachine
+   ${catkin_LIBRARIES}
+)
+
+target_link_libraries(simon_statemachine
    ${catkin_LIBRARIES}
 )
 

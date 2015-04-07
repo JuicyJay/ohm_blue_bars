@@ -10,17 +10,26 @@
 #include <ros/console.h>
 #include <stdlib.h>
 
+
 #include "../Context.h"
 
-
-#include "Explore.h"
+#include "Manipulator.h"
 
 
 namespace autonohm {
 
 Teleoperated::Teleoperated()
+: _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
+   ROS_INFO("New state is Teleoperated.");
 
+   _state_pub           = _nh->advertise<std_msgs::String>("state", 1);
+   _inspector_state_sub = _nh->subscribe("/inspector_state", 20, &Teleoperated::inspectorStateCallback, this);
+
+
+   std_msgs::String msg;
+   msg.data = "explore";
+   _state_pub.publish(msg);
 }
 
 Teleoperated::~Teleoperated()
@@ -31,11 +40,16 @@ Teleoperated::~Teleoperated()
 void Teleoperated::process(void)
 {
    // go to next state->explore
-   if(1)
+   if(_inspector_state.data == "STATE_RELEASED")
    {
-      autonohm::Context::getInstance()->setState(new Explore());
+      autonohm::Context::getInstance()->setState(new Manipulator());
       delete this;
    }
+}
+
+void Teleoperated::inspectorStateCallback(const std_msgs::String& state)
+{
+   _inspector_state = state;
 }
 
 } /* namespace autonohm */
