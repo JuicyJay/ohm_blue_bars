@@ -45,8 +45,8 @@ void Manipulator::process(void)
       ROS_INFO("slow driving enabled");
    }
 
-   if(_inspector_state.data.compare("STATE_PARKED"))
-   {
+   if(_inspector_state.data == "STATE_PARKED")
+	   {
       autonohm::Context::getInstance()->setState(new Teleoperated());
       delete this;
    }
@@ -60,7 +60,7 @@ void Manipulator::inspectorStateCallback(const std_msgs::String& state)
 
 void Manipulator::actionFromJoyCallback(const ohm_teleop::Action& action)
 {
-   ROS_INFO("action callback");
+//   ROS_INFO("action callback");
    _action = action;
 }
 
