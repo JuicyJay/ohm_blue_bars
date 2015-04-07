@@ -23,11 +23,11 @@ Manipulator::Manipulator()
    ROS_INFO("New state is Manipulator.");
 
    _state_pub           = _nh->advertise<std_msgs::String>("state", 1);
-   _inspector_state_sub = _nh->subscribe("/inspector_state", 20, &Manipulator::inspectorStateCallback, this);
-   _action_sub          = _nh->subscribe("/joy_action",      20, &Manipulator::actionFromJoyCallback, this);
+   _inspector_state_sub = _nh->subscribe("/inspector_cmd/state", 20, &Manipulator::inspectorStateCallback, this);
+   _action_sub          = _nh->subscribe("/joy_action",          20, &Manipulator::actionFromJoyCallback, this);
 
    std_msgs::String msg;
-   msg.data = "explore";
+   msg.data = "manipulator";
    _state_pub.publish(msg);
 
 }
@@ -45,7 +45,7 @@ void Manipulator::process(void)
       ROS_INFO("slow driving enabled");
    }
 
-   if(_inspector_state.data == "STATE_PARKED")
+   if(_inspector_state.data.compare("STATE_PARKED"))
    {
       autonohm::Context::getInstance()->setState(new Teleoperated());
       delete this;

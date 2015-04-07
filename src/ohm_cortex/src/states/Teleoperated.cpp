@@ -28,7 +28,7 @@ Teleoperated::Teleoperated()
 
 
    std_msgs::String msg;
-   msg.data = "explore";
+   msg.data = "teleoperated";
    _state_pub.publish(msg);
 }
 
