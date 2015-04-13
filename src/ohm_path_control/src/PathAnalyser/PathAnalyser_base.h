@@ -18,6 +18,13 @@ using namespace Eigen;
 namespace analyser
 {
 
+//enum enum_state {
+//   IDLE = 0,
+//   REACHED_GOAL,
+//   MOVING,
+//   ABORTED
+//};
+
 typedef struct {
    double linear;
    double angular;
@@ -34,7 +41,8 @@ typedef struct {
    double path_length_remaining;
    unsigned int num_goals;
    unsigned int current_goal_id;
-   bool reached_final_goal;
+   //analyser::enum_state state;
+   bool reached_goal;
 } info;
 
 class PathAnalyser_base
@@ -76,6 +84,8 @@ public:
 
    void setDoEndRotate(const bool doEndRotate) { _do_end_rotate = doEndRotate; }
    bool isDoEndRotate() { return _do_end_rotate; }
+   inline bool isReachedFinalGoal() const { return _reached_final_goal; }
+
 
 protected: //dataelements
    std::vector<analyser::pose> _path;  ///< current path to analyse
@@ -87,11 +97,15 @@ protected:  //functions
    inline bool isLastGoal() { return _currentGoal_index == _path.size() - 1 ? true : false; }
    inline bool isFirstGoal() { return _currentGoal_index == 0 ? true : false; }
 
-   double getDistToCurrentGoal() const { return _dist_to_current_goal; }
-   void setDistToCurrentGoal(double distToCurrentPose) { _dist_to_current_goal = distToCurrentPose; }
-   bool isReachedFinalGoal() const { return _reached_final_goal; }
+   inline double getDistToCurrentGoal() const { return _dist_to_current_goal; }
+   inline void setDistToCurrentGoal(double distToCurrentPose) { _dist_to_current_goal = distToCurrentPose; }
    void setReachedFinalGoal(bool reachedFinalGoal) { _reached_final_goal = reachedFinalGoal; }
-   double getPathLengthRest() const { return _path_lenth_rest; }
+   //inline void setState(analyser::enum_state state)
+   //{
+   //   _state = state;
+   //}
+   //inline analyser::enum_state getState() { return _state; }
+   inline double getPathLengthRest() const { return _path_lenth_rest; }
 
 
 private:
@@ -101,6 +115,7 @@ private:
    double _path_lenth_rest;
    bool _reached_final_goal;           ///< must set in analyse() by user of this baseclass
    bool _do_end_rotate;
+   //analyser::enum_state _state;
    //for eigen
 //public:
    //EIGEN_MAKE_ALIGNED_OPERATOR_NEW

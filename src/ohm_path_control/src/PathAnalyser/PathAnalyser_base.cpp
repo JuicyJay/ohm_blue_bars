@@ -18,7 +18,6 @@ PathAnalyser_base::PathAnalyser_base() :
       _path_lenth(0),
       _path_lenth_rest(0),
       _reached_final_goal(false)
-
 {
    _do_end_rotate = true;
 }
@@ -50,7 +49,7 @@ analyser::info PathAnalyser_base::getInfo()
    info.path_length_remaining = _path_lenth_rest + _dist_to_current_goal;
    info.num_goals = _path.size();
    info.current_goal_id = _currentGoal_index;
-   info.reached_final_goal = _reached_final_goal;
+   info.reached_goal = _reached_final_goal;
    return info;
 }
 

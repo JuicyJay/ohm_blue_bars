@@ -145,6 +145,12 @@ analyser::diff_scale BasicAnalyser::analyse(analyser::pose current_pose)
    return diff_scale;
 }
 
+
+double BasicAnalyser::getDetectionRadius() const
+{
+   return _curr_target_radius;
+}
+
 double BasicAnalyser::scaleFnk_cos_n(unsigned int cos_pwr, double cos_factor, double value)
 {
    //cos_pwr must be >= 2
@@ -196,3 +202,5 @@ void BasicAnalyser::local_reachedFinalGoal(bool state)
 }
 
 } /* namespace analyser */
+
+
