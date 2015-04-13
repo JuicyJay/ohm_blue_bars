@@ -5,16 +5,19 @@
 #include <ohm_autonomy/MarkTarget.h>
 #include <ohm_autonomy/GetTarget.h>
 #include <ohm_path_plan/PlanPaths.h>
+#include <nav_msgs/GetMap.h>
 
 #include <list>
 
 #include "Wall.h"
 #include "Target.h"
 #include "TargetFactory.h"
+#include "PartitionGrid.h"
 
 std::list<Target> _haveToInspect;
 std::vector<Target> _targets;
 ros::ServiceClient _srvPlanPaths;
+ros::Publisher _pubGridMarker;
 tf::TransformListener* _listener = 0;
 std::string _tfSource, _tfTarget;
 
@@ -168,6 +171,23 @@ int main(int argc, char** argv)
     _srvPlanPaths = nh.serviceClient<ohm_path_plan::PlanPaths>(topic);
     para.param<std::string>("tf_source", _tfSource, "map");
     para.param<std::string>("tf_target", _tfTarget, "base_footprint");
+
+    para.param<std::string>("service_get_map", topic, "map");
+    ros::ServiceClient srvMap(nh.serviceClient<nav_msgs::GetMap>(topic));
+    _pubGridMarker = nh.advertise<visualization_msgs::MarkerArray>("exploration/target_grid", 2);
+    ros::service::waitForService(topic);
+
+    nav_msgs::GetMap service;
+
+    if (!srvMap.call(service))
+    {
+        ROS_ERROR("target_stack: can not call the service get map.");
+        return 1;
+    }
+
+    PartitionGrid grid(service.response.map, 1.2f);
+    ROS_INFO("publish %d markers.", grid.getMarkerMsg().markers.size());
+    _pubGridMarker.publish(grid.getMarkerMsg());
 
     ::sleep(5);
 
