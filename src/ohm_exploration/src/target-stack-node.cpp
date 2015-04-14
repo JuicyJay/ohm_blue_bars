@@ -8,6 +8,8 @@
 #include <nav_msgs/GetMap.h>
 
 #include <list>
+#include <cstdlib>
+#include <ctime>
 
 #include "Wall.h"
 #include "Target.h"
@@ -20,6 +22,7 @@ ros::ServiceClient _srvPlanPaths;
 ros::Publisher _pubGridMarker;
 tf::TransformListener* _listener = 0;
 std::string _tfSource, _tfTarget;
+PartitionGrid* _grid = 0;
 
 Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
 {
@@ -59,6 +62,37 @@ Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
     return target;
 }
 
+void estimateDistanceFromOrigin(std::list<Target>& targets)
+{
+    if (!targets.size())
+        return;
+
+    ohm_path_plan::PlanPaths paths;
+    paths.request.origin.position.x = 0.0;
+    paths.request.origin.position.y = 0.0;
+    paths.request.origin.position.z = 0.0;
+
+    for (std::list<Target>::const_iterator target(targets.begin()); target != targets.end(); ++target)
+        paths.request.targets.push_back(target->pose().toRos());
+
+
+    if (!_srvPlanPaths.call(paths))
+    {
+        ROS_ERROR("Cannot call the path plan node.");
+        return;
+    }
+    if (paths.response.lengths.size() != targets.size())
+    {
+        ROS_ERROR("Not enough distances received from the path plan node.");
+        return;
+    }
+
+
+    std::vector<double>::const_iterator distance(paths.response.lengths.begin());
+    for (std::list<Target>::iterator target(targets.begin()); target != targets.end(); ++target, ++distance)
+        target->setDistanceFromOrigin(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
+}
+
 void callbackWalls(const ohm_autonomy::WallArray& walls)
 {
     /* Use the center of the walls to create targets and get the corresponding lenghts. */
@@ -92,12 +126,16 @@ void callbackWalls(const ohm_autonomy::WallArray& walls)
                                       transform.getOrigin().z()),
                       Eigen::Vector3f(1.0f, 0.0f, 0.0f));
 
+
     /* Estimate the best path. */
     ROS_INFO("Take closest with origin.");
     TargetFactory factory;
 
     factory.create(receivedWalls);
     std::list<Target> targets(factory.targets().begin(), factory.targets().end());
+    estimateDistanceFromOrigin(targets);
+
+
     Target target(takeClosestTargetFromList(targets, origin));
 
     while (target.valid())
@@ -172,6 +210,8 @@ int main(int argc, char** argv)
     para.param<std::string>("tf_source", _tfSource, "map");
     para.param<std::string>("tf_target", _tfTarget, "base_footprint");
 
+
+    /* Get a map and then create the target grid. */
     para.param<std::string>("service_get_map", topic, "map");
     ros::ServiceClient srvMap(nh.serviceClient<nav_msgs::GetMap>(topic));
     _pubGridMarker = nh.advertise<visualization_msgs::MarkerArray>("exploration/target_grid", 2);
@@ -185,13 +225,22 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    PartitionGrid grid(service.response.map, 1.2f);
-    ROS_INFO("publish %d markers.", grid.getMarkerMsg().markers.size());
-    _pubGridMarker.publish(grid.getMarkerMsg());
+    _grid = new PartitionGrid(service.response.map, 1.2f);
+
 
     ::sleep(5);
 
     ros::spin();
 
+//    ros::Rate rate(10);
+//    srand(time(0));
+//    while (ros::ok())
+//    {
+//        _pubGridMarker.publish(grid.getMarkerMsg());
+//        ros::spinOnce();
+//        rate.sleep();
+//    }
+
     delete _listener;
+    delete _grid;
 }

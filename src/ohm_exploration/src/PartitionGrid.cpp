@@ -20,7 +20,7 @@ PartitionGrid::PartitionGrid(const nav_msgs::OccupancyGrid& map, const float cel
                    v
     */
     for (float x = -cellsize * 2.0f; x >= min.x(); x -= cellsize * 2.0f)
-        for (float y = -cellsize * 2.0f; y >= min.y(); y -= cellsize * 2.0f)
+        for (float y = 0.0f; y <= max.y(); y += cellsize * 2.0f)
             _grid.push_back(Partition(Eigen::Vector2f(x, y), cellsize * 3.0f));
 
 

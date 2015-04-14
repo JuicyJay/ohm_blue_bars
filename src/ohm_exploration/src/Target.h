@@ -25,6 +25,8 @@ public:
     inline bool inspected(void) const { return _inspected; }
     inline void setDistance(const float value) { _distance = value; }
     inline float distance(void) const { return _distance; }
+    inline void setDistanceFromOrigin(const float value) { _distanceFromOrigin = value; }
+    inline float distanceFromOrigin(void) const { return _distanceFromOrigin; }
 
     void takeId(void);
 
@@ -36,6 +38,7 @@ private:
     Pose _pose;
     bool _valid;
     float _distance;
+    float _distanceFromOrigin;
 
     static unsigned int s_id;
 };

@@ -25,6 +25,10 @@ public:
     Partition(const float xMin, const float yMin, const float size);
     Partition(const Eigen::Vector2f& center, const float size);
 
+    bool insert(Target* target);
+    int numUninspectedTargets(void) const;
+    int numValidTargets(void) const;
+
     visualization_msgs::Marker getMarkerMsg(void) const;
 
 private:
@@ -38,6 +42,7 @@ private:
     std::vector<Target*> _targets;
 
     static int s_id;
+    static float s_maxDistanceFromOrigin;
 };
 
 #endif

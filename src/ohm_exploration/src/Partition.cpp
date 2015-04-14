@@ -1,7 +1,11 @@
 #include "Partition.h"
 #include "Target.h"
 
+#include <cstdlib>
+#include <limits>
+
 int Partition::s_id = 0;
+float Partition::s_maxDistanceFromOrigin = 5.0f;
 
 Partition::Partition(void)
     : _initialized(false),
@@ -36,6 +40,42 @@ Partition::Partition(const Eigen::Vector2f& center, const float size)
 
 }
 
+bool Partition::insert(Target* target)
+{
+    if (target->pose().position.x() >= _xMin && target->pose().position.x() <= _xMax &&
+        target->pose().position.y() >= _yMin && target->pose().position.y() <= _yMax)
+    {
+        _targets.push_back(target);
+        return true;
+    }
+
+    return false;
+}
+
+int Partition::numUninspectedTargets(void) const
+{
+    int num = 0;
+
+    for (std::vector<Target*>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
+        if (!(**target).inspected())
+            ++num;
+
+    return num;
+}
+
+int Partition::numValidTargets(void) const
+{
+    int num = 0;
+
+    for (std::vector<Target*>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
+    {
+        if (!(**target).inspected() && (**target).distanceFromOrigin() < s_maxDistanceFromOrigin)
+            ++num;
+    }
+
+    return num;
+}
+
 visualization_msgs::Marker Partition::getMarkerMsg(void) const
 {
     visualization_msgs::Marker msg;
@@ -56,13 +96,13 @@ visualization_msgs::Marker Partition::getMarkerMsg(void) const
     msg.pose.orientation.z = 0.0;
     msg.pose.orientation.w = 1.0;
 
-    msg.scale.x = 0.1;
+    msg.scale.x = 0.05;
     msg.scale.y = 1.0;
     msg.scale.z = 1.0;
     msg.color.a = 1.0;
-    msg.color.r = 1.0;
-    msg.color.g = 1.0;
-    msg.color.b = 1.0;
+    msg.color.r = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
+    msg.color.g = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
+    msg.color.b = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
 
 
     /* Set the borderline. */
