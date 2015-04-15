@@ -22,10 +22,15 @@ class PartitionGrid
 public:
     PartitionGrid(const nav_msgs::OccupancyGrid& map, const float cellsize = 1.2f);
 
+    void insert(std::vector<Target*>& targets);
+    Partition* selected(void);
+    void switchToNextPartition(void);
+
     visualization_msgs::MarkerArray getMarkerMsg(void) const;
 
 private:
     std::vector<Partition> _grid;
+    unsigned int _selected;
 };
 
 #endif

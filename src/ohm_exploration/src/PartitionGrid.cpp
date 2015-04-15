@@ -44,6 +44,31 @@ PartitionGrid::PartitionGrid(const nav_msgs::OccupancyGrid& map, const float cel
             _grid.push_back(Partition(Eigen::Vector2f(x, y), cellsize * 3.0f));
 }
 
+void PartitionGrid::insert(std::vector<Target*>& targets)
+{
+    for (std::vector<Partition>::iterator partition(_grid.begin()); partition < _grid.end(); ++partition)
+        partition->insert(targets);
+}
+
+Partition* PartitionGrid::selected(void)
+{
+    if (_selected < _grid.size())
+        return &_grid[_selected];
+
+    return 0;
+}
+
+void PartitionGrid::switchToNextPartition(void)
+{
+    unsigned int min = 0;
+
+    for (unsigned int i = 0; i < _grid.size(); ++i)
+        if (_grid[i].center().norm() < _grid[min].center().norm())
+            min = i;
+
+    _selected = min;
+}
+
 visualization_msgs::MarkerArray PartitionGrid::getMarkerMsg(void) const
 {
     visualization_msgs::MarkerArray msg;

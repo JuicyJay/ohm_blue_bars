@@ -16,14 +16,14 @@
 #include "TargetFactory.h"
 #include "PartitionGrid.h"
 
-std::list<Target> _haveToInspect;
-std::vector<Target> _targets;
+std::vector<Target*> _targets;
 ros::ServiceClient _srvPlanPaths;
 ros::Publisher _pubGridMarker;
 tf::TransformListener* _listener = 0;
 std::string _tfSource, _tfTarget;
 PartitionGrid* _grid = 0;
 
+/*
 Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
 {
     if (!targets.size())
@@ -61,8 +61,9 @@ Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
     targets.pop_front();
     return target;
 }
+*/
 
-void estimateDistanceFromOrigin(std::list<Target>& targets)
+void estimateDistancesFromOrigin(std::vector<Target*>& targets)
 {
     if (!targets.size())
         return;
@@ -72,8 +73,8 @@ void estimateDistanceFromOrigin(std::list<Target>& targets)
     paths.request.origin.position.y = 0.0;
     paths.request.origin.position.z = 0.0;
 
-    for (std::list<Target>::const_iterator target(targets.begin()); target != targets.end(); ++target)
-        paths.request.targets.push_back(target->pose().toRos());
+    for (std::vector<Target*>::const_iterator target(targets.begin()); target < targets.end(); ++target)
+        paths.request.targets.push_back((**target).pose().toRos());
 
 
     if (!_srvPlanPaths.call(paths))
@@ -89,24 +90,12 @@ void estimateDistanceFromOrigin(std::list<Target>& targets)
 
 
     std::vector<double>::const_iterator distance(paths.response.lengths.begin());
-    for (std::list<Target>::iterator target(targets.begin()); target != targets.end(); ++target, ++distance)
-        target->setDistanceFromOrigin(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
+    for (std::vector<Target*>::iterator target(targets.begin()); target < targets.end(); ++target, ++distance)
+        (**target).setDistanceFromOrigin(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
 }
 
-void callbackWalls(const ohm_autonomy::WallArray& walls)
+void estimateDistances(void)
 {
-    /* Use the center of the walls to create targets and get the corresponding lenghts. */
-    ohm_path_plan::PlanPaths paths;
-    std::vector<Wall> receivedWalls;
-
-    for (std::vector<ohm_autonomy::Wall>::const_iterator wall(walls.walls.begin());
-         wall < walls.walls.end();
-         ++wall)
-    {
-        receivedWalls.push_back(Wall(*wall));
-    }
-
-
     /* Get the current robot pose. */
     ROS_INFO("Get robot pose.");
     tf::StampedTransform transform;
@@ -121,38 +110,47 @@ void callbackWalls(const ohm_autonomy::WallArray& walls)
         ROS_INFO("Will use coordinate (0, 0, 0).");
     }
 
-    const Pose origin(Eigen::Vector3f(transform.getOrigin().x(),
-                                      transform.getOrigin().y(),
-                                      transform.getOrigin().z()),
-                      Eigen::Vector3f(1.0f, 0.0f, 0.0f));
 
+    /* Estiamte all distances off the targets to the current robot pose. */
+    const Pose robot(Eigen::Vector3f(transform.getOrigin().x(),
+                                     transform.getOrigin().y(),
+                                     transform.getOrigin().z()),
+                     Eigen::Vector3f(1.0f, 0.0f, 0.0f));
 
-    /* Estimate the best path. */
-    ROS_INFO("Take closest with origin.");
+    _grid->selected()->estimateDistances(_srvPlanPaths, robot);
+}
+
+void callbackWalls(const ohm_autonomy::WallArray& msg)
+{
     TargetFactory factory;
+    std::vector<Wall> walls;
 
-    factory.create(receivedWalls);
-    std::list<Target> targets(factory.targets().begin(), factory.targets().end());
-    estimateDistanceFromOrigin(targets);
+    for (std::vector<ohm_autonomy::Wall>::const_iterator wall(msg.walls.begin()); wall < msg.walls.end(); ++wall)
+        walls.push_back(Wall(*wall));
 
 
-    Target target(takeClosestTargetFromList(targets, origin));
+    factory.create(walls);
+    estimateDistancesFromOrigin(factory.targets());
+    _grid->insert(factory.targets());
 
-    while (target.valid())
-    {
-        _haveToInspect.push_back(target);
-	ROS_INFO_STREAM("Take closest with position: " << target.pose().position);
-        target = takeClosestTargetFromList(targets, target.pose());
-    }
+
+//    Target target(takeClosestTargetFromList(targets, origin));
+//
+//    while (target.valid())
+//    {
+//        _haveToInspect.push_back(target);
+//	ROS_INFO_STREAM("Take closest with position: " << target.pose().position);
+//        target = takeClosestTargetFromList(targets, target.pose());
+//    }
 }
 
 bool callbackMarkTarget(ohm_autonomy::MarkTarget::Request& req, ohm_autonomy::MarkTarget::Response& res)
 {
-    for (std::vector<Target>::iterator target(_targets.begin()); target < _targets.end(); ++target)
+    for (std::vector<Target*>::iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
-        if (req.id == target->id())
+        if (req.id == (**target).id())
         {
-            target->setInspected(true);
+            (**target).setInspected(true);
             return true;
         }
     }
@@ -164,25 +162,36 @@ bool callbackGetTarget(ohm_autonomy::GetTarget::Request& req, ohm_autonomy::GetT
 {
     if (req.id < 0)
     {
-        if (!_haveToInspect.size())
+        _grid->switchToNextPartition();
+        Partition* partition(_grid->selected());
+
+        if (!partition)
+        {
+            ROS_ERROR("No valid partition found.");
+            return false;
+        }
+
+        estimateDistances();
+
+        if (!partition->numValidTargets())
         {
             ROS_ERROR("No target in the stack!");
             return false;
         }
 
-        _targets.push_back(_haveToInspect.front());
-        _haveToInspect.pop_front();
-        res.pose = _targets.back().pose().toRos();
-        res.id = _targets.back().id();
+        Target* target = partition->target();
+
+        res.pose = target->pose().toRos();
+        res.id   = target->id();
 
         return true;
     }
 
-    for (std::vector<Target>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
+    for (std::vector<Target*>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
-        if (req.id == target->id())
+        if (req.id == (**target).id())
         {
-            res.pose = target->pose().toRos();
+            res.pose = (**target).pose().toRos();
             return true;
         }
     }

@@ -7,7 +7,7 @@ const float POSE_ROBOT_DISTANCE = 0.6f;
 
 void TargetFactory::create(const std::vector<Wall>& walls)
 {
-    std::list<Target> targets;
+    std::list<Target*> targets;
 
     for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
     {
@@ -18,17 +18,17 @@ void TargetFactory::create(const std::vector<Wall>& walls)
         const Eigen::Vector3f v(Eigen::Vector3f(wall->model().r().x(), wall->model().r().y(), 0.0f));
 
 
-        targets.push_back(Pose(center + n * POSE_ROBOT_DISTANCE, -n));
+        targets.push_back(new Target(Pose(center + n * POSE_ROBOT_DISTANCE, -n)));
 
         for (unsigned int i = 1; i < numPoses; ++i)
         {
-            Target targetBack(Pose(center + v * POSE_POSE_DISTANCE * static_cast<float>(i) +
-                                   n * POSE_ROBOT_DISTANCE, -n));
-            Target targetFront(Pose(center - v * POSE_POSE_DISTANCE * static_cast<float>(i) +
-                                    n * POSE_ROBOT_DISTANCE, -n));
+            Target* targetBack = new Target(Pose(center + v * POSE_POSE_DISTANCE * static_cast<float>(i) +
+                                                 n * POSE_ROBOT_DISTANCE, -n));
+            Target* targetFront = new Target(Pose(center - v * POSE_POSE_DISTANCE * static_cast<float>(i) +
+                                                  n * POSE_ROBOT_DISTANCE, -n));
 
-            targetBack.takeId();
-            targetFront.takeId();
+            targetBack->takeId();
+            targetFront->takeId();
             targets.push_back(targetBack);
             targets.push_front(targetFront);
         }
