@@ -23,7 +23,7 @@ Teleoperated::Teleoperated()
 {
    ROS_INFO("New state is Teleoperated.");
 
-   _state_pub           = _nh->advertise<std_msgs::String>("state", 1);
+   _state_pub           = _nh->advertise<std_msgs::String>("/cortex/state", 1);
    _inspector_state_sub = _nh->subscribe("/inspector_cmd/state", 20, &Teleoperated::inspectorStateCallback, this);
 
 
