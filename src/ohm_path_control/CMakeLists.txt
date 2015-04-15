@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   roscpp
   tf
+  ohm_srvs
+  ohm_autonomy
 )
 find_package(cmake_modules REQUIRED)
 

@@ -48,6 +48,7 @@ add_message_files(
    MoveRobot.msg
    Wall.msg
    WallArray.msg
+   PathControlInfo.msg
    )
 
 ## Generate services in the 'srv' folder
@@ -68,6 +69,7 @@ add_service_files(
 generate_messages(
    DEPENDENCIES
    geometry_msgs
+   std_msgs
 )
 
 ###################################

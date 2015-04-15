@@ -29,6 +29,8 @@ public:
 
    analyser::diff_scale analyse(analyser::pose current_pose);
 
+   double getDetectionRadius() const;
+
 private: //functions
    /**
     * @brief contains the transfere function with a cos(mx)^(2..n)

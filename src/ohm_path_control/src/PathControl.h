@@ -9,6 +9,9 @@
 #include <std_msgs/Bool.h>
 #include <tf/transform_listener.h>
 
+#include <ohm_autonomy/PathControlInfo.h>
+#include <ohm_srvs/NodeControl.h>
+
 #include <string>
 #include <vector>
 #include <Eigen/Dense>
@@ -28,10 +31,13 @@ private:    //dataelements
     ros::NodeHandle _nh;
 
     ros::Publisher _pub_cmd_vel;
-    ros::Publisher _pubState;
+    ros::Publisher _pub_state;
+    ros::Publisher _pub_state_old;
     ros::Subscriber _sub_path;
     ros::Subscriber _sub_em_stop;
     ros::Subscriber _sub_pause;
+
+    ros::ServiceServer _srv_nodeControl_endrotate;
 
     tf::TransformListener _tf_listnener;
 
@@ -84,6 +90,9 @@ private:    //functions
      */
     void doPathControl(void);
 
+
+    void pubState(void);
+
     /**
      * @brief callback for next path
      *
@@ -104,6 +113,9 @@ private:    //functions
      * @param msg
      */
     void subPause_callback(const std_msgs::Bool& msg);
+
+    bool srvCntrlEndrotate_callback(ohm_srvs::NodeControlRequest& req,
+                                    ohm_srvs::NodeControlResponse& res);
 };
 
 #endif /* TEMPLATE_H_ */
