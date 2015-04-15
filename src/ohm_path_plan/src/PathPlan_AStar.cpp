@@ -15,7 +15,6 @@ PathPlan_AStar::PathPlan_AStar() :
    ros::NodeHandle privNh("~");
    std::string sub_map;
    std::string sub_target;
-   std::string sub_pose;
    std::string pub_path;
    std::string frame_id;
    std::string tf_map_frame;
@@ -33,7 +32,6 @@ PathPlan_AStar::PathPlan_AStar() :
 
    privNh.param("sub_map",               sub_map,        std::string("map"));
    privNh.param("sub_target",            sub_target,     std::string("/move_base_simple/goal"));
-   privNh.param("sub_pose",              sub_pose,       std::string("robot0/pose"));
    privNh.param("pub_path",              pub_path,       std::string("path"));
    privNh.param("srv_plan_paths",        srv_plan_paths, std::string("path_plan/srv_plan_paths"));
    privNh.param("srv_plan_path",         srv_plan_path,  std::string("path_plan/srv_plan_path"));
@@ -135,6 +133,8 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
 
    pose.x = tf.getOrigin().x();
    pose.y = tf.getOrigin().y();
+
+   _robot_pos = pose;
 
    //obvious::Timer timer;
    //timer.reset();
@@ -246,6 +246,10 @@ void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
    apps::MapOperations::inflateCirc(planner->getGridMap(), 10, 127, _robot_radius);
    apps::MapOperations::binarize(planner->getGridMap(), 0, 1, FREE_VALUE, WALL_VALUE);
 
+   //clear robot position to free_value //todo not useful ... robot can step wise move in to wall
+   //apps::MapOperations::drawFilledCircle(planner->getGridMap(), _robot_pos, _robot_radius, FREE_VALUE);
+
+   //create and add costmap (for dt)
    apps::GridMap* cost_map_dt = new apps::GridMap(planner->getGridMap());
    apps::MapOperations::distnaceTransformCirc(cost_map_dt, _dt_radius, WALL_VALUE);
    planner->addCostmap("dt", cost_map_dt);
@@ -281,6 +285,8 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
 
    pose.x = req.origin.position.x;
    pose.y = req.origin.position.y;
+
+   _robot_pos = pose;
 
    //obvious::Timer timer;
    //timer.reset();
@@ -347,6 +353,8 @@ bool PathPlan_AStar::srvCallback_plan_path(
 
    pose.x = req.origin.position.x;
    pose.y = req.origin.position.y;
+
+   _robot_pos = pose;
 
    //obvious::Timer timer;
    //timer.reset();

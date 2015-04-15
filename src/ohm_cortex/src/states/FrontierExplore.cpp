@@ -1,5 +1,5 @@
 /*
- * FrontierExplore.cpp
+  * FrontierExplore.cpp
  *
  *  Created on: 30.01.2015
  *      Author: chris
@@ -10,22 +10,19 @@
 // states
 #include "Drive.h"
 
-
-
 //#include "ohm_frontier_exploration/ExplorationConfig.h"
 #include "ohm_frontier_exploration/GetTarget.h"
 
-
-namespace autonohm {
+namespace autonohm
+{
 
 FrontierExplore::FrontierExplore(void) :
       _nh(autonohm::Context::getInstance()->getNodeHandle())
 {
    ROS_INFO("New state is frontier explore");
 
-   _state_pub         = _nh->advertise<std_msgs::String>("state", 1);
+   _state_pub = _nh->advertise<std_msgs::String>("state", 1);
    _target_srv_client = _nh->serviceClient<ohm_frontier_exploration::GetTarget>("ohm_frontier_exploration/get_target", 1);
-
 
    std_msgs::String msg;
    msg.data = "exploreFrontier";
@@ -33,31 +30,16 @@ FrontierExplore::FrontierExplore(void) :
 
 }
 
-FrontierExplore::~FrontierExplore() {
+FrontierExplore::~FrontierExplore()
+{
    // TODO Auto-generated destructor stub
 }
 
-
 void FrontierExplore::process(void)
 {
-   ohm_frontier_exploration::GetTarget service;
-   geometry_msgs::Pose goal;
-
-   if(!_target_srv_client.call(service)) {
-      ROS_ERROR("Service for frontier exploration failed. ");
-   }
-   else {
-      ROS_INFO("received new target from frontier based exploration");
-
-      goal = service.response.target;
-
-      ROS_INFO("Leave frontier explore state");
-      Context::getInstance()->setState(new Drive(goal));
-      delete this;
-   }
-
-
 
 }
 
 } /* namespace autonohm */
+
+

@@ -1,10 +1,19 @@
 <?xml version="1.0"?>
 <launch>
-   <node name="ohm_path_plan_node" pkg="ohm_path_plan" type="ohm_path_control_node">
-      <param name="pub_name_path"  type="string" value="path" />
-      <param name="sub_name_map"   type="string" value="map" />
-      <param name="action_name"    type="string" value="move_to" />
-      <param name="frame_id"       type="string" value="map" />
-      <param name="robot_radius"   type="double" value="0.3" />
+   <node name="ohm_path_plan_astar_node" pkg="ohm_path_plan" type="ohm_path_plan_astar_node" output = "screen">
+      <param name="sub_map"            type="string" value="map" />
+      <param name="sub_target"         type="string" value="path_plan/target" />
+      <param name="pub_path"           type="string" value="path_plan/target_path" />
+      <param name="srv_plan_paths"     type="string" value="path_plan/srv_plan_paths" />
+      <param name="srv_plan_path"      type="string" value="path_plan/srv_plan_path" /> 
+      <param name="frame_id"           type="string" value="map" />
+      <param name="tf_map_frame"       type="string" value="map" />
+      <param name="tf_robot_frame"     type="string" value="base_footprint" />
+      <param name="robot_radius"       type="double" value="0.35" />
+      <param name="dt_radius"          type="double" value="0.6" />
+      <!--param name="cost_short_step" type="double" value="1" /-->
+      <!--param name="cost_long_step"  type="double" value="1.43" /-->
+      <param name="factor_dist"        type="double" value="1" />
+      <param name="costmap_weight"     type="double" value="10" />
    </node>
 </launch>

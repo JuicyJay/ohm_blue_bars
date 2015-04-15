@@ -16,24 +16,24 @@ PathControl::PathControl() : _rate(0)
     std::string sub_name_path;
     std::string sub_name_em_stop;
     std::string sub_name_pause;
-    std::string srv_name_ctrl_endroate;
+    std::string srv_name_ser_doendroate;
 
     std::string config_file_controller;
     std::string config_file_analyser;
     std::string tf_map_frame;
     std::string tf_robot_frame;
     
-    privNh.param("pub_name_cmd_vel",       pub_name_cmd_vel,       std::string("vel/teleop"));
-    privNh.param("pub_name_state",         pub_name_state,         std::string("path_control/state"));
-    privNh.param("pub_name_state_full",    pub_name_state_full,    std::string("path_control/state_full"));
-    privNh.param("sub_name_path",          sub_name_path,          std::string("path"));
-    privNh.param("sub_name_em_stop",       sub_name_em_stop,       std::string("path_control/emergency_stop"));
-    privNh.param("sub_name_pause",         sub_name_pause,         std::string("path_control/pause"));
-    privNh.param("srv_name_ctrl_endroate", srv_name_ctrl_endroate, std::string("path_control/ctrl_endrotate"));
-    privNh.param("config_file_controller", config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
-    privNh.param("config_file_analyser",   config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
-    privNh.param("tf_map_frame",           tf_map_frame,           std::string("map"));
-    privNh.param("tf_robot_frame",         tf_robot_frame,         std::string("base_footprint"));
+    privNh.param("pub_name_cmd_vel",         pub_name_cmd_vel,       std::string("vel/teleop"));
+    privNh.param("pub_name_state",           pub_name_state,         std::string("path_control/state"));
+    privNh.param("pub_name_state_full",      pub_name_state_full,    std::string("path_control/state_full"));
+    privNh.param("sub_name_path",            sub_name_path,          std::string("path"));
+    privNh.param("sub_name_em_stop",         sub_name_em_stop,       std::string("path_control/emergency_stop"));
+    privNh.param("sub_name_pause",           sub_name_pause,         std::string("path_control/pause"));
+    privNh.param("srv_name_ser_doendroate",  srv_name_ser_doendroate, std::string("path_control/do_end_rotation"));
+    privNh.param("config_file_controller",   config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
+    privNh.param("config_file_analyser",     config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
+    privNh.param("tf_map_frame",             tf_map_frame,           std::string("map"));
+    privNh.param("tf_robot_frame",           tf_robot_frame,         std::string("base_footprint"));
 
     _tf_map_frame = tf_map_frame;
     _tf_robot_frame = tf_robot_frame;
@@ -49,7 +49,7 @@ PathControl::PathControl() : _rate(0)
     _sub_pause = _nh.subscribe(sub_name_pause, 1, &PathControl::subPause_callback, this);
 
     //init srv
-    _srv_nodeControl_endrotate = _nh.advertiseService(srv_name_ctrl_endroate, &PathControl::srvCntrlEndrotate_callback, this);
+    _srv_nodeControl_endrotate = _nh.advertiseService(srv_name_ser_doendroate, &PathControl::srvCntrlEndrotate_callback, this);
 
     //_pathAnalyser = new analyser::SimpleAnalyser(config_file_analyser);
     _pathAnalyser = new analyser::BasicAnalyser(config_file_analyser);
@@ -310,24 +310,24 @@ void PathControl::subPath_callback(const nav_msgs::Path& msg)
 
 
 
-   //prove last path element of nan
-   if(msg.poses.size())
-   {
-      if(isnan(msg.poses[msg.poses.size() - 1].pose.orientation.w) ||
-         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.x) ||
-         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.y) ||
-         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.z)   )
-      {
-         //if none is nan ... than set to norotate
-         ROS_INFO("ohm_path_control -> Disable Rotate");
-         _pathAnalyser->setDoEndRotate(false);
-      }
-      else
-      {
-         ROS_INFO("ohm_path_control -> Enable Rotate");
-         _pathAnalyser->setDoEndRotate(true);
-      }
-   }
+//   //prove last path element of nan
+//   if(msg.poses.size())
+//   {
+//      if(isnan(msg.poses[msg.poses.size() - 1].pose.orientation.w) ||
+//         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.x) ||
+//         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.y) ||
+//         isnan(msg.poses[msg.poses.size() - 1].pose.orientation.z)   )
+//      {
+//         //if none is nan ... than set to norotate
+//         ROS_INFO("ohm_path_control -> Disable Rotate");
+//         _pathAnalyser->setDoEndRotate(false);
+//      }
+//      else
+//      {
+//         ROS_INFO("ohm_path_control -> Enable Rotate");
+//         _pathAnalyser->setDoEndRotate(true);
+//      }
+//   }
 
    ROS_INFO("Path.size: %d",(int)path_trunc.size());
    _pathAnalyser->setPath(path_trunc);
@@ -361,10 +361,12 @@ bool PathControl::srvCntrlEndrotate_callback(ohm_srvs::NodeControlRequest& req,
 
    if(req.action == req.ENABLE)
    {
+      ROS_INFO("ohm_path_control -> Enable Rotate");
       _pathAnalyser->setDoEndRotate(true);
    }
    else if(req.action == req.DISABLE)
    {
+      ROS_INFO("ohm_path_control -> Disable Rotate");
       _pathAnalyser->setDoEndRotate(false);
    }
    else

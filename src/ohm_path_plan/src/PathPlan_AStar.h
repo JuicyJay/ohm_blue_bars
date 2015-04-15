@@ -59,6 +59,8 @@ private:    //dataelements
 
     //std::vector<apps::GridMap*> _cost_maps;
 
+    apps::Point2D _robot_pos;
+
 public:
     PathPlan_AStar();
     virtual ~PathPlan_AStar();

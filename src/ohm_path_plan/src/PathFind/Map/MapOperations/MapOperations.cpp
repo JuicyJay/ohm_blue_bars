@@ -330,6 +330,37 @@ void apps::MapOperations::distnaceTransformCirc(GridMap* map, double offset, uin
    delete[] lt;
 }
 
+void MapOperations::drawFilledCircle(GridMap* map, Point2D circ_center, double radius,  uint8_t circ_value)
+{
+   Pixel circ_c = map->toPixel(circ_center);
+
+   unsigned int rad = std::abs(radius / (double)map->getCellSize() + 0.555);
+
+   //define rect around circle:
+   unsigned int xc = (circ_c.x <= rad) ? 0 : circ_c.x - rad;
+   unsigned int yc = (circ_c.y <= rad) ? 0 : circ_c.y - rad;
+   unsigned int wc = 2 * (rad + 1);
+
+   //iterate over all rect pixel an prove if they are in circle
+   for(unsigned int y = yc; y < (wc + yc); ++y)
+   {
+      for(unsigned int x = xc; x < (wc + xc); ++x)
+      {
+         //prove if it is inside circ
+         if( (x - circ_c.x)*(x - circ_c.x) + (y - circ_c.y)*(y - circ_c.y) < (rad * rad) )
+         {
+            Pixel p;
+            p.x = x;
+            p.y = y;
+
+            unsigned int idx = pixelToIdx(p,map->getWidth());
+            if(idx < map->getWidth() * map->getHeight())
+               map->getMapData()[idx] = circ_value;
+         }
+      }
+   }
+}
+
 void MapOperations::drawCircle(uint8_t* data, unsigned int width, Pixel c, unsigned int radius, uint8_t value)
 {
    int x0 = c.x;
