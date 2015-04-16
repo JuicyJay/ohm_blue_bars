@@ -17,6 +17,7 @@
 #include <geometry_msgs/Quaternion.h>
 #include <nav_msgs/Path.h>
 #include <std_msgs/Bool.h>
+#include <ohm_srvs/NodeControl.h>
 
 #include <Eigen/Dense>
 #include <limits>
@@ -56,6 +57,8 @@ private: // functions
     void subPath_callback(const nav_msgs::Path& msg);
     void subState_callback(const std_msgs::Bool& msg);
 
+    bool setEndRotate(bool state);
+
 private:
     ros::NodeHandle* _nh;
     ros::Publisher _state_pub;
@@ -64,6 +67,8 @@ private:
 
     ros::Subscriber _subPath;
     ros::Subscriber _subState;
+
+    ros::ServiceClient _srv_doendrot;
 
     geometry_msgs::PoseStamped _targetPose;
     geometry_msgs::Quaternion _targetOrientation;  //just used in non default mode

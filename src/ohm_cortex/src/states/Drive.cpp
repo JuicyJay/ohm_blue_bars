@@ -41,9 +41,14 @@ Drive::Drive(const geometry_msgs::Pose& target)
       *_pubPath   = _nh->advertise<nav_msgs::Path>("/georg/path", 1);
    }
 
-   //add subscriber:
+   //init subscriber:
    _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
    _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
+
+   //init service
+   _srv_doendrot = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/path_control/do_end_rotation");
+   _srv_doendrot.waitForExistence();
+
    _old_state = true;
    _reached_target = false;
    _got_path = false;
@@ -86,6 +91,11 @@ Drive::Drive(const geometry_msgs::Point& target, const geometry_msgs::Quaternion
    //add subscriber:
    _subPath  = _nh->subscribe("/georg/target_path", 1, &Drive::subPath_callback, this);
    _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
+
+   //init service
+   _srv_doendrot = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/path_control/do_end_rotation");
+   _srv_doendrot.waitForExistence();
+
    _old_state = true;
    _reached_target = false;
    _got_path = false;
@@ -146,14 +156,18 @@ void Drive::process(void)
          //now pubish to pathcontroll and begin moving until target reached
          if(_mode == drive::NO_TARGET_ORI)
          {//change last wp orientation
+            this->setEndRotate(false);
+            //geometry_msgs::Quaternion ori;
+            //ori.x = std::numeric_limits<double>::quiet_NaN();
+            //ori.y = std::numeric_limits<double>::quiet_NaN();
+            //ori.z = std::numeric_limits<double>::quiet_NaN();
+            //ori.w = std::numeric_limits<double>::quiet_NaN();
 
-            geometry_msgs::Quaternion ori;
-            ori.x = std::numeric_limits<double>::quiet_NaN();
-            ori.y = std::numeric_limits<double>::quiet_NaN();
-            ori.z = std::numeric_limits<double>::quiet_NaN();
-            ori.w = std::numeric_limits<double>::quiet_NaN();
-
-            _path.poses[_path.poses.size() - 1].pose.orientation = ori;
+            //_path.poses[_path.poses.size() - 1].pose.orientation = ori;
+         }
+         else
+         {
+            this->setEndRotate(true);
          }
          _pubPath->publish(_path);
 
@@ -215,6 +229,26 @@ void Drive::subState_callback(const std_msgs::Bool& msg)
       _reached_target = true;
    }
    _old_state = tmp;
+}
+
+bool Drive::setEndRotate(bool state)
+{
+   ohm_srvs::NodeControl srv;
+   srv.request.action = state ? (int8_t)srv.request.ENABLE : (int8_t)srv.request.DISABLE;
+
+   if(_srv_doendrot.call(srv))
+   {
+      if(srv.response.accepted)
+      {
+         return true;
+      }
+   }
+   else
+   {
+      ROS_WARN("ohm_move -> unable to set END_ROTATION ohm_path_control");
+   }
+
+   return false;
 }
 
 } // end namespace autonohm
