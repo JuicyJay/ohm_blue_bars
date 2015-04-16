@@ -165,6 +165,9 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
 
    std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
 
+   _pubPath.publish(this->toRosPath(path,msg));
+
+
    //save map and dt map
    apps::GridMap* tmp_map = astar_planer->getCostmap("dt");
    if(tmp_map != NULL)
@@ -177,7 +180,6 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    astar_planer->resetCostmaps();
    delete astar_planer;
 
-   _pubPath.publish(this->toRosPath(path,msg));
 }
 
 void PathPlan_AStar::debug_save_as_img(std::string file, apps::GridMap* map,
