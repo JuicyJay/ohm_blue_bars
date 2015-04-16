@@ -65,6 +65,7 @@ Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
 
 void estimateDistancesFromOrigin(std::vector<Target*>& targets)
 {
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
     if (!targets.size())
         return;
 
@@ -122,6 +123,7 @@ void estimateDistances(void)
 
 void callbackWalls(const ohm_autonomy::WallArray& msg)
 {
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
     TargetFactory factory;
     std::vector<Wall> walls;
 
@@ -130,7 +132,9 @@ void callbackWalls(const ohm_autonomy::WallArray& msg)
 
 
     factory.create(walls);
+    ROS_INFO("found %d targets.", factory.targets().size());
     estimateDistancesFromOrigin(factory.targets());
+    _targets.insert(_targets.end(), factory.targets().begin(), factory.targets().end());
     _grid->insert(factory.targets());
     _grid->selected()->printAllTargets();
 
@@ -146,8 +150,12 @@ void callbackWalls(const ohm_autonomy::WallArray& msg)
 
 bool callbackMarkTarget(ohm_autonomy::MarkTarget::Request& req, ohm_autonomy::MarkTarget::Response& res)
 {
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
+  ROS_INFO("id = %d", req.id);
+
     for (std::vector<Target*>::iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
+      ROS_INFO("target.id() = %d", (**target).id());
         if (req.id == (**target).id())
         {
             (**target).setInspected(true);
@@ -160,6 +168,7 @@ bool callbackMarkTarget(ohm_autonomy::MarkTarget::Request& req, ohm_autonomy::Ma
 
 bool callbackGetTarget(ohm_autonomy::GetTarget::Request& req, ohm_autonomy::GetTarget::Response& res)
 {
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
     if (req.id < 0)
     {
         _grid->switchToNextPartition();

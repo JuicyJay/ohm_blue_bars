@@ -58,7 +58,7 @@ void Explore::process(void)
     {
         ROS_INFO("No targets available. Will try to find new one in the map.");
         std_srvs::Empty service;
-
+	/*
         if (!_srvTrigger.call(service))
         {
             ROS_ERROR("Can't trigger the wall-finder-node. Will kill myself.");
@@ -80,6 +80,7 @@ void Explore::process(void)
         Context::getInstance()->setState(new Explore);
         delete this;
         return;
+	*/
     }
 
 

@@ -17,8 +17,9 @@ void TargetFactory::create(const std::vector<Wall>& walls)
         const Eigen::Vector3f n(Eigen::Vector3f(wall->model().n().x(), wall->model().n().y(), 0.0f));
         const Eigen::Vector3f v(Eigen::Vector3f(wall->model().r().x(), wall->model().r().y(), 0.0f));
 
-
-        targets.push_back(new Target(Pose(center + n * POSE_ROBOT_DISTANCE, -n)));
+	Target* target = new Target(Pose(center + n * POSE_ROBOT_DISTANCE, -n));
+	target->takeId();
+        targets.push_back(target);
 
         for (unsigned int i = 1; i < numPoses; ++i)
         {
