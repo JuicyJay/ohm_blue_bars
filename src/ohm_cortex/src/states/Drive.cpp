@@ -46,7 +46,7 @@ Drive::Drive(const geometry_msgs::Pose& target)
    _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
 
    //init service
-   _srv_doendrot = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/path_control/path_control/do_end_rotation");
+   _srv_doendrot = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/path_control/do_end_rotation");
    _srv_doendrot.waitForExistence();
 
    _old_state = true;
@@ -93,7 +93,7 @@ Drive::Drive(const geometry_msgs::Point& target, const geometry_msgs::Quaternion
    _subState = _nh->subscribe("/georg/path_control/state", 1, &Drive::subState_callback, this);
 
    //init service
-   _srv_doendrot = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/path_control/path_control/do_end_rotation");
+   _srv_doendrot = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/path_control/do_end_rotation");
    _srv_doendrot.waitForExistence();
 
    _old_state = true;

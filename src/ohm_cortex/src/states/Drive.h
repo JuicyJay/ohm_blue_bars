@@ -17,6 +17,7 @@
 #include <geometry_msgs/Quaternion.h>
 #include <nav_msgs/Path.h>
 #include <std_msgs/Bool.h>
+#include <ohm_srvs/NodeControl.h>
 
 #include <Eigen/Dense>
 #include <limits>
