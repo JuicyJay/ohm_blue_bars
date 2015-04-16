@@ -147,6 +147,8 @@ void PathPlan_AStar::subCallback_target(const geometry_msgs::PoseStamped& msg)
    end.x = msg.pose.position.x;
    end.y = msg.pose.position.y;
 
+   _target_pos = end;
+
    apps::Astar_dt* astar_planer = new apps::Astar_dt(NULL);
    astar_planer->setWallValue(WALL_VALUE);
    astar_planer->setAstarParam(_cost_short_step,
@@ -247,8 +249,11 @@ void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
    apps::MapOperations::binarize(planner->getGridMap(), 0, 1, FREE_VALUE, WALL_VALUE);
 
    //clear robot position to free_value //todo not useful ... robot can step wise move in to wall
-   //apps::MapOperations::drawFilledCircle(planner->getGridMap(), _robot_pos, _robot_radius, FREE_VALUE);
-
+   //just do if target pose is outside of the robot radius
+   if(!((_target_pos.x - _robot_pos.x)*(_target_pos.x - _robot_pos.x)  + (_target_pos.y - _robot_pos.y)*(_target_pos.y - _robot_pos.y) < (_robot_radius * _robot_radius)))
+   {
+      apps::MapOperations::drawFilledCircle(planner->getGridMap(), _robot_pos, _robot_radius, FREE_VALUE);
+   }
    //create and add costmap (for dt)
    apps::GridMap* cost_map_dt = new apps::GridMap(planner->getGridMap());
    apps::MapOperations::distnaceTransformCirc(cost_map_dt, _dt_radius, WALL_VALUE);
@@ -287,6 +292,7 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
    pose.y = req.origin.position.y;
 
    _robot_pos = pose;
+   _target_pos = pose;
 
    //obvious::Timer timer;
    //timer.reset();
@@ -385,6 +391,8 @@ bool PathPlan_AStar::srvCallback_plan_path(
    apps::Point2D end;
    end.x = req.target.position.x;
    end.y = req.target.position.y;
+
+   _target_pos = end;
 
    std::vector<apps::Point2D> path = this->do_path_planning(astar_planer, pose, end);
 

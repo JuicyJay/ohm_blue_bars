@@ -60,6 +60,7 @@ private:    //dataelements
     //std::vector<apps::GridMap*> _cost_maps;
 
     apps::Point2D _robot_pos;
+    apps::Point2D _target_pos;
 
 public:
     PathPlan_AStar();
