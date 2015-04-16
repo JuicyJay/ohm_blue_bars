@@ -82,6 +82,7 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
 
 void callbackRoi(const ohm_common::MapRoi& msg)
 {
+  return;
   if (!_initialized)
     {
       ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": no map received yet. Can not set the roi.");
