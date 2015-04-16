@@ -1,6 +1,7 @@
 #include <string.h>
 #include <ros/ros.h>
-
+#include <ohm_common/RobotEvent.h>
+#include <queue>
 
 #include "Context.h"
 #include "states/Approach.h"
@@ -19,10 +20,15 @@
 #include "ohm_cortex/Force.h"
 #include "GetTransformation.h"
 
+
 bool force(ohm_cortex::Force::Request& req, ohm_cortex::Force::Response& res);
+void subEvent_callback(const ohm_common::RobotEvent& msg);
+void handleEvents();
 
 ros::ServiceServer    _state_srv;
 autonohm::Context*    context;
+std::queue<ohm_common::RobotEvent> _event_queue;
+ohm_common::RobotEvent _msg;
 
 
 int main(int argc, char** argv)
@@ -30,10 +36,13 @@ int main(int argc, char** argv)
    ros::init(argc, argv, "statemachine_node");
    ros::NodeHandle nh("~");
 
+   ros::Subscriber subEvent;
+
    context = autonohm::Context::getInstance();
    context->setNodeHandle(&nh);
 
    _state_srv = nh.advertiseService("force_state", force);
+   subEvent   = nh.subscribe("/georg/event",20, subEvent_callback);
 
    // Set init state
    context->setState(new autonohm::Init);
@@ -48,6 +57,7 @@ int main(int argc, char** argv)
      context->process();
      r.sleep();
      ros::spinOnce();
+     handleEvents();
    }
 }
 
@@ -71,4 +81,33 @@ bool force(ohm_cortex::Force::Request& req, ohm_cortex::Force::Response& res)
 
 
    return true;
+}
+
+void subEvent_callback(const ohm_common::RobotEvent& msg)
+{
+   _event_queue.push(msg);
+}
+
+void handleEvents()
+{
+   while(_event_queue.size())
+   {
+      switch (_event_queue.front().event) {
+         case _msg.FLIP_OVER:
+            //todo pause slam
+            //todo counter and cancle moving / new target
+
+
+            break;
+         case _msg.MOVING_ABORTED:
+
+            break;
+         case _msg.MOVING_PAUSED:
+
+            break;
+         default:
+            break;
+      }
+      _event_queue.pop();
+   }
 }
