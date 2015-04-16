@@ -132,7 +132,7 @@ void callbackWalls(const ohm_autonomy::WallArray& msg)
     factory.create(walls);
     estimateDistancesFromOrigin(factory.targets());
     _grid->insert(factory.targets());
-
+    _grid->selected()->printAllTargets();
 
 //    Target target(takeClosestTargetFromList(targets, origin));
 //

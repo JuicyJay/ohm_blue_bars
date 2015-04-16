@@ -41,6 +41,7 @@ public:
     void estimateDistances(ros::ServiceClient& client, const Pose& robot);
 
     visualization_msgs::Marker getMarkerMsg(void) const;
+    void printAllTargets(void) const;
 
 private:
     bool _initialized;

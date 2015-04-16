@@ -43,4 +43,12 @@ private:
     static unsigned int s_id;
 };
 
+inline std::ostream& operator<<(std::ostream& os, const Target& target)
+{
+    os << "Target: id = " << target.id() << ", inspected = " << target.inspected() << ", distance = "
+       << target.distance() << ", distance from origin = " << target.distanceFromOrigin();
+
+    return os;
+}
+
 #endif

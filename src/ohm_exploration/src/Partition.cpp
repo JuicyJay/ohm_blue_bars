@@ -135,6 +135,12 @@ void Partition::estimateDistances(ros::ServiceClient& client, const Pose& robot)
         (**target).setDistance(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
 }
 
+void Partition::printAllTargets(void) const
+{
+    for (std::vector<Target*>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
+        ROS_INFO_STREAM(*target);
+}
+
 visualization_msgs::Marker Partition::getMarkerMsg(void) const
 {
     visualization_msgs::Marker msg;
