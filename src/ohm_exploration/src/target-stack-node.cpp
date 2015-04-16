@@ -179,6 +179,7 @@ bool callbackGetTarget(ohm_autonomy::GetTarget::Request& req, ohm_autonomy::GetT
             return false;
         }
 
+        ROS_INFO("num valid targets = %d", partition->numValidTargets());
         Target* target = partition->target();
 
         res.pose = target->pose().toRos();
