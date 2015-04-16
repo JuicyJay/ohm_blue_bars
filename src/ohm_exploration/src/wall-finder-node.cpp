@@ -31,7 +31,7 @@ float _resolution = 1.0f;
 float _originMapX = 0.0f;
 float _originMapY = 0.0f;
 
-bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
+bool search(void)
 {
     nav_msgs::GetMap service;
 
@@ -80,6 +80,11 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
     return true;
 }
 
+bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& res)
+{
+    return search();
+}
+
 void callbackRoi(const ohm_common::MapRoi& msg)
 {
   if (!_initialized)
@@ -112,5 +117,24 @@ int main(int argc, char** argv)
     _pubWalls = nh.advertise<ohm_autonomy::WallArray>("exploration/walls", 2);
     _subRoi = nh.subscribe("exploration/set_roi", 2, callbackRoi);
 
-    ros::spin();
+    bool autotrigger;
+    double frames;
+    para.param<bool>("autotrigger", autotrigger, true);
+    para.param<double>("rate", frames, 0.05);
+
+    if (autotrigger)
+    {
+        ros::Rate rate(frames);
+
+        while (ros::ok())
+        {
+            search();
+            ros::spinOnce();
+            rate.sleep();
+        }
+    }
+    else
+    {
+        ros::spin();
+    }
 }
