@@ -1,6 +1,7 @@
 #include "PartitionGrid.h"
 
 PartitionGrid::PartitionGrid(const nav_msgs::OccupancyGrid& map, const float cellsize)
+  : _selected(0)
 {
     const Eigen::Vector2f min(map.info.origin.position.x, map.info.origin.position.y);
     const Eigen::Vector2f max(min.x() + map.info.width  * map.info.resolution,
@@ -60,9 +61,9 @@ Partition* PartitionGrid::selected(void)
 
 void PartitionGrid::switchToNextPartition(void)
 {
-    if (_selected < _grid.size())
+    if (_selected >= _grid.size())
     {
-        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": selected > gird.size().");
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": selected > gird.size(). selected = " << _selected);
         return;
     }
 

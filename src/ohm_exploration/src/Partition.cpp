@@ -7,7 +7,7 @@
 #include <ohm_path_plan/PlanPaths.h>
 
 int Partition::s_id = 0;
-float Partition::s_maxDistanceFromOrigin = 5.0f;
+float Partition::s_maxDistanceFromOrigin = 15.0f;
 
 Partition::Partition(void)
     : _initialized(false),
