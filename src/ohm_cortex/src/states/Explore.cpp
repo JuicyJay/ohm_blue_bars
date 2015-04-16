@@ -56,8 +56,9 @@ void Explore::process(void)
     /* If the stack is empty fill it. */
     if (!stack->getTarget(pose, id))
     {
-        ROS_INFO("No targets available. Will try to find new one in the map.");
+        ROS_INFO("No targets available.");
         std_srvs::Empty service;
+        return;
 	/*
         if (!_srvTrigger.call(service))
         {

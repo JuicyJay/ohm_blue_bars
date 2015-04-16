@@ -60,11 +60,23 @@ Partition* PartitionGrid::selected(void)
 
 void PartitionGrid::switchToNextPartition(void)
 {
+    if (_selected < _grid.size())
+    {
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": selected > gird.size().");
+        return;
+    }
+
+    Eigen::Vector2f current(_grid[_selected].center());
     unsigned int min = 0;
 
     for (unsigned int i = 0; i < _grid.size(); ++i)
-        if (_grid[i].center().norm() < _grid[min].center().norm())
+    {
+        if (i != _selected && _grid[i].numValidTargets() &&
+            (_grid[i].center() - current).norm() < (_grid[min].center() - current).norm())
+        {
             min = i;
+        }
+    }
 
     _selected = min;
 }
