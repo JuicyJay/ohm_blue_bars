@@ -157,7 +157,7 @@ target_link_libraries(frontier_statemachine
 target_link_libraries(viz ${QT_LIBRARIES} ${catkin_LIBRARIES})
 
 
-install(TARGETS statemachine
+install(TARGETS statemachine frontier_statemachine
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

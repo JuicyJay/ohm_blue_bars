@@ -83,7 +83,7 @@ FrontierExplorationNode::FrontierExplorationNode(void) :
 
    // Service Server
    _best_target_service = private_nh.advertiseService("get_target", &FrontierExplorationNode::getFrontierServiceCB, this);
-   _transmitt_targets_service = private_nh.advertiseService("node_control", &FrontierExplorationNode::callback_srv_transmittTargets, this);
+   _transmitt_targets_service = _nh.advertiseService("frontier/node_control", &FrontierExplorationNode::callback_srv_transmittTargets, this);
 
    _viz.setNodeHandle(_nh);
 
