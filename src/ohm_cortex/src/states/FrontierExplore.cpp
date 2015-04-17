@@ -41,7 +41,7 @@ FrontierExplore::FrontierExplore(int numFrontiers, IState* afterState) :
    _numFrontiers = numFrontiers;
    _cntrFrontiers = 0;
 
-   _state = frontier::WAIT_FRONTIERS;
+   _state = frontier::TRIGGER_FRONTIERS;
    _oldArivalState = false;
    //_triggerd = false;
 }
@@ -82,6 +82,7 @@ void FrontierExplore::process(void)
          else
          {
             //transmitt path
+            ROS_INFO("FrontierState -> Pub path");
             _model->pubTargetPath(path_);
             _state = frontier::WAIT_ARIVAL;
          }

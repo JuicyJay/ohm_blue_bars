@@ -164,7 +164,7 @@ private:
       _nh = autonohm::Context::getInstance()->getNodeHandle();
 
       //init publisher
-      _pub_path  = _nh->advertise<nav_msgs::Path>("path",1);
+      _pub_path  = _nh->advertise<nav_msgs::Path>("/georg/path",1);
 
       //inti subscriber
       _sub_frontier = _nh->subscribe("/georg/frontiers", 1, &FrontierExploreModel::subCallback_frontiers, this);
