@@ -131,8 +131,9 @@ void callbackWalls(const ohm_autonomy::WallArray& msg)
 
 
     factory.create(walls);
-    estimateDistancesFromOrigin(factory.targets());
+    //    estimateDistancesFromOrigin(factory.targets());
     _targets.insert(_targets.end(), factory.targets().begin(), factory.targets().end());
+    estimateDistancesFromOrigin(_targets);
     _grid->insert(factory.targets());
     _grid->selected()->printAllTargets();
 
@@ -182,6 +183,7 @@ bool callbackGetTarget(ohm_autonomy::GetTarget::Request& req, ohm_autonomy::GetT
 
         ROS_INFO("num valid targets = %d", partition->numValidTargets());
         estimateDistances();
+	_pubGridMarker.publish(_grid->getMarkerMsg());
         Target* target = partition->target();
 
         res.pose = target->pose().toRos();
