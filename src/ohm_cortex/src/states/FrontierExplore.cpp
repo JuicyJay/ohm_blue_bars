@@ -63,7 +63,7 @@ void FrontierExplore::process(void)
          break;
 
       case frontier::WAIT_FRONTIERS:
-         ROS_INFO("FrontierState -> ");
+         //ROS_INFO("FrontierState -> Wait_Frontiers");
          if(_model->isFrontierRdy())
             _state = frontier::PLANNING;
          break;
@@ -89,7 +89,7 @@ void FrontierExplore::process(void)
          break;
       }
       case frontier::WAIT_ARIVAL:
-         ROS_INFO("FrontierState -> Wait for arival");
+         //ROS_INFO("FrontierState -> Wait for arival");
          if(!_oldArivalState && _model->getArivalState())
          {//arrived
             if(_numFrontiers < 0)

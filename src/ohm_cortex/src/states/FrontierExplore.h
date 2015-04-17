@@ -56,6 +56,7 @@ public:
 
    bool trigger()
    {
+      ROS_INFO("FontierState -> Trigger Frontiers");
       ohm_srvs::NodeControl srv;
       srv.request.action = (int8_t)srv.request.SINGLESHOT;
 

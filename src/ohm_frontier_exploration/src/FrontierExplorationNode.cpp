@@ -144,7 +144,7 @@ void FrontierExplorationNode::publishFrontiers(void)
    geometry_msgs::PoseArray frontierMarkers;
    frontierMarkers.header.stamp    = ros::Time::now();
    frontierMarkers.header.seq      = seq++;
-   frontierMarkers.header.frame_id = "/sim_map";
+   frontierMarkers.header.frame_id = "map";
 
    // fill message
    for(unsigned int i = 0; i < _frontiers.size(); ++i)
