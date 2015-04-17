@@ -93,15 +93,15 @@ void handleEvents()
    {
       ohm_common::RobotEvent msg = _event_queue.front();
 
-      if(msg.event == ohm_common::RobotEvent::FLIP_OVER)
+      if(msg.event == msg.FLIP_OVER)
       {
          ROS_INFO("ohm_cortex -> EVENT -> FLIP_OVER");
       }
-      else if(msg.event == ohm_common::RobotEvent::MOVING_ABORTED)
+      else if(msg.event == msg.MOVING_ABORTED)
       {
          ROS_INFO("ohm_cortex -> EVENT -> MOVING_ABORTED");
       }
-      else if(msg.event == ohm_common::RobotEvent::MOVING_PAUSED)
+      else if(msg.event == msg.MOVING_PAUSED)
       {
          ROS_INFO("ohm_cortex -> EVENT -> MOVING_PAUSED");
       }
