@@ -167,10 +167,12 @@ visualization_msgs::Marker Partition::getMarkerMsg(void) const
     msg.scale.y = 1.0;
     msg.scale.z = 1.0;
     msg.color.a = 1.0;
-    msg.color.r = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
-    msg.color.g = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
-    msg.color.b = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
-
+//    msg.color.r = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
+//    msg.color.g = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
+//    msg.color.b = static_cast<float>(::rand()) / static_cast<float>(std::numeric_limits<int>::max());
+    msg.color.r = 1.0f;
+    msg.color.g = 0.0f;
+    msg.color.b = 0.0f;
 
     /* Set the borderline. */
     msg.points.resize(8);

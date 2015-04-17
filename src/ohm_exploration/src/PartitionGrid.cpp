@@ -91,7 +91,16 @@ visualization_msgs::MarkerArray PartitionGrid::getMarkerMsg(void) const
     visualization_msgs::MarkerArray msg;
 
     for (std::vector<Partition>::const_iterator partition(_grid.begin()); partition < _grid.end(); ++partition)
+    {
         msg.markers.push_back(partition->getMarkerMsg());
+
+        if (partition->id() == _grid[_selected].id())
+        {
+            msg.markers.back().color.r = 0.0;
+            msg.markers.back().color.g = 1.0;
+            msg.markers.back().color.b = 0.0;
+        }
+    }
 
     return msg;
 }

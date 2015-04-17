@@ -36,7 +36,8 @@ public:
     Target* target(void);
     int numUninspectedTargets(void) const;
     int numValidTargets(void) const;
-    const Eigen::Vector2f& center(void) const { return _center; }
+    inline const Eigen::Vector2f& center(void) const { return _center; }
+    inline int id(void) const { return _id; }
 
     void estimateDistances(ros::ServiceClient& client, const Pose& robot);
 
