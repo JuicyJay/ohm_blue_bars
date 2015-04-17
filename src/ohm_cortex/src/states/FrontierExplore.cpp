@@ -58,7 +58,7 @@ void FrontierExplore::process(void)
 
       case frontier::TRIGGER_FRONTIERS:
          ROS_INFO("FrontierState -> Trigger Frontiers");
-         if(_model->trigger())
+         if(!_model->trigger())
             _state = frontier::WAIT_FRONTIERS;
          break;
 
