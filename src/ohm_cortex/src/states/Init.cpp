@@ -36,6 +36,8 @@ Init::~Init(void)
 
 void Init::process(void)
 {
+    ::sleep(5);
+
     Context::getInstance()->setState(new Explore);
     delete this;
 }

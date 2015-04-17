@@ -2,14 +2,16 @@
  * Waiting.cpp
  *
  *  Created on: 14.10.2014
- *      Author: chris
+ *      Author: chris and Knueppl
  */
 
 #include "Waiting.h"
+#include "Explore.h"
 
 #include <std_msgs/String.h>
 
 #include "../Context.h"
+#include "../GetTransformation.h"
 
 #include "ConfirmVictim.h"
 #include "RejectVictim.h"
@@ -37,28 +39,24 @@ Waiting::~Waiting(void)
 
 void Waiting::process(void)
 {
+    GetTransformation* listener = GetTransformation::instance();
 
+    if (!listener->waitAndLookUpTransform("map", "simon/base_footprint", 2.0f))
+    {
+        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": look up transform failed.");
+        return;
+    }
 
+    const float distance = listener->position().norm();
 
-//   if(1/*go back to explore*/) {
-//      autonohm::Context::getInstance()->setState(new ConfirmVictim());
-//      delete this;
-//   }
-//
-//   if(1/*go back to explore*/) {
-//      autonohm::Context::getInstance()->setState(new RejectVictim());
-//      delete this;
-//   }
-//
-//   if(1/*go closer to victim*/) {
-//      autonohm::Context::getInstance()->setState(new Approach());
-//      delete this;
-//   }
-//
-//   if(1/*abort to teleop*/) {
-//      autonohm::Context::getInstance()->setState(new Teleoperated());
-//      delete this;
-//   }
+    ROS_INFO("Current distance of simon is %f.", distance);
+
+    if (distance >= 3.0f)
+    {
+        ROS_INFO("Will leave state Waiting.");
+        Context::getInstance()->setState(new Explore);
+        delete this;
+    }
 }
 
 } /* namespace autonohm */
