@@ -166,8 +166,8 @@ private:
       _pub_path  = _nh->advertise<nav_msgs::Path>("path",1);
 
       //inti subscriber
-      _sub_frontier = _nh->subscribe("frontiers", 1, &FrontierExploreModel::subCallback_frontiers, this);
-      _sub_state    = _nh->subscribe("path_control/state", 1, &FrontierExploreModel::subCallback_state, this);
+      _sub_frontier = _nh->subscribe("/georg/frontiers", 1, &FrontierExploreModel::subCallback_frontiers, this);
+      _sub_state    = _nh->subscribe("/georg/path_control/state", 1, &FrontierExploreModel::subCallback_state, this);
 
       //init service
       _service_path         = _nh->serviceClient<ohm_path_plan::PlanPath>("/georg/path_plan/srv_plan_path");
