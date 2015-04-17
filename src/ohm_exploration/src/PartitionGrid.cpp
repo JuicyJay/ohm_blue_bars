@@ -99,6 +99,8 @@ visualization_msgs::MarkerArray PartitionGrid::getMarkerMsg(void) const
             msg.markers.back().color.r = 0.0;
             msg.markers.back().color.g = 1.0;
             msg.markers.back().color.b = 0.0;
+
+	    msg.markers.back().pose.position.z = 0.1;
         }
     }
 

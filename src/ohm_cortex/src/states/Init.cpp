@@ -9,6 +9,7 @@
 
 #include "../Context.h"
 #include "Explore.h"
+#include "Waiting.h"
 
 // ros includes
 #include <std_msgs/String.h>
@@ -39,6 +40,7 @@ void Init::process(void)
     ::sleep(5);
 
     Context::getInstance()->setState(new Explore);
+    //    Context::getInstance()->setState(new Waiting);
     delete this;
 }
 

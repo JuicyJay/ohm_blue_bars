@@ -294,8 +294,10 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
    pose.y = req.origin.position.y;
 
    _robot_pos = pose;
-   _target_pos = pose;
-
+   apps::Point2D tmp_target;
+   tmp_target.x += 2 * _robot_radius;
+   tmp_target.y += 2 * _robot_radius;
+   _target_pos = tmp_target;
    //obvious::Timer timer;
    //timer.reset();
 
