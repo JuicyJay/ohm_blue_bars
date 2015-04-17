@@ -28,7 +28,6 @@ void handleEvents();
 ros::ServiceServer    _state_srv;
 autonohm::Context*    context;
 std::queue<ohm_common::RobotEvent> _event_queue;
-ohm_common::RobotEvent _msg;
 
 
 int main(int argc, char** argv)
@@ -92,17 +91,19 @@ void handleEvents()
 {
    while(_event_queue.size())
    {
-      switch (_event_queue.front().event) {
-         case _msg.FLIP_OVER:
+      ohm_common::RobotEvent msg = _event_queue.front();
+
+      switch (msg.event) {
+         case msg.FLIP_OVER:
             //todo pause slam
             //todo counter and cancle moving / new target
 
 
             break;
-         case _msg.MOVING_ABORTED:
+         case msg.MOVING_ABORTED:
 
             break;
-         case _msg.MOVING_PAUSED:
+         case msg.MOVING_PAUSED:
 
             break;
          default:
