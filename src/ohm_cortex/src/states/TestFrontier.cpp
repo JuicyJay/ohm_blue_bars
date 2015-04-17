@@ -29,6 +29,7 @@ void TestFrontier::subInt_callback(const std_msgs::Int32& msg)
    ROS_INFO("TRIGGER Frontier: %d",msg.data);
 
    Context::getInstance()->setState(new FrontierExplore(msg.data, new TestFrontier));
+   delete this;
 }
 
 } /* namespace autonohm */

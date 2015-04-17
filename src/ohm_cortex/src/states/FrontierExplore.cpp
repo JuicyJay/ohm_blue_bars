@@ -57,17 +57,20 @@ void FrontierExplore::process(void)
    switch (_state) {
 
       case frontier::TRIGGER_FRONTIERS:
+         ROS_INFO("FrontierState -> Trigger Frontiers");
          if(_model->trigger())
             _state = frontier::WAIT_FRONTIERS;
          break;
 
       case frontier::WAIT_FRONTIERS:
+         ROS_INFO("FrontierState -> ");
          if(_model->isFrontierRdy())
             _state = frontier::PLANNING;
          break;
 
       case frontier::PLANNING:
       {
+         ROS_INFO("FrontierState -> Planning");
          nav_msgs::Path path_;
          path_= this->getBestTargetPath();
 
@@ -86,6 +89,7 @@ void FrontierExplore::process(void)
          break;
       }
       case frontier::WAIT_ARIVAL:
+         ROS_INFO("FrontierState -> Wait for arival");
          if(!_oldArivalState && _model->getArivalState())
          {//arrived
             if(_numFrontiers < 0)
