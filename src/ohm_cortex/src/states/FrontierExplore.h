@@ -170,9 +170,9 @@ private:
       _sub_state    = _nh->subscribe("path_control/state", 1, &FrontierExploreModel::subCallback_state, this);
 
       //init service
-      _service_path         = _nh->serviceClient<ohm_path_plan::PlanPath>("path_plan/srv_plan_path");
-      _service_do_endrotate = _nh->serviceClient<ohm_srvs::NodeControl>("path_control/do_end_rotation");
-      _service_trigger      = _nh->serviceClient<ohm_srvs::NodeControl>("frontier/node_control");
+      _service_path         = _nh->serviceClient<ohm_path_plan::PlanPath>("/georg/path_plan/srv_plan_path");
+      _service_do_endrotate = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/path_control/do_end_rotation");
+      _service_trigger      = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/frontier/node_control");
       _service_path.waitForExistence();
       _service_do_endrotate.waitForExistence();
       _service_trigger.waitForExistence();
