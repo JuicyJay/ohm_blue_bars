@@ -93,21 +93,21 @@ void handleEvents()
    {
       ohm_common::RobotEvent msg = _event_queue.front();
 
-      switch (msg.event) {
-         case msg.FLIP_OVER:
-            //todo pause slam
-            //todo counter and cancle moving / new target
-
-
-            break;
-         case msg.MOVING_ABORTED:
-
-            break;
-         case msg.MOVING_PAUSED:
-
-            break;
-         default:
-            break;
+      if(msg.event == ohm_common::RobotEvent::FLIP_OVER)
+      {
+         ROS_INFO("ohm_cortex -> EVENT -> FLIP_OVER");
+      }
+      else if(msg.event == ohm_common::RobotEvent::MOVING_ABORTED)
+      {
+         ROS_INFO("ohm_cortex -> EVENT -> MOVING_ABORTED");
+      }
+      else if(msg.event == ohm_common::RobotEvent::MOVING_PAUSED)
+      {
+         ROS_INFO("ohm_cortex -> EVENT -> MOVING_PAUSED");
+      }
+      else
+      {
+         ROS_INFO("ohm_cortex -> EVENT -> Undefined");
       }
       _event_queue.pop();
    }
