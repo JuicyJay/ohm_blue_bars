@@ -94,16 +94,16 @@ void handleEvents()
       ohm_common::RobotEvent msg = _event_queue.front();
 
       switch (msg.event) {
-         case ohm_common::RobotEvent::FLIP_OVER:
+         case (int64_t)ohm_common::RobotEvent::FLIP_OVER:
             //todo pause slam
             //todo counter and cancle moving / new target
 
 
             break;
-         case ohm_common::RobotEvent::MOVING_ABORTED:
+         case (int64_t)ohm_common::RobotEvent::MOVING_ABORTED:
 
             break;
-         case ohm_common::RobotEvent::MOVING_PAUSED:
+         case (int64_t)ohm_common::RobotEvent::MOVING_PAUSED:
 
             break;
          default:
