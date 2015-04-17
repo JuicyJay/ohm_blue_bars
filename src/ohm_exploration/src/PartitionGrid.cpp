@@ -1,5 +1,7 @@
 #include "PartitionGrid.h"
 
+#include <limits.h>
+
 PartitionGrid::PartitionGrid(const nav_msgs::OccupancyGrid& map, const float cellsize)
   : _selected(0)
 {
@@ -69,13 +71,15 @@ void PartitionGrid::switchToNextPartition(void)
 
     Eigen::Vector2f current(_grid[_selected].center());
     unsigned int min = 0;
+    float minDistance = std::numeric_limits<float>::max();
 
     for (unsigned int i = 0; i < _grid.size(); ++i)
     {
         if (i != _selected && _grid[i].numValidTargets() &&
-            (_grid[i].center() - current).norm() < (_grid[min].center() - current).norm())
+            (_grid[i].center() - current).norm() < minDistance)
         {
             min = i;
+            minDistance = (_grid[i].center() - current).norm();
         }
     }
 
