@@ -22,10 +22,10 @@ public:
 
     void create(const std::vector<Wall>& walls);
 
-    const std::vector<Target>& targets(void) const { return _targets; }
+    std::vector<Target*>& targets(void) { return _targets; }
 
 private:
-    std::vector<Target> _targets;
+    std::vector<Target*> _targets;
 };
 
 #endif

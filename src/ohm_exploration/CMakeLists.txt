@@ -135,6 +135,8 @@ add_executable(target-stack
                src/Target.cpp
                src/TargetFactory.cpp
                src/target-stack-node.cpp
+               src/Partition.cpp
+               src/PartitionGrid.cpp
                )
 
 add_executable(mission-planner

@@ -5,19 +5,25 @@
 #include <ohm_autonomy/MarkTarget.h>
 #include <ohm_autonomy/GetTarget.h>
 #include <ohm_path_plan/PlanPaths.h>
+#include <nav_msgs/GetMap.h>
 
 #include <list>
+#include <cstdlib>
+#include <ctime>
 
 #include "Wall.h"
 #include "Target.h"
 #include "TargetFactory.h"
+#include "PartitionGrid.h"
 
-std::list<Target> _haveToInspect;
-std::vector<Target> _targets;
+std::vector<Target*> _targets;
 ros::ServiceClient _srvPlanPaths;
+ros::Publisher _pubGridMarker;
 tf::TransformListener* _listener = 0;
 std::string _tfSource, _tfTarget;
+PartitionGrid* _grid = 0;
 
+/*
 Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
 {
     if (!targets.size())
@@ -55,21 +61,42 @@ Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
     targets.pop_front();
     return target;
 }
+*/
 
-void callbackWalls(const ohm_autonomy::WallArray& walls)
+void estimateDistancesFromOrigin(std::vector<Target*>& targets)
 {
-    /* Use the center of the walls to create targets and get the corresponding lenghts. */
-    ohm_path_plan::PlanPaths paths;
-    std::vector<Wall> receivedWalls;
+  ROS_INFO_STREAM(__PRETTY_FUNCTION__);
+    if (!targets.size())
+        return;
 
-    for (std::vector<ohm_autonomy::Wall>::const_iterator wall(walls.walls.begin());
-         wall < walls.walls.end();
-         ++wall)
+    ohm_path_plan::PlanPaths paths;
+    paths.request.origin.position.x = 0.0;
+    paths.request.origin.position.y = 0.0;
+    paths.request.origin.position.z = 0.0;
+
+    for (std::vector<Target*>::const_iterator target(targets.begin()); target < targets.end(); ++target)
+        paths.request.targets.push_back((**target).pose().toRos());
+
+
+    if (!_srvPlanPaths.call(paths))
     {
-        receivedWalls.push_back(Wall(*wall));
+        ROS_ERROR("Cannot call the path plan node.");
+        return;
+    }
+    if (paths.response.lengths.size() != targets.size())
+    {
+        ROS_ERROR("Not enough distances received from the path plan node.");
+        return;
     }
 
 
+    std::vector<double>::const_iterator distance(paths.response.lengths.begin());
+    for (std::vector<Target*>::iterator target(targets.begin()); target < targets.end(); ++target, ++distance)
+        (**target).setDistanceFromOrigin(*distance < 0 ? std::numeric_limits<float>::max() : *distance);
+}
+
+void estimateDistances(void)
+{
     /* Get the current robot pose. */
     ROS_INFO("Get robot pose.");
     tf::StampedTransform transform;
@@ -84,34 +111,48 @@ void callbackWalls(const ohm_autonomy::WallArray& walls)
         ROS_INFO("Will use coordinate (0, 0, 0).");
     }
 
-    const Pose origin(Eigen::Vector3f(transform.getOrigin().x(),
-                                      transform.getOrigin().y(),
-                                      transform.getOrigin().z()),
-                      Eigen::Vector3f(1.0f, 0.0f, 0.0f));
 
-    /* Estimate the best path. */
-    ROS_INFO("Take closest with origin.");
+    /* Estiamte all distances off the targets to the current robot pose. */
+    const Pose robot(Eigen::Vector3f(transform.getOrigin().x(),
+                                     transform.getOrigin().y(),
+                                     transform.getOrigin().z()),
+                     Eigen::Vector3f(1.0f, 0.0f, 0.0f));
+
+    _grid->selected()->estimateDistances(_srvPlanPaths, robot);
+}
+
+void callbackWalls(const ohm_autonomy::WallArray& msg)
+{
     TargetFactory factory;
+    std::vector<Wall> walls;
 
-    factory.create(receivedWalls);
-    std::list<Target> targets(factory.targets().begin(), factory.targets().end());
-    Target target(takeClosestTargetFromList(targets, origin));
+    for (std::vector<ohm_autonomy::Wall>::const_iterator wall(msg.walls.begin()); wall < msg.walls.end(); ++wall)
+        walls.push_back(Wall(*wall));
 
-    while (target.valid())
-    {
-        _haveToInspect.push_back(target);
-	ROS_INFO_STREAM("Take closest with position: " << target.pose().position);
-        target = takeClosestTargetFromList(targets, target.pose());
-    }
+
+    factory.create(walls);
+    estimateDistancesFromOrigin(factory.targets());
+    _targets.insert(_targets.end(), factory.targets().begin(), factory.targets().end());
+    _grid->insert(factory.targets());
+    _grid->selected()->printAllTargets();
+
+//    Target target(takeClosestTargetFromList(targets, origin));
+//
+//    while (target.valid())
+//    {
+//        _haveToInspect.push_back(target);
+//	ROS_INFO_STREAM("Take closest with position: " << target.pose().position);
+//        target = takeClosestTargetFromList(targets, target.pose());
+//    }
 }
 
 bool callbackMarkTarget(ohm_autonomy::MarkTarget::Request& req, ohm_autonomy::MarkTarget::Response& res)
 {
-    for (std::vector<Target>::iterator target(_targets.begin()); target < _targets.end(); ++target)
+    for (std::vector<Target*>::iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
-        if (req.id == target->id())
+        if (req.id == (**target).id())
         {
-            target->setInspected(true);
+            (**target).setInspected(true);
             return true;
         }
     }
@@ -123,25 +164,37 @@ bool callbackGetTarget(ohm_autonomy::GetTarget::Request& req, ohm_autonomy::GetT
 {
     if (req.id < 0)
     {
-        if (!_haveToInspect.size())
+        Partition* partition(_grid->selected());
+
+        if (!partition)
         {
-            ROS_ERROR("No target in the stack!");
+            ROS_ERROR("No valid partition found.");
             return false;
         }
 
-        _targets.push_back(_haveToInspect.front());
-        _haveToInspect.pop_front();
-        res.pose = _targets.back().pose().toRos();
-        res.id = _targets.back().id();
+
+        if (!partition->numValidTargets())
+        {
+            ROS_ERROR("No target in the stack! Will switch to the next partition.");
+            _grid->switchToNextPartition();
+            return false;
+        }
+
+        ROS_INFO("num valid targets = %d", partition->numValidTargets());
+        estimateDistances();
+        Target* target = partition->target();
+
+        res.pose = target->pose().toRos();
+        res.id   = target->id();
 
         return true;
     }
 
-    for (std::vector<Target>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
+    for (std::vector<Target*>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
-        if (req.id == target->id())
+        if (req.id == (**target).id())
         {
-            res.pose = target->pose().toRos();
+            res.pose = (**target).pose().toRos();
             return true;
         }
     }
@@ -169,9 +222,37 @@ int main(int argc, char** argv)
     para.param<std::string>("tf_source", _tfSource, "map");
     para.param<std::string>("tf_target", _tfTarget, "base_footprint");
 
+
+    /* Get a map and then create the target grid. */
+    para.param<std::string>("service_get_map", topic, "map");
+    ros::ServiceClient srvMap(nh.serviceClient<nav_msgs::GetMap>(topic));
+    _pubGridMarker = nh.advertise<visualization_msgs::MarkerArray>("exploration/target_grid", 2);
+    ros::service::waitForService(topic);
+
+    nav_msgs::GetMap service;
+
+    if (!srvMap.call(service))
+    {
+        ROS_ERROR("target_stack: can not call the service get map.");
+        return 1;
+    }
+
+    _grid = new PartitionGrid(service.response.map, 1.2f);
+
+
     ::sleep(5);
 
     ros::spin();
 
+//    ros::Rate rate(10);
+//    srand(time(0));
+//    while (ros::ok())
+//    {
+//        _pubGridMarker.publish(grid.getMarkerMsg());
+//        ros::spinOnce();
+//        rate.sleep();
+//    }
+
     delete _listener;
+    delete _grid;
 }
