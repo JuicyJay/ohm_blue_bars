@@ -60,7 +60,7 @@ public:
       ohm_srvs::NodeControl srv;
       srv.request.action = (int8_t)srv.request.SINGLESHOT;
 
-      if(_service_do_endrotate.call(srv))
+      if(_service_trigger.call(srv))
       {
          if(srv.response.accepted)
          {
