@@ -83,6 +83,7 @@ void FrontierExplore::process(void)
          {
             //transmitt path
             ROS_INFO("FrontierState -> Pub path");
+            path_.header.frame_id = "map";
             _model->pubTargetPath(path_);
             _state = frontier::WAIT_ARIVAL;
          }
