@@ -214,6 +214,7 @@ bool FrontierExplorationNode::callback_srv_transmittTargets(
    {
       res.accepted = false;
    }
+   ROS_INFO("ohm_frontier ->  callback NodeControll serivce: accept: %s", (res.accepted) ? "true" : "false");
 
    return true;
 }

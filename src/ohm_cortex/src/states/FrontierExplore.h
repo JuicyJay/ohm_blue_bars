@@ -71,7 +71,7 @@ public:
       {
          ROS_WARN("ohm_cortex: FrontierExploration -> unable to trigger frontier");
       }
-
+      ROS_WARN("ohm_cortex: FrontierExploration -> unable to tirgger... not accepted");
       return false;
    }
 
