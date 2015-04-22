@@ -272,6 +272,10 @@ void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
    if(!((_target_pos.x - _robot_pos.x)*(_target_pos.x - _robot_pos.x)  + (_target_pos.y - _robot_pos.y)*(_target_pos.y - _robot_pos.y) < (_robot_radius * _robot_radius)))
    {
       apps::MapOperations::drawFilledCircle(planner->getGridMap(), _robot_pos, _robot_radius, FREE_VALUE);
+      ROS_INFO("ohm_path_plan ->     Planning WITH free circ");
+   }
+   else{
+      ROS_INFO("ohm_path_plan ->     Planning WITHOUT free circ");
    }
    //create and add costmap (for dt)
    apps::GridMap* cost_map_dt = new apps::GridMap(planner->getGridMap());
