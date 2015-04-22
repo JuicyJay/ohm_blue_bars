@@ -9,6 +9,7 @@
 #include "Explore.h"
 
 #include <std_msgs/String.h>
+#include <ohm_srvs/NodeControl.h>
 
 #include "../Context.h"
 #include "../GetTransformation.h"
@@ -30,6 +31,9 @@ Waiting::Waiting(void)
    std_msgs::String msg;
    msg.data = "waiting";
    _state_pub.publish(msg);
+
+   /* Node Control Mapping */
+   _srvControlMap = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/node_control");
 }
 
 Waiting::~Waiting(void)
@@ -41,7 +45,7 @@ void Waiting::process(void)
 {
     GetTransformation* listener = GetTransformation::instance();
 
-    if (!listener->waitAndLookUpTransform("map", "simon/base_footprint", 2.0f))
+    if (!listener->waitAndLookUpTransform("map", "simon/base_link", 2.0f))
     {
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": look up transform failed.");
         return;
@@ -54,6 +58,16 @@ void Waiting::process(void)
     if (distance >= 3.0f)
     {
         ROS_INFO("Will leave state Waiting.");
+	
+
+	ohm_srvs::NodeControl service;
+	service.request.action = ohm_srvs::NodeControl::Request::START;
+
+	if (!_srvControlMap.call(service))
+	{
+	  ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can't call service georg/node_control");
+	}
+
         Context::getInstance()->setState(new Explore);
         delete this;
     }

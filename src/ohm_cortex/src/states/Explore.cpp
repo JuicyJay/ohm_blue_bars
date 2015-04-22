@@ -53,6 +53,7 @@ void Explore::process(void)
     geometry_msgs::Pose pose;
     unsigned int id = 0;
 
+    ROS_INFO("Explore: get target from stack.");
     /* If the stack is empty fill it. */
     if (!stack->getTarget(pose, id))
     {
@@ -89,6 +90,7 @@ void Explore::process(void)
     ohm_autonomy::MarkTarget service;
     service.request.id = id;
 
+    ROS_INFO("Explore: mark the target.");
     if (!_srvMarkTarget.call(service))
     {
         ROS_ERROR_STREAM("Can't not mark target " << id << " as be inspected. Will kill myself.");

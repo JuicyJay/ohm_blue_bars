@@ -28,6 +28,7 @@ class Waiting : public IState
 public:
    /**
     * Default constructor
+
     */
    Waiting(void);
    /**
@@ -43,7 +44,7 @@ private:
 
    ros::NodeHandle* _nh;
    ros::Publisher   _state_pub;
-
+   ros::ServiceClient _srvControlMap;
 
 };
 

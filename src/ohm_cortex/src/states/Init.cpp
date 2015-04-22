@@ -39,8 +39,8 @@ void Init::process(void)
 {
     ::sleep(5);
 
-    Context::getInstance()->setState(new Explore);
-    //    Context::getInstance()->setState(new Waiting);
+  //    Context::getInstance()->setState(new Explore);
+    Context::getInstance()->setState(new Waiting);
     delete this;
 }
 
