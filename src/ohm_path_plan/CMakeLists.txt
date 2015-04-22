@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   actionlib
   tf
+  ohm_common
 )
 
 ## System dependencies are found with CMake's conventions

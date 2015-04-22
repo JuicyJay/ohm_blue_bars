@@ -5,6 +5,7 @@
 #define USE_OPENCV
 
 #include <ros/ros.h>
+#include <std_msgs/String.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <nav_msgs/Path.h>
 #include <nav_msgs/OccupancyGrid.h>
@@ -12,6 +13,7 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <map>
 #include <obcore/base/Timer.h>
 
 #include "PathFind/Map/GridMap.h"
@@ -20,6 +22,8 @@
 
 #include <ohm_path_plan/PlanPaths.h>
 #include <ohm_path_plan/PlanPath.h>
+
+#include <ohm_common/Obstacle.h>
 
 class PathPlan_AStar
 {
@@ -30,8 +34,12 @@ private:    //dataelements
     ros::NodeHandle _nh;
 
     ros::Publisher _pubPath;
+
     ros::Subscriber _subMap;
     ros::Subscriber _subTargetPose;
+    ros::Subscriber _subObstacles;
+    ros::Subscriber _subRemoveObstacles;
+
 
     ros::ServiceServer _srv_plan_paths;
     ros::ServiceServer _srv_plan_path;
@@ -61,6 +69,8 @@ private:    //dataelements
 
     apps::Point2D _robot_pos;
     apps::Point2D _target_pos;
+
+    std::map<std::string, ohm_common::Obstacle> _obstacles;
 
 public:
     PathPlan_AStar();
@@ -103,6 +113,9 @@ private:    //functions
 
     void subCallback_map(const nav_msgs::OccupancyGrid& msg);
     void subCallback_target(const geometry_msgs::PoseStamped& msg);
+    void subCallback_obstacle(const ohm_common::Obstacle& msg);
+    void subCallback_removeObstacle(const std_msgs::String& msg);
+
 
     bool srvCallback_plan_sorted(ohm_path_plan::PlanPathsRequest& req,
                                  ohm_path_plan::PlanPathsResponse& res);

@@ -361,6 +361,32 @@ void MapOperations::drawFilledCircle(GridMap* map, Point2D circ_center, double r
    }
 }
 
+
+void MapOperations::drawFilledRect(GridMap* map, Point2D rect_p, double rect_w, double rect_h, uint8_t rect_value)
+{
+   Pixel p = map->toPixel(rect_p);
+   unsigned int w = std::abs(rect_w / (double)map->getCellSize() + 0.555);
+   unsigned int h = std::abs(rect_h / (double)map->getCellSize() + 0.555);
+
+   uint8_t* data = map->getMapData();
+
+   for(unsigned int y = p.y; y < (p.y + h); ++y)
+   {
+      for(unsigned int x = p.x; x < (p.x + w); ++x)
+      {
+         Pixel tmp;
+         tmp.x = x;
+         tmp.y = y;
+         unsigned int idx = pixelToIdx(tmp, map->getWidth());
+
+         if(x >= 0 && x < map->getWidth() && y >= 0 && y < map->getHeight())
+         {
+            data[idx] = rect_value;
+         }
+      }
+   }
+}
+
 void MapOperations::drawCircle(uint8_t* data, unsigned int width, Pixel c, unsigned int radius, uint8_t value)
 {
    int x0 = c.x;
@@ -414,5 +440,4 @@ void MapOperations::drawCircle(uint8_t* data, unsigned int width, Pixel c, unsig
 }
 
 } /* namespace apps */
-
 

@@ -15,6 +15,8 @@ PathPlan_AStar::PathPlan_AStar() :
    ros::NodeHandle privNh("~");
    std::string sub_map;
    std::string sub_target;
+   std::string sub_obstacle;
+   std::string sub_remove_obstacle;
    std::string pub_path;
    std::string frame_id;
    std::string tf_map_frame;
@@ -30,12 +32,14 @@ PathPlan_AStar::PathPlan_AStar() :
    double costmap_weight ;
    //int int_val;
 
-   privNh.param("sub_map",               sub_map,        std::string("map"));
-   privNh.param("sub_target",            sub_target,     std::string("/move_base_simple/goal"));
-   privNh.param("pub_path",              pub_path,       std::string("path"));
-   privNh.param("srv_plan_paths",        srv_plan_paths, std::string("path_plan/srv_plan_paths"));
-   privNh.param("srv_plan_path",         srv_plan_path,  std::string("path_plan/srv_plan_path"));
-   privNh.param("frame_id",              frame_id,       std::string("map"));
+   privNh.param("sub_map",               sub_map,                 std::string("map"));
+   privNh.param("sub_target",            sub_target,              std::string("/move_base_simple/goal"));
+   privNh.param("sub_obstacle",          sub_obstacle,            std::string("path_plan/add_obstacle"));
+   privNh.param("sub_remove_obstacle",   sub_remove_obstacle,     std::string("path_plan/remove_obstacle"));
+   privNh.param("pub_path",              pub_path,                std::string("path"));
+   privNh.param("srv_plan_paths",        srv_plan_paths,          std::string("path_plan/srv_plan_paths"));
+   privNh.param("srv_plan_path",         srv_plan_path,           std::string("path_plan/srv_plan_path"));
+   privNh.param("frame_id",              frame_id,                std::string("map"));
    privNh.param("tf_map_frame",           tf_map_frame,           std::string("map"));
    privNh.param("tf_robot_frame",         tf_robot_frame,         std::string("base_footprint"));
 
@@ -63,8 +67,10 @@ PathPlan_AStar::PathPlan_AStar() :
    _pubPath = _nh.advertise<nav_msgs::Path>(pub_path,1);
 
    //inti subscriber
-   _subMap        = _nh.subscribe(sub_map, 1, &PathPlan_AStar::subCallback_map, this);
-   _subTargetPose = _nh.subscribe(sub_target, 1, &PathPlan_AStar::subCallback_target, this);
+   _subMap              = _nh.subscribe(sub_map, 1, &PathPlan_AStar::subCallback_map, this);
+   _subTargetPose       = _nh.subscribe(sub_target, 1, &PathPlan_AStar::subCallback_target, this);
+   _subObstacles        = _nh.subscribe(sub_obstacle, 1, &PathPlan_AStar::subCallback_obstacle, this);
+   _subRemoveObstacles  = _nh.subscribe(sub_remove_obstacle, 1, &PathPlan_AStar::subCallback_removeObstacle, this);
 
    //init services
    _srv_plan_paths = _nh.advertiseService(srv_plan_paths, &PathPlan_AStar::srvCallback_plan_sorted, this);
@@ -246,6 +252,17 @@ nav_msgs::Path PathPlan_AStar::toRosPath(std::vector<apps::Point2D> path,
 
 void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
 {
+   //add virtual obstacles
+   for(std::map<std::string, ohm_common::Obstacle>::iterator it = _obstacles.begin(); it != _obstacles.end(); ++it)
+   {
+      apps::Point2D p;
+      p.x = it->second.rect.x;
+      p.y = it->second.rect.y;
+      double w = it->second.rect.width;
+      double h = it->second.rect.height;
+      apps::MapOperations::drawFilledRect(planner->getGridMap(), p, w, h, 100);
+   }
+
    //inflate and binarize image
    apps::MapOperations::inflateCirc(planner->getGridMap(), 10, 127, _robot_radius);
    apps::MapOperations::binarize(planner->getGridMap(), 0, 1, FREE_VALUE, WALL_VALUE);
@@ -275,6 +292,27 @@ std::vector<apps::Point2D> PathPlan_AStar::do_path_planning(apps::Astar_dt* plan
    return path;
 }
 
+
+void PathPlan_AStar::subCallback_obstacle(const ohm_common::Obstacle& msg)
+{
+   ROS_INFO("ohm_path_plan -> insert Obstacle: %s",msg.name.data.c_str());
+   //insert or update obstacle
+   _obstacles[std::string(msg.name.data)] = msg;
+}
+
+void PathPlan_AStar::subCallback_removeObstacle(const std_msgs::String& msg)
+{
+   ROS_INFO("ohm_path_plan -> remove Obstacle: %s",msg.data.c_str());
+   try{
+      _obstacles.at(std::string(msg.data));
+      _obstacles.erase(std::string(msg.data));
+   }
+   catch (std::out_of_range& e) {
+      ROS_WARN("ohm_path_plan -> obstacle to remove does not exist");
+   }
+}
+
+
 bool PathPlan_AStar::srvCallback_plan_sorted(
       ohm_path_plan::PlanPathsRequest& req,
       ohm_path_plan::PlanPathsResponse& res)
@@ -295,8 +333,8 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
 
    _robot_pos = pose;
    apps::Point2D tmp_target;
-   tmp_target.x += 2 * _robot_radius;
-   tmp_target.y += 2 * _robot_radius;
+   tmp_target.x += 3 * _robot_radius;
+   tmp_target.y += 3 * _robot_radius;
    _target_pos = tmp_target;
    //obvious::Timer timer;
    //timer.reset();

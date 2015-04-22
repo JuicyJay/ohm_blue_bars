@@ -28,6 +28,7 @@ public:
    static void distnaceTransformCirc(GridMap* map, double offset, uint8_t wall_val);
 
    static void drawFilledCircle(GridMap* map, Point2D circ_center, double radius, uint8_t circ_value);
+   static void drawFilledRect(GridMap* map, Point2D rect_p, double rect_w, double rect_h, uint8_t rect_value);
 
 
    static inline unsigned int pixelToIdx(Pixel pix, unsigned int width)

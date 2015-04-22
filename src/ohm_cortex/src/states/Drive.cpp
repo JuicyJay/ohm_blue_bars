@@ -184,16 +184,16 @@ void Drive::process(void)
       case drive::DESTROY:
          if(_mode == drive::NO_TARGET_ORI)
          {//next inspect
-	   if (_stateAfter)
-	   {
-	     ROS_INFO("ohm_cortex: Drive -> Call state after");
-	     Context::getInstance()->setState(_stateAfter);
-	   }
-	   else
-	   {
-	     ROS_INFO("ohm_cortex: Drive -> Call LookAtTarget");
-	     Context::getInstance()->setState(new LookAtTarget(_targetOrientation));
-	   }
+            if (_stateAfter)
+            {
+               ROS_INFO("ohm_cortex: Drive -> Call state after");
+               Context::getInstance()->setState(_stateAfter);
+            }
+            else
+            {
+               ROS_INFO("ohm_cortex: Drive -> Call LookAtTarget");
+               Context::getInstance()->setState(new LookAtTarget(_targetOrientation));
+            }
          }
          else
          {//next explore
