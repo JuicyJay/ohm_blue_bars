@@ -385,6 +385,7 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
 
    }
 
+   ROS_INFO("ohm_path_plan -> Exit planning service");
    return true;
 }
 
@@ -456,7 +457,7 @@ bool PathPlan_AStar::srvCallback_plan_path(
       res.length = astar_planer->getPathLenght(path);
    }
 
-
+   ROS_INFO("ohm_path_plan -> Exit planning service");
    return true;
 }
 
