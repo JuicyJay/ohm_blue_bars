@@ -7,11 +7,16 @@
 #include <ohm_srvs/NodeControl.h>
 #include <ohm_perception/GetVictim.h>
 
+#include <Eigen/Geometry>
+
 namespace autonohm {
 
-Inspect::Inspect(void)
+float Inspect::s_inspectionTime = 4.0f;
+
+Inspect::Inspect(const geometry_msgs::Quaternion& orientation)
     : _nh(autonohm::Context::getInstance()->getNodeHandle()),
-      _foundVictim(false)
+      _foundVictim(false),
+      _orientation(orientation)
 {
     /* Debug publications. */
     ROS_INFO("New state is Inspect.");
@@ -34,7 +39,18 @@ Inspect::Inspect(void)
        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim detection node control service.");
 
 
-   /* Get the current time stamp for the live time of this state. */
+   /* Sensor head control. */
+    _srvHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/sensor_head/mode");
+    _pubDirection = _nh->advertise<geometry_msgs::QuaternionStamped>("/georg/goal/sensor_head", 2);
+
+    ohm_actors::SensorHeadMode mode;
+    mode.request.mode = ohm_actors::SensorHeadMode::Request::BIND_DIRECTION;
+
+    if (!_srvHeadMode.call(mode))
+        ROS_ERROR("Can't call change mode service of the sensor head node.");
+
+
+    /* Get the current time stamp for the live time of this state. */
    _stamp = ros::Time::now();
 }
 
@@ -46,11 +62,20 @@ Inspect::~Inspect(void)
 
    if (!_srvVictimControl.call(control))
        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim detection node control service.");
+
+
+    /* Set sensor head mode back to mode NONE. */
+    ohm_actors::SensorHeadMode mode;
+    mode.request.mode = ohm_actors::SensorHeadMode::Request::NONE;
+
+    if (!_srvHeadMode.call(mode))
+        ROS_ERROR("Can't call change mode service of the sensor head node.");
 }
 
 
 void Inspect::process(void)
 {
+    /* Victim detection. */
     ohm_perception::GetVictim service;
     service.request.id = ohm_perception::GetVictim::Request::LAST;
 
@@ -62,15 +87,41 @@ void Inspect::process(void)
         delete this;
         return;
     }
-    if ((ros::Time::now() - _stamp).toSec() > 2.0f)
+
+
+    /* Publish direction. */
+    geometry_msgs::QuaternionStamped direction;
+    Eigen::Quaternionf orientation(_orientation.w, _orientation.x, _orientation.y, _orientation.z);
+    static unsigned int seq = 0;
+
+    direction.header.stamp = ros::Time::now();
+    direction.header.seq = ++seq;
+    direction.header.frame_id = "map";
+
+    if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime * 0.5f)
     {
-        ROS_INFO("Inspect state already lives 2 seconds. Now its time to kill it.");
+        orientation *= Eigen::AngleAxisf(30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
+    }
+    else if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime)
+    {
+        orientation *= Eigen::AngleAxisf(-30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
+    }
+    else
+    {
+        ROS_INFO("Inspect state already lives %f seconds. Now its time to kill it.", s_inspectionTime);
 
         /* Set the state after and kill myself.*/
         Context::getInstance()->setState(new Explore);
         delete this;
         return;
     }
+
+    direction.quaternion.w = orientation.w();
+    direction.quaternion.x = orientation.x();
+    direction.quaternion.y = orientation.y();
+    direction.quaternion.z = orientation.z();
+
+    _pubDirection.publish(direction);
 }
 
 } /* namespace autonohm */
