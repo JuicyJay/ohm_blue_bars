@@ -65,7 +65,7 @@ void Waiting::process(void)
 
 	if (!_srvControlMap.call(service))
 	{
-	  ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can't call service georg/node_control");
+            ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can't call service georg/node_control");
 	}
 
         Context::getInstance()->setState(new Explore);
