@@ -7,6 +7,7 @@
 #include "Drive.h"
 #include "Explore.h"
 #include "LookAtTarget.h"
+#include "Inspect.h"
 
 namespace autonohm {
 
@@ -192,7 +193,8 @@ void Drive::process(void)
             else
             {
                ROS_INFO("ohm_cortex: Drive -> Call LookAtTarget");
-               Context::getInstance()->setState(new LookAtTarget(_targetOrientation));
+	       //               Context::getInstance()->setState(new LookAtTarget(_targetOrientation));
+               Context::getInstance()->setState(new Inspect(_targetOrientation));
             }
          }
          else

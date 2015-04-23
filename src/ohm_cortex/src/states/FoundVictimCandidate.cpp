@@ -78,7 +78,9 @@ void FoundVictimCandidate::process(void)
     if (stack.response.victim.checked)
     {
         /* Set the state after and kill myself.*/
-        Context::getInstance()->setState(new Inspect);
+      //        Context::getInstance()->setState(new Inspect);
+      Context::getInstance()->setState(new Explore);
+      
         delete this;
         return;
     }

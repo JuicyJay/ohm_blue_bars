@@ -84,7 +84,7 @@ add_executable(statemachine
                src/states/Manipulator.cpp
 #               src/states/FrontierExplore.cpp
                src/states/FoundVictimCandidate.cpp
-               src/states/LookAtTarget.cpp
+#               src/states/LookAtTarget.cpp
                src/GetTransformation.cpp
                )
                
@@ -130,7 +130,7 @@ add_executable(frontier_statemachine
                src/states/Manipulator.cpp
                src/states/FrontierExplore.cpp
                src/states/FoundVictimCandidate.cpp
-               src/states/LookAtTarget.cpp
+#               src/states/LookAtTarget.cpp
                src/states/TestFrontier.cpp
                src/GetTransformation.cpp
                )

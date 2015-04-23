@@ -51,10 +51,10 @@ void LookAtTarget::process(void)
     if ((ros::Time::now() - _stamp).toSec() > 1.0f)
     {
         ROS_INFO("LookAtTarget state already lives 1 seconds. Now its time to kill it.");
-
         /* Set the state after and kill myself.*/
-        Context::getInstance()->setState(new Inspect);
-        delete this;
+	//        Context::getInstance()->setState(new Inspect);
+	//        delete this;
+
         return;
     }
 

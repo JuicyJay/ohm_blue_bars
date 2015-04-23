@@ -6,6 +6,8 @@
 
 #include <ohm_srvs/NodeControl.h>
 #include <ohm_perception/GetVictim.h>
+#include <ohm_actors/SensorHeadMode.h>
+#include <geometry_msgs/QuaternionStamped.h>
 
 #include <Eigen/Geometry>
 
@@ -100,11 +102,11 @@ void Inspect::process(void)
 
     if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime * 0.5f)
     {
-        orientation *= Eigen::AngleAxisf(30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
+      orientation *= Eigen::Quaternionf(Eigen::AngleAxisf(30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY()));
     }
     else if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime)
     {
-        orientation *= Eigen::AngleAxisf(-30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
+      orientation *= Eigen::Quaternionf(Eigen::AngleAxisf(-30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY()));
     }
     else
     {
