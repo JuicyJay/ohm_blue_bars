@@ -30,11 +30,11 @@ FoundVictimCandidate::FoundVictimCandidate(const ohm_perception::Victim& goal)
     ohm_actors::SensorHeadMode mode;
     mode.request.mode = ohm_actors::SensorHeadMode::Request::LOOK_AT_POINT;
     _srvSensorHeadMode = _nh->serviceClient<ohm_actors::SensorHeadMode>("/georg/sensor_head/mode");
-    _pubGoal = _nh->advertise<geometry_msgs::Point>("/georg/goal/sensor_head", 2);
 
     if (!_srvSensorHeadMode.call(mode))
         ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the service sensor head mode.");
 
+    _pubGoal = _nh->advertise<geometry_msgs::Point>("/georg/goal/look_at_victim", 2);
 
     /* Service for to can call the victim stack node. */
     _srvVictimStack = _nh->serviceClient<ohm_perception::GetVictim>("/victim/get_victim");

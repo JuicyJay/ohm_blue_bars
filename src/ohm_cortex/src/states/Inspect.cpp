@@ -70,8 +70,8 @@ Inspect::~Inspect(void)
     ohm_actors::SensorHeadMode mode;
     mode.request.mode = ohm_actors::SensorHeadMode::Request::NONE;
 
-    if (!_srvHeadMode.call(mode))
-        ROS_ERROR("Can't call change mode service of the sensor head node.");
+    //    if (!_srvHeadMode.call(mode))
+    //        ROS_ERROR("Can't call change mode service of the sensor head node.");
 }
 
 
