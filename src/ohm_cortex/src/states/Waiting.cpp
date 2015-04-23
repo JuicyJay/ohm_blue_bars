@@ -43,7 +43,7 @@ Waiting::~Waiting(void)
 
 void Waiting::process(void)
 {
-  /*
+
     GetTransformation* listener = GetTransformation::instance();
 
     if (!listener->waitAndLookUpTransform("map", "simon/base_link", 2.0f))
@@ -57,7 +57,6 @@ void Waiting::process(void)
     ROS_INFO("Current distance of simon is %f.", distance);
     
     if (distance >= 3.0f)
-  */
     {
         ROS_INFO("Will leave state Waiting.");
 	
