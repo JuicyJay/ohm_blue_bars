@@ -94,6 +94,8 @@ void Inspect::process(void)
     /* Publish direction. */
     geometry_msgs::QuaternionStamped direction;
     Eigen::Quaternionf orientation(_orientation.w, _orientation.x, _orientation.y, _orientation.z);
+    Eigen::Vector3f euler(orientation.matrix().eulerAngles(0, 1, 2));
+    ROS_INFO("got orientation: (%f, %f, %f)", euler.x(), euler.y(), euler.z());
     static unsigned int seq = 0;
 
     direction.header.stamp = ros::Time::now();
@@ -102,11 +104,11 @@ void Inspect::process(void)
 
     if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime * 0.5f)
     {
-      orientation *= Eigen::Quaternionf(Eigen::AngleAxisf(30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY()));
+        orientation *= Eigen::Quaternionf(Eigen::AngleAxisf(30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY()));
     }
     else if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime)
     {
-      orientation *= Eigen::Quaternionf(Eigen::AngleAxisf(-30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY()));
+        orientation *= Eigen::Quaternionf(Eigen::AngleAxisf(-30.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY()));
     }
     else
     {
@@ -122,6 +124,9 @@ void Inspect::process(void)
     direction.quaternion.x = orientation.x();
     direction.quaternion.y = orientation.y();
     direction.quaternion.z = orientation.z();
+
+    euler = orientation.matrix().eulerAngles(0, 1, 2);
+    ROS_INFO("new orientation: (%f, %f, %f)", euler.x(), euler.y(), euler.z());
 
     _pubDirection.publish(direction);
 }

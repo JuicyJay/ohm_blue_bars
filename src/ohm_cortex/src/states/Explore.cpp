@@ -12,7 +12,6 @@
 #include <ohm_autonomy/MarkTarget.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <std_srvs/Empty.h>
-#include <ohm_sensor_head/Mode.h>
 
 #include <Eigen/Geometry>
 
