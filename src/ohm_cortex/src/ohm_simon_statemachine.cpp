@@ -13,7 +13,7 @@
 #include "Context.h"
 #include "states/Teleoperated.h"
 
-#include "GetTransformation.h"
+//#include "GetTransformation.h"
 
 ros::ServiceServer    _state_srv;
 autonohm::Context*    context;
@@ -31,7 +31,7 @@ int main(int argc, char** argv)
    context->setState(new autonohm::Teleoperated);
 
    // Init the tf listener.
-   GetTransformation::instance();
+  // GetTransformation::instance();
 
    ros::Rate r(10.0);
 
