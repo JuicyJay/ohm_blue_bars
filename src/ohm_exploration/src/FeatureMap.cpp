@@ -208,7 +208,7 @@ void FeatureMap::markWalls(const std::vector<Wall>& walls)
 {
     for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
     {
-        const float thickness = 0.2f / wall->resolution();
+        const float thickness = 0.5f / wall->resolution();
         Eigen::Vector2f start(wall->center() - wall->model().r() * wall->length() * 0.5f);
 
         for (Ray x(start - wall->model().n() * thickness, wall->model().r(), wall->length()); x.next();)

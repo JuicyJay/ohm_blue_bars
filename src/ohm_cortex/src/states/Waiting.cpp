@@ -43,7 +43,6 @@ Waiting::~Waiting(void)
 
 void Waiting::process(void)
 {
-
     GetTransformation* listener = GetTransformation::instance();
 
     if (!listener->waitAndLookUpTransform("map", "simon/base_link", 2.0f))

@@ -79,7 +79,7 @@ Inspect::~Inspect(void)
     mode.request.mode = ohm_actors::SensorHeadMode::Request::NONE;
 
     //    if (!_srvHeadMode.call(mode))
-    //        ROS_ERROR("Can't call change mode service of the sensor head node.");
+    //      ROS_ERROR("Can't call change mode service of the sensor head node.");
 }
 
 
@@ -113,7 +113,7 @@ void Inspect::process(void)
     if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime * 0.5f)
     {
         orientation = Eigen::AngleAxisf(euler.z(), Eigen::Vector3f::UnitZ()) *
-            Eigen::AngleAxisf(-20.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
+            Eigen::AngleAxisf(0.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
     }
     else if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime)
     {

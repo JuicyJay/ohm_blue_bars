@@ -239,7 +239,7 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    _grid = new PartitionGrid(service.response.map, 1.2f);
+    _grid = new PartitionGrid(service.response.map, 0.87f);
 
 
     ::sleep(5);

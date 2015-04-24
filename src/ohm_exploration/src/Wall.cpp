@@ -31,6 +31,7 @@ Wall::Wall(const PointVector& points)
 
     for (PointVector::const_iterator point(_points.begin()); pointEnd < _points.end(); ++point, ++pointEnd)
     {
+      // Hack!!!
         if ((*point - *pointEnd).cast<float>().norm() > 5.0f)
             break;
     }
@@ -39,7 +40,7 @@ Wall::Wall(const PointVector& points)
         _points.resize(pointEnd - _points.begin());
 
 //    std::cout << "points = " << _points.size() << std::endl;
-    _valid = _points.size() >= 30;
+    _valid = _points.size() >= 15;
 
     if (!_valid)
         return;
