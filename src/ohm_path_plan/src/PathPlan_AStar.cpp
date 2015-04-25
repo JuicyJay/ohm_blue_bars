@@ -16,7 +16,9 @@ PathPlan_AStar::PathPlan_AStar() :
    std::string sub_map;
    std::string sub_target;
    std::string sub_obstacle;
+   std::string sub_anti_obstacle;
    std::string sub_remove_obstacle;
+   std::string sub_remove_anti_obstacle;
    std::string pub_path;
    std::string frame_id;
    std::string tf_map_frame;
@@ -32,16 +34,18 @@ PathPlan_AStar::PathPlan_AStar() :
    double costmap_weight ;
    //int int_val;
 
-   privNh.param("sub_map",               sub_map,                 std::string("map"));
-   privNh.param("sub_target",            sub_target,              std::string("/move_base_simple/goal"));
-   privNh.param("sub_obstacle",          sub_obstacle,            std::string("path_plan/add_obstacle"));
-   privNh.param("sub_remove_obstacle",   sub_remove_obstacle,     std::string("path_plan/remove_obstacle"));
-   privNh.param("pub_path",              pub_path,                std::string("path"));
-   privNh.param("srv_plan_paths",        srv_plan_paths,          std::string("path_plan/srv_plan_paths"));
-   privNh.param("srv_plan_path",         srv_plan_path,           std::string("path_plan/srv_plan_path"));
-   privNh.param("frame_id",              frame_id,                std::string("map"));
-   privNh.param("tf_map_frame",           tf_map_frame,           std::string("map"));
-   privNh.param("tf_robot_frame",         tf_robot_frame,         std::string("base_footprint"));
+   privNh.param("sub_map",                   sub_map,                      std::string("map"));
+   privNh.param("sub_target",                sub_target,                   std::string("/move_base_simple/goal"));
+   privNh.param("sub_obstacle",              sub_obstacle,                 std::string("path_plan/add_obstacle"));
+   privNh.param("sub_anti_obstacle",         sub_anti_obstacle,            std::string("path_plan/add_anti_obstacle"));
+   privNh.param("sub_remove_obstacle",       sub_remove_obstacle,          std::string("path_plan/remove_obstacle"));
+   privNh.param("sub_remove_anti_obstacle",  sub_remove_anti_obstacle,     std::string("path_plan/remove_anti_obstacle"));
+   privNh.param("pub_path",                  pub_path,                     std::string("path"));
+   privNh.param("srv_plan_paths",            srv_plan_paths,               std::string("path_plan/srv_plan_paths"));
+   privNh.param("srv_plan_path",             srv_plan_path,                std::string("path_plan/srv_plan_path"));
+   privNh.param("frame_id",                  frame_id,                     std::string("map"));
+   privNh.param("tf_map_frame",              tf_map_frame,                 std::string("map"));
+   privNh.param("tf_robot_frame",            tf_robot_frame,               std::string("base_footprint"));
 
    privNh.param<double>("robot_radius",     robot_radius   ,   0.35);
    privNh.param<double>("dt_radius",        dt_radius,         0.6);
@@ -69,8 +73,10 @@ PathPlan_AStar::PathPlan_AStar() :
    //inti subscriber
    _subMap              = _nh.subscribe(sub_map, 1, &PathPlan_AStar::subCallback_map, this);
    _subTargetPose       = _nh.subscribe(sub_target, 1, &PathPlan_AStar::subCallback_target, this);
-   _subObstacles        = _nh.subscribe(sub_obstacle, 1, &PathPlan_AStar::subCallback_obstacle, this);
-   _subRemoveObstacles  = _nh.subscribe(sub_remove_obstacle, 1, &PathPlan_AStar::subCallback_removeObstacle, this);
+   _subObstacles        = _nh.subscribe(sub_obstacle, 10, &PathPlan_AStar::subCallback_obstacle, this);
+   _subAntiObstacles    = _nh.subscribe(sub_anti_obstacle, 10, &PathPlan_AStar::subCallback_anti_obstacle, this);
+   _subRemoveObstacles  = _nh.subscribe(sub_remove_obstacle, 10, &PathPlan_AStar::subCallback_removeObstacle, this);
+   _subRemoveAntiObstacles = _nh.subscribe(sub_remove_anti_obstacle, 10, &PathPlan_AStar::subCallback_remove_anti_obstacle, this);
 
    //init services
    _srv_plan_paths = _nh.advertiseService(srv_plan_paths, &PathPlan_AStar::srvCallback_plan_sorted, this);
@@ -263,9 +269,22 @@ void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
       apps::MapOperations::drawFilledRect(planner->getGridMap(), p, w, h, 100);
    }
 
+
    //inflate and binarize image
    apps::MapOperations::inflateCirc(planner->getGridMap(), 10, 127, _robot_radius);
    apps::MapOperations::binarize(planner->getGridMap(), 0, 1, FREE_VALUE, WALL_VALUE);
+
+   //add virtual obstacles//Free stuff
+   for(std::map<std::string, ohm_common::Obstacle>::iterator it = _anti_obstacles.begin(); it != _anti_obstacles.end(); ++it)
+   {
+      apps::Point2D p;
+      p.x = it->second.rect.x;
+      p.y = it->second.rect.y;
+      double w = it->second.rect.width;
+      double h = it->second.rect.height;
+      apps::MapOperations::drawFilledRect(planner->getGridMap(), p, w, h, FREE_VALUE);
+   }
+
 
    //clear robot position to free_value //todo not useful ... robot can step wise move in to wall
    //just do if target pose is outside of the robot radius
@@ -316,6 +335,25 @@ void PathPlan_AStar::subCallback_removeObstacle(const std_msgs::String& msg)
    }
 }
 
+
+void PathPlan_AStar::subCallback_anti_obstacle(const ohm_common::Obstacle& msg)
+{
+   ROS_INFO("ohm_path_plan -> insert AntiObstacle: %s",msg.name.data.c_str());
+   //insert
+   _anti_obstacles[std::string(msg.name.data)] = msg;
+}
+
+void PathPlan_AStar::subCallback_remove_anti_obstacle(const std_msgs::String& msg)
+{
+   ROS_INFO("ohm_path_plan -> remove AntiObstacle: %s",msg.data.c_str());
+   try{
+      _anti_obstacles.at(std::string(msg.data));
+      _anti_obstacles.erase(std::string(msg.data));
+   }
+   catch (std::out_of_range& e) {
+      ROS_WARN("ohm_path_plan -> anti_obstacle to remove does not exist");
+   }
+}
 
 bool PathPlan_AStar::srvCallback_plan_sorted(
       ohm_path_plan::PlanPathsRequest& req,

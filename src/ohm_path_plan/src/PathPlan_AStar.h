@@ -38,7 +38,9 @@ private:    //dataelements
     ros::Subscriber _subMap;
     ros::Subscriber _subTargetPose;
     ros::Subscriber _subObstacles;
+    ros::Subscriber _subAntiObstacles;
     ros::Subscriber _subRemoveObstacles;
+    ros::Subscriber _subRemoveAntiObstacles;
 
 
     ros::ServiceServer _srv_plan_paths;
@@ -71,6 +73,7 @@ private:    //dataelements
     apps::Point2D _target_pos;
 
     std::map<std::string, ohm_common::Obstacle> _obstacles;
+    std::map<std::string, ohm_common::Obstacle> _anti_obstacles;
 
 public:
     PathPlan_AStar();
@@ -115,6 +118,8 @@ private:    //functions
     void subCallback_target(const geometry_msgs::PoseStamped& msg);
     void subCallback_obstacle(const ohm_common::Obstacle& msg);
     void subCallback_removeObstacle(const std_msgs::String& msg);
+    void subCallback_anti_obstacle(const ohm_common::Obstacle& msg);
+    void subCallback_remove_anti_obstacle(const std_msgs::String& msg);
 
 
     bool srvCallback_plan_sorted(ohm_path_plan::PlanPathsRequest& req,
