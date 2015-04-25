@@ -8,6 +8,7 @@
 
 int Partition::s_id = 0;
 float Partition::s_maxDistanceFromOrigin = 20.0f;
+float Partition::s_minDistanceFromOrigin = 3.0f;
 
 Partition::Partition(void)
     : _initialized(false),
@@ -73,7 +74,9 @@ Target* Partition::target(void)
 
     for (unsigned int i = 0; i < _targets.size(); ++i)
     {
-        if (!_targets[i]->inspected() && _targets[i]->distanceFromOrigin() < s_maxDistanceFromOrigin)
+      ROS_INFO("distance from orign %f", _targets[i]->distanceFromOrigin());
+      if (!_targets[i]->inspected() && _targets[i]->distanceFromOrigin() < s_maxDistanceFromOrigin
+	  && _targets[i]->distanceFromOrigin() > s_minDistanceFromOrigin)
         {
             if (min < 0) min = i;
             if (_targets[i]->distance() < _targets[min]->distance()) min = i;
@@ -102,8 +105,11 @@ int Partition::numValidTargets(void) const
 
     for (std::vector<Target*>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
-        if (!(**target).inspected() && (**target).distanceFromOrigin() < s_maxDistanceFromOrigin)
-            ++num;
+        if (!(**target).inspected() && (**target).distanceFromOrigin() < s_maxDistanceFromOrigin
+	    && (**target).distanceFromOrigin() > s_minDistanceFromOrigin)
+      {
+	++num;
+      }
     }
 
     return num;

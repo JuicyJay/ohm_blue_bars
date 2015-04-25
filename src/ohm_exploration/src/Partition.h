@@ -57,6 +57,7 @@ private:
 
     static int s_id;
     static float s_maxDistanceFromOrigin;
+    static float s_minDistanceFromOrigin;
 };
 
 #endif

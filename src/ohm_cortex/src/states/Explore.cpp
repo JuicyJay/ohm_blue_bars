@@ -7,6 +7,7 @@
  */
 
 #include "Explore.h"
+#include "FrontierExplore.h"
 
 #include <ohm_autonomy/GetTarget.h>
 #include <ohm_autonomy/MarkTarget.h>
@@ -57,31 +58,9 @@ void Explore::process(void)
     if (!stack->getTarget(pose, id))
     {
         ROS_INFO("No targets available.");
-        std_srvs::Empty service;
-        return;
-	/*
-        if (!_srvTrigger.call(service))
-        {
-            ROS_ERROR("Can't trigger the wall-finder-node. Will kill myself.");
-            Context::getInstance()->setState(new Init);
-	    ::exit(1); // HACK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            delete this;
-            return;
-        }
-
-	if (!_srvNextSection.call(service))
-	  {
-	    ROS_ERROR("Can't trigger mission planner.");
-            Context::getInstance()->setState(new Init);
-            delete this;
-            return;
-	  }
-
-        ROS_INFO("The wall-finder-node is be triggered. Will recall meself now.");
-        Context::getInstance()->setState(new Explore);
+        Context::getInstance()->setState(new FrontierExplore(1));
         delete this;
         return;
-	*/
     }
 
 
