@@ -9,7 +9,11 @@ find_package(catkin REQUIRED COMPONENTS
   ohm_common
   std_msgs
   tf
+  roscpp
 )
+
+find_package(cmake_modules REQUIRED)
+find_package(Eigen REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -96,6 +100,7 @@ catkin_package(
 # include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
@@ -104,16 +109,19 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-# add_executable(ohm_diarrhea_node src/ohm_diarrhea_node.cpp)
+add_executable(diarrhea-node
+               src/diarrhea-node.cpp
+               src/GetTransformation.cpp
+               )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 # add_dependencies(ohm_diarrhea_node ohm_diarrhea_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(ohm_diarrhea_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(diarrhea-node
+   ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
