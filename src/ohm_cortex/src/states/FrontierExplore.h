@@ -13,6 +13,7 @@
 
 #include <geometry_msgs/PoseArray.h>
 #include <nav_msgs/Path.h>
+#include <nav_msgs/OccupancyGrid.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/String.h>
 #include <ohm_path_plan/PlanPath.h>
@@ -193,6 +194,7 @@ private:
       _state = msg.data;
    }
 
+
 private:
    static FrontierExploreModel* _instance;
    //ros
@@ -247,12 +249,18 @@ public:
 private:
    nav_msgs::Path getBestTargetPath();
    void setAfterState();
+   void subCallback_map(const nav_msgs::OccupancyGrid& msg);
+   bool pubPath(nav_msgs::Path path);
+   void callArrived();
+
 
 private:
    IState* _afterState;
 
    ros::NodeHandle* _nh;
    ros::Publisher _state_pub;
+   ros::Subscriber _sub_map;     ///< For trigger planning
+
 
    autonohm::FrontierExploreModel* _model;
 
@@ -260,6 +268,10 @@ private:
    int _cntrFrontiers;
 
    bool _oldArivalState;
+   bool _moving;
+
+   geometry_msgs::PoseStamped _targetPose;
+
    //bool _triggerd;
 
    frontier::enum_state _state;

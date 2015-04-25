@@ -31,6 +31,8 @@ FrontierExplore::FrontierExplore(int numFrontiers, IState* afterState) :
    _afterState = afterState;
 
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
+   _sub_map   = _nh->subscribe("georg/map", 1, &FrontierExplore::subCallback_map, this);
+
 
    std_msgs::String msg;
    msg.data = "exploreFrontier";
@@ -43,6 +45,7 @@ FrontierExplore::FrontierExplore(int numFrontiers, IState* afterState) :
 
    _state = frontier::TRIGGER_FRONTIERS;
    _oldArivalState = false;
+   _moving = false;
    //_triggerd = false;
 }
 
@@ -85,6 +88,7 @@ void FrontierExplore::process(void)
             ROS_INFO("FrontierState -> Pub path");
             path_.header.frame_id = "map";
             _model->pubTargetPath(path_);
+            _moving = true;
             _state = frontier::WAIT_ARIVAL;
          }
 
@@ -94,19 +98,8 @@ void FrontierExplore::process(void)
          //ROS_INFO("FrontierState -> Wait for arival");
          if(!_oldArivalState && _model->getArivalState())
          {//arrived
-            if(_numFrontiers < 0)
-            {//endless mode... untill no frontiers availible
-               _state = frontier::TRIGGER_FRONTIERS;
-            }
-            else if(_cntrFrontiers >= (_numFrontiers - 1))
-            {//end state
-               this->setAfterState();
-            }
-            else
-            {
-               _cntrFrontiers++;
-               _state = frontier::TRIGGER_FRONTIERS;
-            }
+            this->callArrived();
+
          }
          _oldArivalState = _model->getArivalState();
 
@@ -142,6 +135,7 @@ nav_msgs::Path FrontierExplore::getBestTargetPath()
                path_trunc.poses.push_back(path.poses[k]);
             }
             path_trunc.poses.back().pose.orientation = frontiers.poses[i].orientation;
+            _targetPose = targetPose;
             return path_trunc;
          }
          else
@@ -150,6 +144,7 @@ nav_msgs::Path FrontierExplore::getBestTargetPath()
             tmp_path.poses.push_back(path.poses[0]);
             //set orientation
             tmp_path.poses[0].pose.orientation = frontiers.poses[i].orientation;
+            _targetPose = targetPose;
             return tmp_path;
          }
 
@@ -171,6 +166,83 @@ void FrontierExplore::setAfterState()
    {
       Context::getInstance()->setState(new Explore);
       delete this;
+   }
+}
+
+void FrontierExplore::subCallback_map(const nav_msgs::OccupancyGrid& msg)
+{
+   if(_moving)
+   {//plan new path
+
+      if(!this->pubPath(_model->requestPath(_targetPose)))
+      {//aboard moving to target... set arrived.
+         //stop
+         nav_msgs::Path empty_path;
+         empty_path.header.frame_id = "map";
+         empty_path.poses.clear();
+         _model->pubTargetPath(empty_path);
+
+         this->callArrived();
+      }
+   }
+}
+
+bool FrontierExplore::pubPath(nav_msgs::Path path)
+{
+   if(!path.poses.size())
+   {//empty path
+      path.header.frame_id = "map";
+      _model->pubTargetPath(path);
+      return false;
+   }
+
+   geometry_msgs::PoseStamped target;
+   //truncate path
+   unsigned int num_cut = (TRANCATE_LENGTH / MAP_CELL_SIZE) + 0.555;
+
+   if(path.poses.size() > num_cut)
+   {
+      nav_msgs::Path path_trunc;
+
+      for(unsigned int k = 0; k < path.poses.size() - num_cut; ++k)
+      {
+         path_trunc.poses.push_back(path.poses[k]);
+      }
+      path_trunc.poses.back().pose.orientation = target.pose.orientation;
+      //_targetPose = targetPose;
+      path_trunc.header.frame_id = "map";
+      _model->pubTargetPath(path_trunc);
+      return true;
+   }
+   else
+   {//to short path... just rotate to target pose
+      nav_msgs::Path tmp_path;
+      tmp_path.poses.push_back(path.poses[0]);
+      //set orientation
+      tmp_path.poses[0].pose.orientation = target.pose.orientation;
+      //_targetPose = targetPose;
+      tmp_path.header.frame_id = "map";
+      _model->pubTargetPath(tmp_path);
+      return true;
+   }
+}
+
+
+void FrontierExplore::callArrived()
+{
+   _moving = false;
+   if(_numFrontiers < 0)
+   {//endless mode... untill no frontiers availible
+      _state = frontier::TRIGGER_FRONTIERS;
+   }
+   else if(_cntrFrontiers >= (_numFrontiers - 1))
+   {//end state
+      this->setAfterState();
+   }
+   else
+   {
+      _cntrFrontiers++;
+      _state = frontier::TRIGGER_FRONTIERS;
    }
 }
 
