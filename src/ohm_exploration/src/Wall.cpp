@@ -53,7 +53,7 @@ Wall::Wall(const PointVector& points)
 //    std::cout << "valid  = " << _valid << std::endl;
 
     _length = (_points.back() - _points.front()).cast<float>().norm();
-    _valid &= _length >= 30;
+    _valid &= _length >= 20.0f;
 //    for (unsigned int i = 0; i < _points.size(); ++i)
 //    {
 //        std::cout << "(" << _points[i].x() << ", " << _points[i].y() << ")" << std::endl;

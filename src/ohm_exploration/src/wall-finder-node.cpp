@@ -48,8 +48,17 @@ bool search(void)
 	_resolution = service.response.map.info.resolution;
 	_originMapX = service.response.map.info.origin.position.x;
 	_originMapY = service.response.map.info.origin.position.y;
+
+	const float height = service.response.map.info.height * _resolution;
+	const float width = 8.0f;
+
+	_roi.setX((-width * 0.5f - _originMapX) / _resolution);
+	_roi.setY(0);
+	_roi.setWidth(width / _resolution);
+	_roi.setHeight(height / _resolution);
     }
 
+    ROS_INFO("roi = (%d, %d, %d, %d)", _roi.x(), _roi.y(), _roi.width(), _roi.height());
 
     /* Update the map in wallFinder and then looking for walls. */
     std::vector<Wall> walls;
