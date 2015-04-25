@@ -31,7 +31,7 @@ FrontierExplore::FrontierExplore(int numFrontiers, IState* afterState) :
    _afterState = afterState;
 
    _state_pub = _nh->advertise<std_msgs::String>("state", 1);
-   _sub_map   = _nh->subscribe("georg/map", 1, &FrontierExplore::subCallback_map, this);
+   _sub_map   = _nh->subscribe("/georg/map", 1, &FrontierExplore::subCallback_map, this);
 
 
    std_msgs::String msg;
@@ -171,12 +171,14 @@ void FrontierExplore::setAfterState()
 
 void FrontierExplore::subCallback_map(const nav_msgs::OccupancyGrid& msg)
 {
+   ROS_INFO("frontier -> Got Map");
    if(_moving)
    {//plan new path
-
+      ROS_INFO("frontier -> plan path");
       if(!this->pubPath(_model->requestPath(_targetPose)))
       {//aboard moving to target... set arrived.
          //stop
+         ROS_INFO("frontier -> STOP");
          nav_msgs::Path empty_path;
          empty_path.header.frame_id = "map";
          empty_path.poses.clear();
