@@ -34,10 +34,10 @@ int main(int argc, char** argv)
             lastPosition = gt.position();
 
             mrHanky.name.data   = ss.str();
-            mrHanky.rect.x      = lastPosition.x() - radius * 0.5f;
-            mrHanky.rect.y      = lastPosition.y() - radius * 0.5f;
-            mrHanky.rect.width  = radius;
-            mrHanky.rect.height = radius;
+            mrHanky.rect.x      = lastPosition.x() - radius;
+            mrHanky.rect.y      = lastPosition.y() - radius;
+            mrHanky.rect.width  = radius * 2.0f;
+            mrHanky.rect.height = radius * 2.0f;
 
             pubMrHanky.publish(mrHanky);
         }
