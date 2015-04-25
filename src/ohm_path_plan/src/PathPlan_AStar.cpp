@@ -73,10 +73,10 @@ PathPlan_AStar::PathPlan_AStar() :
    //inti subscriber
    _subMap              = _nh.subscribe(sub_map, 1, &PathPlan_AStar::subCallback_map, this);
    _subTargetPose       = _nh.subscribe(sub_target, 1, &PathPlan_AStar::subCallback_target, this);
-   _subObstacles        = _nh.subscribe(sub_obstacle, 1, &PathPlan_AStar::subCallback_obstacle, this);
-   _subAntiObstacles    = _nh.subscribe(sub_anti_obstacle, 1, &PathPlan_AStar::subCallback_anti_obstacle, this);
-   _subRemoveObstacles  = _nh.subscribe(sub_remove_obstacle, 1, &PathPlan_AStar::subCallback_removeObstacle, this);
-   _subRemoveAntiObstacles = _nh.subscribe(sub_remove_anti_obstacle, 1, &PathPlan_AStar::subCallback_remove_anti_obstacle, this);
+   _subObstacles        = _nh.subscribe(sub_obstacle, 10, &PathPlan_AStar::subCallback_obstacle, this);
+   _subAntiObstacles    = _nh.subscribe(sub_anti_obstacle, 10, &PathPlan_AStar::subCallback_anti_obstacle, this);
+   _subRemoveObstacles  = _nh.subscribe(sub_remove_obstacle, 10, &PathPlan_AStar::subCallback_removeObstacle, this);
+   _subRemoveAntiObstacles = _nh.subscribe(sub_remove_anti_obstacle, 10, &PathPlan_AStar::subCallback_remove_anti_obstacle, this);
 
    //init services
    _srv_plan_paths = _nh.advertiseService(srv_plan_paths, &PathPlan_AStar::srvCallback_plan_sorted, this);
