@@ -2,7 +2,7 @@
 
 namespace {
 const float POSE_POSE_DISTANCE  = 0.4f;
-const float POSE_ROBOT_DISTANCE = 0.6f;
+const float POSE_ROBOT_DISTANCE = 0.7f;
 }
 
 void TargetFactory::create(const std::vector<Wall>& walls)

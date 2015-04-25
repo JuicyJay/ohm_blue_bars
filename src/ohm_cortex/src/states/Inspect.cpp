@@ -36,9 +36,14 @@ Inspect::Inspect(const geometry_msgs::Quaternion& orientation)
    control.request.action = ohm_srvs::NodeControl::Request::START;
    _srvVictimControl = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/victim_detection/control");
    _srvVictimStack = _nh->serviceClient<ohm_perception::GetVictim>("/victim/get_victim");
+   _srvVictimToWorldControl = _nh->serviceClient<ohm_srvs::NodeControl>("/georg/victim_to_world/control");
 
    if (!_srvVictimControl.call(control))
        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim detection node control service.");
+
+
+   if (!_srvVictimToWorldControl.call(control))
+       ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim to world node control service.");
 
 
    /* Sensor head control. */
@@ -65,13 +70,16 @@ Inspect::~Inspect(void)
    if (!_srvVictimControl.call(control))
        ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim detection node control service.");
 
+   if (!_srvVictimToWorldControl.call(control))
+       ROS_ERROR_STREAM(__PRETTY_FUNCTION__ << ": can not call the victim to world node control service.");
 
+   
     /* Set sensor head mode back to mode NONE. */
     ohm_actors::SensorHeadMode mode;
     mode.request.mode = ohm_actors::SensorHeadMode::Request::NONE;
 
     //    if (!_srvHeadMode.call(mode))
-    //        ROS_ERROR("Can't call change mode service of the sensor head node.");
+    //      ROS_ERROR("Can't call change mode service of the sensor head node.");
 }
 
 
@@ -105,7 +113,7 @@ void Inspect::process(void)
     if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime * 0.5f)
     {
         orientation = Eigen::AngleAxisf(euler.z(), Eigen::Vector3f::UnitZ()) *
-            Eigen::AngleAxisf(-20.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
+            Eigen::AngleAxisf(0.0f * M_PI / 180.0f, Eigen::Vector3f::UnitY());
     }
     else if ((ros::Time::now() - _stamp).toSec() < s_inspectionTime)
     {

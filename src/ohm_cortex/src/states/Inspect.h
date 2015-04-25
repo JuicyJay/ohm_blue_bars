@@ -39,6 +39,7 @@ private:
     ros::ServiceClient _srvVictimStack;
     ros::ServiceClient _srvVictimControl;
     ros::ServiceClient _srvHeadMode;
+    ros::ServiceClient _srvVictimToWorldControl;
 
     ros::Time _stamp;
     bool _foundVictim;
