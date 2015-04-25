@@ -9,6 +9,9 @@
 
 #include "../PathFind_base/PathFind_base.h"
 
+//hack
+#include <ros/ros.h>
+
 namespace{
 
 }
@@ -66,8 +69,27 @@ std::vector<Pixel> Astar_dt::computePath(Pixel start, Pixel end)
 
    bool astar_rdy = false;
 
+   //hack begin
+   ros::Time time_start = ros::Time::now();
+   ros::Duration max_time(0.75);
+   unsigned int cnt = 0;
+   //hack end
+
    while(!astar_rdy)
    {
+      //hack begin
+      if((cnt++) % 30)
+      {
+         if((ros::Time::now() - time_start) > max_time)
+         {
+            //time out reached....
+            //return empty path
+            ROS_INFO("ohm_path_plan -> Timeout at planning... no path found");
+            return std::vector<Pixel>(0);
+         }
+      }
+      //hack end
+
       //prove target reached
       if(currNode->pixel.x == _en.x && currNode->pixel.y == _en.y)
       {//astar rdy
