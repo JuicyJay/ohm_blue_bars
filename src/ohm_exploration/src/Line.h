@@ -23,7 +23,7 @@ public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     Line(const Eigen::Vector2f& start, const Eigen::Vector2f& end)
-        : _m((end.x() - start.x()) / (end.y() - start.y())),
+        : _m((end.y() - start.y()) / (end.x() - start.x())),
           _t(start.y() - _m * start.x()),
           _r((end - start).normalized()),
           _n(_r.y(), -_r.x()),
