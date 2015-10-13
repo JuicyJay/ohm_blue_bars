@@ -8,7 +8,7 @@
 
 int Partition::s_id = 0;
 float Partition::s_maxDistanceFromOrigin = 20.0f;
-float Partition::s_minDistanceFromOrigin = 3.0f;
+float Partition::s_minDistanceFromOrigin = 4.5f;
 
 Partition::Partition(void)
     : _initialized(false),

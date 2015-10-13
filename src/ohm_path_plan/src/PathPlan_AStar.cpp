@@ -318,7 +318,7 @@ std::vector<apps::Point2D> PathPlan_AStar::do_path_planning(apps::Astar_dt* plan
 
 void PathPlan_AStar::subCallback_obstacle(const ohm_common::Obstacle& msg)
 {
-   ROS_INFO("ohm_path_plan -> insert Obstacle: %s",msg.name.data.c_str());
+   ROS_INFO("ohm_path_plan -> insert Obstacle: %s, %f, %f, %f, %f",msg.name.data.c_str(), msg.rect.x, msg.rect.y, msg.rect.width, msg.rect.height);
    //insert or update obstacle
    _obstacles[std::string(msg.name.data)] = msg;
 }

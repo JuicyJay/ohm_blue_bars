@@ -96,6 +96,8 @@ void handleEvents()
       if(msg.event == msg.FLIP_OVER)
       {
          ROS_INFO("ohm_cortex -> EVENT -> FLIP_OVER");
+	 delete autonohm::Context::getInstance()->getState();
+	 autonohm::Context::getInstance()->setState(new autonohm::Explore);
       }
       else if(msg.event == msg.MOVING_ABORTED)
       {

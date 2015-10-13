@@ -8,7 +8,7 @@
 
 const float minDistance = 0.1f;
 const float radius = 0.15f;
-const float stopDistance = 10.0f;
+const float stopDistance = 6.0f;
 
 int main(int argc, char** argv)
 {
