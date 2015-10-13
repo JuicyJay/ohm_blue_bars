@@ -96,8 +96,10 @@ void FrontierExplore::process(void)
       }
       case frontier::WAIT_ARIVAL:
          //ROS_INFO("FrontierState -> Wait for arival");
+
          if(!_oldArivalState && _model->getArivalState())
          {//arrived
+            ROS_INFO("Frontier -> in process arrived ----------------------------------------------------------------");
             this->callArrived();
 
          }
@@ -232,6 +234,7 @@ bool FrontierExplore::pubPath(nav_msgs::Path path)
 
 void FrontierExplore::callArrived()
 {
+   ROS_INFO("Fronteir -> Arrived _----------------------");
    _moving = false;
    if(_numFrontiers < 0)
    {//endless mode... untill no frontiers availible
