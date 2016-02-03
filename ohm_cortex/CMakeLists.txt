@@ -50,14 +50,14 @@ QT4_WRAP_CPP(QT_MOC_HPP ${QT_HEADERS}
 QT4_WRAP_UI( QT_FORMS_HPP ${QT_FORMS}
                 )
 
-add_service_files(
-    FILES
-    Force.srv
-)
+# add_service_files(
+#     FILES
+#     Force.srv
+# )
 
 
 
-generate_messages()
+# generate_messages()
 
 catkin_package()
 

@@ -56,30 +56,30 @@ find_package(OpenCV REQUIRED)
 #   Message2.msg
 # )
 
-## Generate services in the 'srv' folder
-add_service_files(
-   FILES
-   PlanPaths.srv
-   PlanPath.srv
-#   Service2.srv
-)
-
-## Generate actions in the 'action' folder
-add_action_files(
-  DIRECTORY
-  action
-  FILES
-  MoveTo.action
-)
-
-## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  actionlib_msgs
-  nav_msgs
-  geometry_msgs#   nav_msgs#
-  std_msgs
-)
+# ## Generate services in the 'srv' folder
+# add_service_files(
+#    FILES
+#    PlanPaths.srv
+#    PlanPath.srv
+# #   Service2.srv
+# )
+#
+# ## Generate actions in the 'action' folder
+# add_action_files(
+#   DIRECTORY
+#   action
+#   FILES
+#   MoveTo.action
+# )
+#
+# ## Generate added messages and services with any dependencies listed here
+# generate_messages(
+#   DEPENDENCIES
+#   actionlib_msgs
+#   nav_msgs
+#   geometry_msgs#   nav_msgs#
+#   std_msgs
+# )
 
 ###################################
 ## catkin specific configuration ##
@@ -138,12 +138,12 @@ add_executable(ohm_path_plan_astar_node ${source_astar})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(ohm_path_plan_node #ohm_path_plan_generate_messages_cpp)
-                 ${ohm_path_plan_EXPORTED_TARGETS})
-add_dependencies(ohm_semiautonom_node #ohm_path_plan_generate_messages_cpp)
-                 ${ohm_path_plan_EXPORTED_TARGETS})
-add_dependencies(ohm_path_plan_astar_node
-                 ${ohm_path_plan_EXPORTED_TARGETS})
+# add_dependencies(ohm_path_plan_node #ohm_path_plan_generate_messages_cpp)
+#                  ${ohm_path_plan_EXPORTED_TARGETS})
+# add_dependencies(ohm_semiautonom_node #ohm_path_plan_generate_messages_cpp)
+#                  ${ohm_path_plan_EXPORTED_TARGETS})
+# add_dependencies(ohm_path_plan_astar_node
+#                  ${ohm_path_plan_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ohm_path_plan_node

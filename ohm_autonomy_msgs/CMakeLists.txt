@@ -7,6 +7,7 @@ project(ohm_autonomy_msgs)
 find_package(catkin REQUIRED COMPONENTS
   message_generation
   geometry_msgs
+  nav_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -43,17 +44,24 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-file(GLOB msg_files "msg/*.msg")
+#file(GLOB msg_files "msg/*.msg")
 add_message_files(
    FILES
-   ${msg_files}
+   MoveRobot.msg
+   PathControlInfo.msg
+   Wall.msg
+   WallArray.msg
    )
 
 ## Generate services in the 'srv' folder
-file(GLOB srv_files "srv/*.srv")
+#file(GLOB srv_files "srv/*.srv")
 add_service_files(
    FILES
-   ${srv_files}
+   Force.srv
+   GetTarget.srv
+   MarkTarget.srv
+   PlanPath.srv
+   PlanPaths.srv
    )
 
 ## Generate actions in the 'action' folder
@@ -68,6 +76,7 @@ generate_messages(
    DEPENDENCIES
    geometry_msgs
    std_msgs
+   nav_msgs
 )
 
 ###################################
