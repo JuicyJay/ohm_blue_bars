@@ -11,7 +11,7 @@
 #include <ohm_common/RobotEvent.h>
 #include <ohm_common/Obstacle.h>
 
-#include <ohm_srvs/NodeControl.h>
+#include <ohm_apps_msgs/NodeControl.h>
 
 #include <Eigen/Dense>
 

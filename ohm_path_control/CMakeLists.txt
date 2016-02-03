@@ -9,8 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   nav_msgs
   roscpp
   tf
-  ohm_srvs
-  ohm_autonomy
+  ohm_apps_msgs
+  ohm_autonomy_msgs
 )
 find_package(cmake_modules REQUIRED)
 
@@ -109,7 +109,7 @@ include_directories(
 #   src/${PROJECT_NAME}/ohm_path_control.cpp
 # )
 
-file(GLOB source_files "src/*.cpp" 
+file(GLOB source_files "src/*.cpp"
                        "src/Controller/*.cpp"
                        "src/PathAnalyser/*.cpp"
                         )

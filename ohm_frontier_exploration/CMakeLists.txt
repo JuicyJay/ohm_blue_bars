@@ -70,10 +70,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
  generate_messages(
    DEPENDENCIES
-   std_msgs 
+   std_msgs
    geometry_msgs
  )
- 
+
 generate_dynamic_reconfigure_options(
   cfg/Exploration.cfg
 )
@@ -90,7 +90,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ohm_frontier_exploration
-  CATKIN_DEPENDS nav_msgs geometry_msgs 
+  CATKIN_DEPENDS nav_msgs geometry_msgs
 #  DEPENDS system_lib
 )
 
@@ -113,17 +113,17 @@ include_directories(
 # )
 
 ## Declare a cpp executable
-add_executable(ohm_frontier_exploration_node 
+add_executable(ohm_frontier_exploration_node
                                               src/FrontierExplorationNode.cpp
                                               src/FrontierFinder.cpp
                                               src/MapSubsampler.cpp
                                               src/FrontierController.cpp
                                               src/Visualization.cpp
                                               )
-                                              
-add_executable(map_dummy                      src/map_dummy_generator.cpp)                                            
 
-add_dependencies(ohm_frontier_exploration_node 
+add_executable(map_dummy                      src/map_dummy_generator.cpp)
+
+add_dependencies(ohm_frontier_exploration_node
                                               ${PROJECT_NAME}_gencfg)
 
 
@@ -135,7 +135,7 @@ add_dependencies(ohm_frontier_exploration_node
  target_link_libraries(ohm_frontier_exploration_node
    ${catkin_LIBRARIES}
  )
- 
+
  target_link_libraries(map_dummy
    ${catkin_LIBRARIES}
  )
@@ -155,7 +155,7 @@ add_dependencies(ohm_frontier_exploration_node
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ohm_frontier_exploration_node 
+install(TARGETS ohm_frontier_exploration_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

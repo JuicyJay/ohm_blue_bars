@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   tf
-  ohm_common
+  ohm_apps_msgs
 )
 
 find_package(cmake_modules REQUIRED)

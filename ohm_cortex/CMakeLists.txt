@@ -11,13 +11,10 @@ find_package(catkin REQUIRED COMPONENTS
     genmsg
     actionlib_msgs
     actionlib
-    ohm_exploration
-    ohm_frontier_exploration
-    ohm_srvs
-    ohm_perception
-    ohm_actors
-    ohm_autonomy
-    ohm_teleop
+    ohm_perception_msgs
+    ohm_autonomy_msgs
+    ohm_actors_msgs
+    ohm_teleop_msgs
     tf
     )
 
@@ -87,7 +84,7 @@ add_executable(statemachine
 #               src/states/LookAtTarget.cpp
                src/GetTransformation.cpp
                )
-               
+
 #add_executable(simon_statemachine
 #               src/ohm_simon_statemachine.cpp
 #               src/Context.cpp
@@ -110,7 +107,7 @@ add_executable(statemachine
 #               src/states/LookAtTarget.cpp
 #               src/GetTransformation.cpp
 #               )
-#               
+#
 add_executable(frontier_statemachine
                src/ohm_georg_frontier_statemachine.cpp
                src/Context.cpp

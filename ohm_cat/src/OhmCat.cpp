@@ -63,7 +63,7 @@ OhmCat::OhmCat() : _rate(0)
     _subVel = _nh.subscribe(sub_vel, 1, &OhmCat::subVel_callback, this);
 
     //init service
-    _srv_slam = _nh.serviceClient<ohm_srvs::NodeControl>(srv_slam_ctrl);
+    _srv_slam = _nh.serviceClient<ohm_apps_msgs::NodeControl>(srv_slam_ctrl);
     _srv_slam.waitForExistence();
 
     _state = ohm_cat::OK;
@@ -253,7 +253,7 @@ void OhmCat::run()
 
 bool OhmCat::setLaserinterupt(bool value)
 {
-   ohm_srvs::NodeControl srv;
+   ohm_apps_msgs::NodeControl srv;
    srv.request.action = value ? (int8_t)srv.request.PAUSE : (int8_t)srv.request.START;
 
    if(_srv_slam.call(srv))

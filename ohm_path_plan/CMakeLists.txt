@@ -13,7 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   actionlib_msgs
   actionlib
   tf
-  ohm_common
+  ohm_apps_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -120,7 +120,7 @@ LINK_DIRECTORIES($ENV{OBVIOUSLY_ROOT}/build/release/obcore)
 #   src/${PROJECT_NAME}/ohm_path_plan.cpp
 # )
 
-file(GLOB source_plan "src/PathPlan.cpp" 
+file(GLOB source_plan "src/PathPlan.cpp"
                         )
 file(GLOB source_semi "src/SemiAutonohm.cpp"
                         )
@@ -129,7 +129,7 @@ file(GLOB source_astar  "src/PathFind/AStar_dt/*.cpp"
                         "src/PathFind/Map/*.cpp"
                         "src/PathFind/PathFind_base/*.cpp"
                         "src/PathPlan_AStar.cpp"
-                        )            
+                        )
 
 ## Declare a cpp executable
 add_executable(ohm_path_plan_node ${source_plan})
@@ -142,26 +142,26 @@ add_dependencies(ohm_path_plan_node #ohm_path_plan_generate_messages_cpp)
                  ${ohm_path_plan_EXPORTED_TARGETS})
 add_dependencies(ohm_semiautonom_node #ohm_path_plan_generate_messages_cpp)
                  ${ohm_path_plan_EXPORTED_TARGETS})
-add_dependencies(ohm_path_plan_astar_node          
-                 ${ohm_path_plan_EXPORTED_TARGETS})       
+add_dependencies(ohm_path_plan_astar_node
+                 ${ohm_path_plan_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ohm_path_plan_node
   ${catkin_LIBRARIES}
   obvision
   obcore
-  ${Boost_LIBRARIES} 
+  ${Boost_LIBRARIES}
 )
 target_link_libraries(ohm_semiautonom_node
   ${catkin_LIBRARIES}
   obvision
   obcore
-  ${Boost_LIBRARIES} 
+  ${Boost_LIBRARIES}
 )
 
 target_link_libraries(ohm_path_plan_astar_node
   ${catkin_LIBRARIES}
-  ${Boost_LIBRARIES} 
+  ${Boost_LIBRARIES}
   ${OpenCV_LIBRARIES}
   obcore
 )

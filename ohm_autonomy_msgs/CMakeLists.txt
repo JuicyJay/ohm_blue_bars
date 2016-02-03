@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(ohm_autonomy)
+project(ohm_autonomy_msgs)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -43,19 +43,17 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
+file(GLOB msg_files "msg/*.msg")
 add_message_files(
    FILES
-   MoveRobot.msg
-   Wall.msg
-   WallArray.msg
-   PathControlInfo.msg
+   ${msg_files}
    )
 
 ## Generate services in the 'srv' folder
+file(GLOB srv_files "srv/*.srv")
 add_service_files(
    FILES
-   MarkTarget.srv
-   GetTarget.srv
+   ${srv_files}
    )
 
 ## Generate actions in the 'action' folder

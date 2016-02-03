@@ -1,5 +1,0 @@
-geometry_msgs/Pose     origin
-geometry_msgs/Pose     target
----
-float64                length
-nav_msgs/Path          path

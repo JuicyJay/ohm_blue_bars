@@ -12,9 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
                     message_generation
                     std_msgs
                     geometry_msgs
-                    ohm_path_plan
-                    ohm_autonomy
-                    ohm_common
+                    ohm_autonomy_msgs
+                    ohm_apps_msgs
                     )
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
