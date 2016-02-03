@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node pkg="ohm_cat"    type="ohm_cat_node"     name="ohm_cat_node" >
+    <param name="pub_vel"          type="string"     value="/georg/vel/teleop"              />              
+    <param name="sub_vel"          type="string"     value="path_control/vel/teleop" />
+    <param name="robot_foot_print" type="string"     value="georg/center"            />
+    <param name="robot_link"       type="string"     value="georg/base"              />
+    <param name="max_pitch"        type="double"     value="40.0"                    />               
+    <param name="max_roll"         type="double"     value="40.0"                    />               
+    <param name="time_to_stop"     type="double"     value="0.4"                     />               
+    <param name="time_to_move"     type="double"     value="0.4"                     />               
+    <param name="time_to_ok"       type="double"     value="0.5"                     />               
+    <param name="time_move"        type="double"     value="0.3"                     />               
+    <param name="time_next_move"   type="double"     value="3.0"                     />               
+    <param name="fix_move_vel"     type="double"     value="0.6"                     />               
+  </node>
+
+</launch>
