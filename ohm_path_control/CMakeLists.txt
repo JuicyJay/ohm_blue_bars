@@ -119,7 +119,7 @@ add_executable(ohm_path_control_node ${source_files})
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(ohm_path_control_node ohm_path_control_generate_messages_cpp)
+add_dependencies(ohm_path_control_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(ohm_path_control_node

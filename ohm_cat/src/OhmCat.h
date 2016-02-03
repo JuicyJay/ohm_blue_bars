@@ -8,8 +8,8 @@
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
 #include <geometry_msgs/Twist.h>
-#include <ohm_common/RobotEvent.h>
-#include <ohm_common/Obstacle.h>
+#include <ohm_apps_msgs/RobotEvent.h>
+#include <ohm_apps_msgs/Obstacle.h>
 
 #include <ohm_apps_msgs/NodeControl.h>
 

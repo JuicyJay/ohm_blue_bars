@@ -1,10 +1,10 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 #include <tf/transform_listener.h>
-#include <ohm_autonomy/WallArray.h>
-#include <ohm_autonomy/MarkTarget.h>
-#include <ohm_autonomy/GetTarget.h>
-#include <ohm_path_plan/PlanPaths.h>
+#include <ohm_autonomy_msgs/WallArray.h>
+#include <ohm_autonomy_msgs/MarkTarget.h>
+#include <ohm_autonomy_msgs/GetTarget.h>
+#include <ohm_autonomy_msgs/PlanPaths.h>
 #include <nav_msgs/GetMap.h>
 
 #include <list>
@@ -29,7 +29,7 @@ Target takeClosestTargetFromList(std::list<Target>& targets, const Pose& origin)
     if (!targets.size())
         return Target();
 
-    ohm_path_plan::PlanPaths paths;
+    ohm_autonomy_msgs::PlanPaths paths;
     paths.request.origin = origin.toRos();
 
     for (std::list<Target>::const_iterator target(targets.begin()); target != targets.end(); ++target)
@@ -69,7 +69,7 @@ void estimateDistancesFromOrigin(std::vector<Target*>& targets)
     if (!targets.size())
         return;
 
-    ohm_path_plan::PlanPaths paths;
+    ohm_autonomy_msgs::PlanPaths paths;
     paths.request.origin.position.x = 0.0;
     paths.request.origin.position.y = 0.0;
     paths.request.origin.position.z = 0.0;
@@ -121,12 +121,12 @@ void estimateDistances(void)
     _grid->selected()->estimateDistances(_srvPlanPaths, robot);
 }
 
-void callbackWalls(const ohm_autonomy::WallArray& msg)
+void callbackWalls(const ohm_autonomy_msgs::WallArray& msg)
 {
     TargetFactory factory;
     std::vector<Wall> walls;
 
-    for (std::vector<ohm_autonomy::Wall>::const_iterator wall(msg.walls.begin()); wall < msg.walls.end(); ++wall)
+    for (std::vector<ohm_autonomy_msgs::Wall>::const_iterator wall(msg.walls.begin()); wall < msg.walls.end(); ++wall)
         walls.push_back(Wall(*wall));
 
 
@@ -147,7 +147,7 @@ void callbackWalls(const ohm_autonomy::WallArray& msg)
 //    }
 }
 
-bool callbackMarkTarget(ohm_autonomy::MarkTarget::Request& req, ohm_autonomy::MarkTarget::Response& res)
+bool callbackMarkTarget(ohm_autonomy_msgs::MarkTarget::Request& req, ohm_autonomy_msgs::MarkTarget::Response& res)
 {
     for (std::vector<Target*>::iterator target(_targets.begin()); target < _targets.end(); ++target)
     {
@@ -161,7 +161,7 @@ bool callbackMarkTarget(ohm_autonomy::MarkTarget::Request& req, ohm_autonomy::Ma
     return false;
 }
 
-bool callbackGetTarget(ohm_autonomy::GetTarget::Request& req, ohm_autonomy::GetTarget::Response& res)
+bool callbackGetTarget(ohm_autonomy_msgs::GetTarget::Request& req, ohm_autonomy_msgs::GetTarget::Response& res)
 {
     if (req.id < 0)
     {
@@ -219,8 +219,8 @@ int main(int argc, char** argv)
     ros::ServiceServer srvGetTarget(nh.advertiseService(topic, callbackGetTarget));
     para.param<std::string>("service_mark_target", topic, "exploration/mark_target");
     ros::ServiceServer srvMarkTarget(nh.advertiseService(topic, callbackMarkTarget));
-    para.param<std::string>("service_plan_paths", topic, "path_plan/plan_paths");
-    _srvPlanPaths = nh.serviceClient<ohm_path_plan::PlanPaths>(topic);
+    para.param<std::string>("service_plan_paths", topic, "autonomy_msgs/plan_paths");
+    _srvPlanPaths = nh.serviceClient<ohm_autonomy_msgs::PlanPaths>(topic);
     para.param<std::string>("tf_source", _tfSource, "map");
     para.param<std::string>("tf_target", _tfTarget, "base_footprint");
 

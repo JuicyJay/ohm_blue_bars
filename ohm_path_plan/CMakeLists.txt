@@ -5,15 +5,16 @@ project(ohm_path_plan)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   geometry_msgs
   nav_msgs
-  roscpp
   std_msgs
   genmsg
-  actionlib_msgs
-  actionlib
+  #actionlib_msgs
+  #actionlib
   tf
   ohm_apps_msgs
+  ohm_autonomy_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -111,19 +112,19 @@ include_directories(
 )
 
 
-INCLUDE_DIRECTORIES($ENV{OBVIOUSLY_ROOT})
+#INCLUDE_DIRECTORIES($ENV{OBVIOUSLY_ROOT})
 
-LINK_DIRECTORIES($ENV{OBVIOUSLY_ROOT}/build/release/obvision)
-LINK_DIRECTORIES($ENV{OBVIOUSLY_ROOT}/build/release/obcore)
+#LINK_DIRECTORIES($ENV{OBVIOUSLY_ROOT}/build/release/obvision)
+#LINK_DIRECTORIES($ENV{OBVIOUSLY_ROOT}/build/release/obcore)
 ## Declare a cpp library
 # add_library(ohm_path_plan
 #   src/${PROJECT_NAME}/ohm_path_plan.cpp
 # )
 
-file(GLOB source_plan "src/PathPlan.cpp"
-                        )
-file(GLOB source_semi "src/SemiAutonohm.cpp"
-                        )
+#file(GLOB source_plan "src/PathPlan.cpp"
+#)
+#file(GLOB source_semi "src/SemiAutonohm.cpp"
+#                        )
 file(GLOB source_astar  "src/PathFind/AStar_dt/*.cpp"
                         "src/PathFind/Map/MapOperations/*.cpp"
                         "src/PathFind/Map/*.cpp"
@@ -132,8 +133,8 @@ file(GLOB source_astar  "src/PathFind/AStar_dt/*.cpp"
                         )
 
 ## Declare a cpp executable
-add_executable(ohm_path_plan_node ${source_plan})
-add_executable(ohm_semiautonom_node ${source_semi})
+#add_executable(ohm_path_plan_node ${source_plan})
+#add_executable(ohm_semiautonom_node ${source_semi})
 add_executable(ohm_path_plan_astar_node ${source_astar})
 
 ## Add cmake target dependencies of the executable/library
@@ -142,28 +143,27 @@ add_executable(ohm_path_plan_astar_node ${source_astar})
 #                  ${ohm_path_plan_EXPORTED_TARGETS})
 # add_dependencies(ohm_semiautonom_node #ohm_path_plan_generate_messages_cpp)
 #                  ${ohm_path_plan_EXPORTED_TARGETS})
-# add_dependencies(ohm_path_plan_astar_node
-#                  ${ohm_path_plan_EXPORTED_TARGETS})
+add_dependencies(ohm_path_plan_astar_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ohm_path_plan_node
-  ${catkin_LIBRARIES}
-  obvision
-  obcore
-  ${Boost_LIBRARIES}
-)
-target_link_libraries(ohm_semiautonom_node
-  ${catkin_LIBRARIES}
-  obvision
-  obcore
-  ${Boost_LIBRARIES}
-)
+# target_link_libraries(ohm_path_plan_node
+#   ${catkin_LIBRARIES}
+#   obvision
+#   obcore
+#   ${Boost_LIBRARIES}
+# )
+# target_link_libraries(ohm_semiautonom_node
+#   ${catkin_LIBRARIES}
+#   obvision
+#   obcore
+#   ${Boost_LIBRARIES}
+# )
 
 target_link_libraries(ohm_path_plan_astar_node
   ${catkin_LIBRARIES}
   ${Boost_LIBRARIES}
   ${OpenCV_LIBRARIES}
-  obcore
+  #obcore
 )
 
 #############

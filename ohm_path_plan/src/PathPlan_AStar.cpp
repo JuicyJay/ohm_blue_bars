@@ -259,7 +259,7 @@ nav_msgs::Path PathPlan_AStar::toRosPath(std::vector<apps::Point2D> path,
 void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
 {
    //add virtual obstacles
-   for(std::map<std::string, ohm_common::Obstacle>::iterator it = _obstacles.begin(); it != _obstacles.end(); ++it)
+   for(std::map<std::string, ohm_apps_msgs::Obstacle>::iterator it = _obstacles.begin(); it != _obstacles.end(); ++it)
    {
       apps::Point2D p;
       p.x = it->second.rect.x;
@@ -275,7 +275,7 @@ void PathPlan_AStar::do_map_operations(apps::Astar_dt* planner)
    apps::MapOperations::binarize(planner->getGridMap(), 0, 1, FREE_VALUE, WALL_VALUE);
 
    //add virtual obstacles//Free stuff
-   for(std::map<std::string, ohm_common::Obstacle>::iterator it = _anti_obstacles.begin(); it != _anti_obstacles.end(); ++it)
+   for(std::map<std::string, ohm_apps_msgs::Obstacle>::iterator it = _anti_obstacles.begin(); it != _anti_obstacles.end(); ++it)
    {
       apps::Point2D p;
       p.x = it->second.rect.x;
@@ -316,7 +316,7 @@ std::vector<apps::Point2D> PathPlan_AStar::do_path_planning(apps::Astar_dt* plan
 }
 
 
-void PathPlan_AStar::subCallback_obstacle(const ohm_common::Obstacle& msg)
+void PathPlan_AStar::subCallback_obstacle(const ohm_apps_msgs::Obstacle& msg)
 {
    ROS_INFO("ohm_path_plan -> insert Obstacle: %s, %f, %f, %f, %f",msg.name.data.c_str(), msg.rect.x, msg.rect.y, msg.rect.width, msg.rect.height);
    //insert or update obstacle
@@ -336,7 +336,7 @@ void PathPlan_AStar::subCallback_removeObstacle(const std_msgs::String& msg)
 }
 
 
-void PathPlan_AStar::subCallback_anti_obstacle(const ohm_common::Obstacle& msg)
+void PathPlan_AStar::subCallback_anti_obstacle(const ohm_apps_msgs::Obstacle& msg)
 {
    ROS_INFO("ohm_path_plan -> insert AntiObstacle: %s",msg.name.data.c_str());
    //insert
@@ -356,8 +356,8 @@ void PathPlan_AStar::subCallback_remove_anti_obstacle(const std_msgs::String& ms
 }
 
 bool PathPlan_AStar::srvCallback_plan_sorted(
-      ohm_path_plan::PlanPathsRequest& req,
-      ohm_path_plan::PlanPathsResponse& res)
+      ohm_autonomy_msgs::PlanPathsRequest& req,
+      ohm_autonomy_msgs::PlanPathsResponse& res)
 {
 
    ROS_INFO("Ohm_path_plan -> PlanPaths service called");
@@ -429,8 +429,8 @@ bool PathPlan_AStar::srvCallback_plan_sorted(
 
 
 bool PathPlan_AStar::srvCallback_plan_path(
-      ohm_path_plan::PlanPathRequest& req,
-      ohm_path_plan::PlanPathResponse& res)
+      ohm_autonomy_msgs::PlanPathRequest& req,
+      ohm_autonomy_msgs::PlanPathResponse& res)
 {
    ROS_INFO("Ohm_path_plan -> PlanPaths service called");
 
@@ -512,5 +512,3 @@ int main(int argc, char *argv[])
    node.start(10);
 
 }
-
-

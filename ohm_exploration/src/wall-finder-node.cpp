@@ -16,8 +16,8 @@
 #include "FindWall.h"
 #include "Rect.h"
 
-#include <ohm_autonomy/WallArray.h>
-#include <ohm_common/MapRoi.h>
+#include <ohm_autonomy_msgs/WallArray.h>
+#include <ohm_apps_msgs/MapRoi.h>
 
 FindWall _wallFinder;
 std::vector<Wall> _walls;
@@ -67,7 +67,7 @@ bool search(void)
     _walls.insert(_walls.end(), walls.begin(), walls.end());
 
     /* Send found walls. */
-    ohm_autonomy::WallArray msgWalls;
+    ohm_autonomy_msgs::WallArray msgWalls;
 
     for (std::vector<Wall>::const_iterator wall(walls.begin()); wall < walls.end(); ++wall)
         msgWalls.walls.push_back(wall->getWallMessage());
@@ -94,7 +94,7 @@ bool callbackTrigger(std_srvs::Empty::Request& req, std_srvs::Empty::Response& r
     return search();
 }
 
-void callbackRoi(const ohm_common::MapRoi& msg)
+void callbackRoi(const ohm_apps_msgs::MapRoi& msg)
 {
   return;
   if (!_initialized)
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     _srvGetMap = nh.serviceClient<nav_msgs::GetMap>(topic);
 
     _pubWallMarkers = nh.advertise<visualization_msgs::MarkerArray>("exploration/wall_markers", 2);
-    _pubWalls = nh.advertise<ohm_autonomy::WallArray>("exploration/walls", 2);
+    _pubWalls = nh.advertise<ohm_autonomy_msgs::WallArray>("exploration/walls", 2);
     _subRoi = nh.subscribe("exploration/set_roi", 2, callbackRoi);
 
     bool autotrigger;

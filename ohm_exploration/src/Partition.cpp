@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <limits>
 
-#include <ohm_path_plan/PlanPaths.h>
+#include <ohm_autonomy_msgs/PlanPaths.h>
 
 int Partition::s_id = 0;
 float Partition::s_maxDistanceFromOrigin = 20.0f;
@@ -117,7 +117,7 @@ int Partition::numValidTargets(void) const
 
 void Partition::estimateDistances(ros::ServiceClient& client, const Pose& robot)
 {
-    ohm_path_plan::PlanPaths paths;
+    ohm_autonomy_msgs::PlanPaths paths;
     paths.request.origin = robot.toRos();
 
     for (std::vector<Target*>::const_iterator target(_targets.begin()); target < _targets.end(); ++target)

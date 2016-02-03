@@ -14,16 +14,16 @@
 #include <opencv2/opencv.hpp>
 #include <vector>
 #include <map>
-#include <obcore/base/Timer.h>
+//#include <obcore/base/Timer.h>
 
 #include "PathFind/Map/GridMap.h"
 #include "PathFind/AStar_dt/Astar_dt.h"
 #include "PathFind/Map/MapOperations/MapOperations.h"
 
-#include <ohm_path_plan/PlanPaths.h>
-#include <ohm_path_plan/PlanPath.h>
+#include <ohm_autonomy_msgs/PlanPaths.h>
+#include <ohm_autonomy_msgs/PlanPath.h>
 
-#include <ohm_common/Obstacle.h>
+#include <ohm_apps_msgs/Obstacle.h>
 
 class PathPlan_AStar
 {
@@ -72,8 +72,8 @@ private:    //dataelements
     apps::Point2D _robot_pos;
     apps::Point2D _target_pos;
 
-    std::map<std::string, ohm_common::Obstacle> _obstacles;
-    std::map<std::string, ohm_common::Obstacle> _anti_obstacles;
+    std::map<std::string, ohm_apps_msgs::Obstacle> _obstacles;
+    std::map<std::string, ohm_apps_msgs::Obstacle> _anti_obstacles;
 
 public:
     PathPlan_AStar();
@@ -116,16 +116,16 @@ private:    //functions
 
     void subCallback_map(const nav_msgs::OccupancyGrid& msg);
     void subCallback_target(const geometry_msgs::PoseStamped& msg);
-    void subCallback_obstacle(const ohm_common::Obstacle& msg);
+    void subCallback_obstacle(const ohm_apps_msgs::Obstacle& msg);
     void subCallback_removeObstacle(const std_msgs::String& msg);
-    void subCallback_anti_obstacle(const ohm_common::Obstacle& msg);
+    void subCallback_anti_obstacle(const ohm_apps_msgs::Obstacle& msg);
     void subCallback_remove_anti_obstacle(const std_msgs::String& msg);
 
 
-    bool srvCallback_plan_sorted(ohm_path_plan::PlanPathsRequest& req,
-                                 ohm_path_plan::PlanPathsResponse& res);
-    bool srvCallback_plan_path(ohm_path_plan::PlanPathRequest& req,
-                               ohm_path_plan::PlanPathResponse& res);
+    bool srvCallback_plan_sorted(ohm_autonomy_msgs::PlanPathsRequest& req,
+                                 ohm_autonomy_msgs::PlanPathsResponse& res);
+    bool srvCallback_plan_path(ohm_autonomy_msgs::PlanPathRequest& req,
+                               ohm_autonomy_msgs::PlanPathResponse& res);
 
 };
 

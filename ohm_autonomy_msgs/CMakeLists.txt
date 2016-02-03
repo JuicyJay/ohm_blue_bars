@@ -59,6 +59,7 @@ add_service_files(
    FILES
    Force.srv
    GetTarget.srv
+   GetFrontierTarget.srv
    MarkTarget.srv
    PlanPath.srv
    PlanPaths.srv
@@ -91,7 +92,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ohm_autonomy
-#  CATKIN_DEPENDS message_generation
+  CATKIN_DEPENDS message_generation message_runtime
 #  DEPENDS system_lib
 )
 

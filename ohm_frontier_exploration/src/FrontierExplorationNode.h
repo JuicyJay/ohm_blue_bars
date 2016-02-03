@@ -13,14 +13,14 @@
 #include <nav_msgs/OccupancyGrid.h>
 
 #include <tf/transform_listener.h>
-#include <costmap_2d/costmap_2d_ros.h>
+//#include <costmap_2d/costmap_2d_ros.h>
 
 #include "Frontier.h"
 #include "FrontierFinder.h"
 #include "Visualization.h"
 #include "FrontierController.h"
 
-#include "ohm_frontier_exploration/GetTarget.h"
+#include "ohm_autonomy_msgs/GetFrontierTarget.h"
 
 //trigger service
 #include "ohm_srvs/NodeControl.h"
@@ -103,16 +103,16 @@ private:
     * @param res
     * @return
     */
-   bool getFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request&  req,
-                             ohm_frontier_exploration::GetTarget::Response& res);
+   bool getFrontierServiceCB(ohm_autonomy_msgs::GetFrontierTarget::Request&  req,
+                             ohm_autonomy_msgs::GetFrontierTarget::Response& res);
    /**
     * Service callback to return all frontiers
     * @param req
     * @param res
     * @return
     */
-   bool getAllFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request&  req,
-                                ohm_frontier_exploration::GetTarget::Response& res);
+   bool getAllFrontierServiceCB(ohm_autonomy_msgs::GetFrontierTarget::Request&  req,
+                                ohm_autonomy_msgs::GetFrontierTarget::Response& res);
 
    /**
     * Service to trigger the transmission of the frontiers

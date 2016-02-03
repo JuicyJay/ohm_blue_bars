@@ -8,7 +8,7 @@
  *
  ***********************************************************************************************************/
 #include <ros/ros.h>
-#include <ohm_common/MapRoi.h>
+#include <ohm_apps_msgs/MapRoi.h>
 #include <std_srvs/Empty.h>
 #include <tf/transform_listener.h>
 
@@ -35,7 +35,7 @@ bool callbackNextSection(std_srvs::Empty::Request& req, std_srvs::Empty::Respons
 
     /* Calculate the next roi the robot should explore. */
     const float edgeLength = 2.0f;
-    ohm_common::MapRoi roi;
+    ohm_apps_msgs::MapRoi roi;
 
     ROS_INFO("robot position = (%f, %f)", T.getOrigin().x(), T.getOrigin().y());
 
@@ -63,7 +63,7 @@ int main(int argc, char** argv)
     ros::ServiceServer srvNextSection(nh.advertiseService(value, callbackNextSection));
     para.param<std::string>("tf_robot", _tfRobot, "georg/base");
 
-    _pubRoi = nh.advertise<ohm_common::MapRoi>("exploration/set_roi", 2);
+    _pubRoi = nh.advertise<ohm_apps_msgs::MapRoi>("exploration/set_roi", 2);
 
     ros::spin();
 

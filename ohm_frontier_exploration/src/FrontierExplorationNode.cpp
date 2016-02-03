@@ -180,8 +180,8 @@ void FrontierExplorationNode::mapCallback(const nav_msgs::OccupancyGrid& map)
    }
 }
 
-bool FrontierExplorationNode::getFrontierServiceCB(ohm_frontier_exploration::GetTarget::Request& req,
-                                                   ohm_frontier_exploration::GetTarget::Response& res)
+bool FrontierExplorationNode::getFrontierServiceCB(ohm_autonomy_msgs::GetFrontierTarget::Request& req,
+                                                   ohm_autonomy_msgs::GetFrontierTarget::Response& res)
 {
    ROS_DEBUG_STREAM("service call: returning new frontier to: " << _frontierController->getBestFrontier());
    res.target = _frontierController->getBestFrontier();
@@ -260,4 +260,3 @@ int main(int argc,char **argv)
 
    autonohm::FrontierExplorationNode::getInstance()->run();
 }
-

@@ -27,7 +27,7 @@ OhmCat::OhmCat() : _rate(0)
     double time_next_move;
     double fix_move_vel;
     //int int_val;
-    
+
     privNh.param("pub_vel",                 pub_vel,         std::string("vel/teleop"));
     privNh.param("pub_event",               pub_event,       std::string("/georg/event"));
     privNh.param("sub_vel",                 sub_vel,         std::string("path_control/vel/teleop"));
@@ -56,8 +56,8 @@ OhmCat::OhmCat() : _rate(0)
 
     //init publisher
     _pubVel   = _nh.advertise<geometry_msgs::Twist>(pub_vel,1);
-    _pubEvent = _nh.advertise<ohm_common::RobotEvent>(pub_event, 20);
-    _pubHanky = _nh.advertise<ohm_common::Obstacle>("/georg/path_plan/add_obstacle",20);
+    _pubEvent = _nh.advertise<ohm_apps_msgs::RobotEvent>(pub_event, 20);
+    _pubHanky = _nh.advertise<ohm_apps_msgs::Obstacle>("/georg/path_plan/add_obstacle",20);
 
     //inti subscriber
     _subVel = _nh.subscribe(sub_vel, 1, &OhmCat::subVel_callback, this);
@@ -330,7 +330,7 @@ void OhmCat::event_Stop()
    ss << "cat_" <<  _cnt++;
 
    //create obstacle
-   ohm_common::Obstacle msg_hanky;
+   ohm_apps_msgs::Obstacle msg_hanky;
    msg_hanky.name.data = ss.str();
    msg_hanky.rect.x       = tf.getOrigin().x() - HANKY_SIZE * 0.5;
    msg_hanky.rect.y       = tf.getOrigin().y() - HANKY_SIZE * 0.5;
@@ -339,7 +339,7 @@ void OhmCat::event_Stop()
 
    _pubHanky.publish(msg_hanky);
 
-   ohm_common::RobotEvent msg;
+   ohm_apps_msgs::RobotEvent msg;
    msg.event = msg.FLIP_OVER;
    _pubEvent.publish(msg);
 
@@ -358,4 +358,3 @@ void OhmCat::event_OK()
 
    this->setLaserinterupt(false);
 }
-

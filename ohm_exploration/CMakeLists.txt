@@ -9,7 +9,6 @@ find_package(catkin REQUIRED COMPONENTS
                     visualization_msgs
                     nav_msgs
                     tf
-                    message_generation
                     std_msgs
                     geometry_msgs
                     ohm_autonomy_msgs
@@ -89,7 +88,7 @@ find_package(OpenCV REQUIRED)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ohm_exploration
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS roscpp ohm_autonomy_msgs ohm_apps_msgs
 #  DEPENDS system_lib
 )
 
@@ -144,9 +143,16 @@ add_executable(mission-planner
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(wall-finder ohm_exploration_generate_messages_cpp)
-# add_dependencies(target-stack ohm_exploration_generate_messages_cpp)
-# add_dependencies(goal-factory ohm_exploration_generate_messages_cpp)
+#add_dependencies(wall-finder ohm_autonomy_msgs_generate_messages_cpp ohm_apps_msgs_generate_messages_cpp)
+#add_dependencies(target-stack ohm_autonomy_msgs_generate_messages_cpp ohm_apps_msgs_generate_messages_cpp)
+#add_dependencies(mission-planner ohm_autonomy_msgs_generate_messages_cpp ohm_apps_msgs_generate_messages_cpp)
+#add_dependencies(map-roi ohm_autonomy_msgs_generate_messages_cpp ohm_apps_msgs_generate_messages_cpp)
+
+add_dependencies(wall-finder ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(target-stack ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(mission-planner ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(map-roi ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 
 ## Specify libraries to link a library or executable target against
 

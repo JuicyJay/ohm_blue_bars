@@ -20,7 +20,7 @@
 #include <Eigen/Core>
 
 #include <visualization_msgs/Marker.h>
-#include <ohm_autonomy/Wall.h>
+#include <ohm_autonomy_msgs/Wall.h>
 
 typedef std::vector<Eigen::Vector2i, Eigen::aligned_allocator<Eigen::Vector2i> > PointVector;
 
@@ -41,7 +41,7 @@ public:
 
     Wall(void) : _valid(false) { }
     Wall(const PointVector& points);
-    Wall(const ohm_autonomy::Wall& wall);
+    Wall(const ohm_autonomy_msgs::Wall& wall);
 
     inline const Line& model(void) const { return _model; }
     inline const PointVector& points(void) const { return _points; }
@@ -60,7 +60,7 @@ public:
     inline void setDistance(const float distance) { _distance = distance; }
 
     visualization_msgs::Marker getMarkerMessage(void) const;
-    ohm_autonomy::Wall getWallMessage(void) const;
+    ohm_autonomy_msgs::Wall getWallMessage(void) const;
 
     /* compare operator for std::sort */
     bool operator()(const Eigen::Vector2i& left, const Eigen::Vector2i& right) const;

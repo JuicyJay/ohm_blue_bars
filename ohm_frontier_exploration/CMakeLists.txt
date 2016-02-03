@@ -129,7 +129,8 @@ add_dependencies(ohm_frontier_exploration_node
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(ohm_frontier_exploration_node ohm_frontier_exploration_generate_messages_cpp)
+add_dependencies(ohm_frontier_exploration_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(map_dummy ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(ohm_frontier_exploration_node

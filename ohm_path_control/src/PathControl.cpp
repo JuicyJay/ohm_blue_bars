@@ -22,7 +22,7 @@ PathControl::PathControl() : _rate(0)
     std::string config_file_analyser;
     std::string tf_map_frame;
     std::string tf_robot_frame;
-    
+
     privNh.param("pub_name_cmd_vel",         pub_name_cmd_vel,       std::string("vel/teleop"));
     privNh.param("pub_name_state",           pub_name_state,         std::string("path_control/state"));
     privNh.param("pub_name_state_full",      pub_name_state_full,    std::string("path_control/state_full"));
@@ -30,8 +30,8 @@ PathControl::PathControl() : _rate(0)
     privNh.param("sub_name_em_stop",         sub_name_em_stop,       std::string("path_control/emergency_stop"));
     privNh.param("sub_name_pause",           sub_name_pause,         std::string("path_control/pause"));
     privNh.param("srv_name_ser_doendroate",  srv_name_ser_doendroate, std::string("path_control/do_end_rotation"));
-    privNh.param("config_file_controller",   config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/controller.xml"));
-    privNh.param("config_file_analyser",     config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy/src/ohm_path_control/config/analyser.xml"));
+    privNh.param("config_file_controller",   config_file_controller, std::string("/home/m1ch1/workspace/ros/ohm_autonomy_msgs/src/ohm_path_control/config/controller.xml"));
+    privNh.param("config_file_analyser",     config_file_analyser,   std::string("/home/m1ch1/workspace/ros/ohm_autonomy_msgs/src/ohm_path_control/config/analyser.xml"));
     privNh.param("tf_map_frame",             tf_map_frame,           std::string("map"));
     privNh.param("tf_robot_frame",           tf_robot_frame,         std::string("base_footprint"));
 
@@ -40,7 +40,7 @@ PathControl::PathControl() : _rate(0)
 
     //init publisher
     _pub_cmd_vel = _nh.advertise<geometry_msgs::Twist>(pub_name_cmd_vel,1);
-    _pub_state = _nh.advertise<ohm_autonomy::PathControlInfo>(pub_name_state_full,1);
+    _pub_state = _nh.advertise<ohm_autonomy_msgs::PathControlInfo>(pub_name_state_full,1);
     _pub_state_old = _nh.advertise<std_msgs::Bool>(pub_name_state,1);
 
     //inti subscriber
@@ -85,7 +85,7 @@ void PathControl::start(const unsigned int rate)
           return;
        }
     }while(!rdy);
-   
+
     this->run();
 }
 
@@ -96,7 +96,7 @@ void PathControl::run()
     while(ros::ok())
     {
        this->doPathControl();
-       
+
        ros::spinOnce();
        _rate->sleep();
     }
@@ -188,7 +188,7 @@ void PathControl::doPathControl(void)
 void PathControl::pubState(void)
 {
    analyser::info pathInfo = _pathAnalyser->getInfo();
-   ohm_autonomy::PathControlInfo msg_state;
+   ohm_autonomy_msgs::PathControlInfo msg_state;
    msg_state.pathLenght = pathInfo.path_length;
    msg_state.pathLenght_remaining = pathInfo.path_length_remaining;
    msg_state.numWaypoints = pathInfo.num_goals;
@@ -354,8 +354,8 @@ void PathControl::subPause_callback(const std_msgs::Bool& msg)
 
 
 
-bool PathControl::srvCntrlEndrotate_callback(ohm_srvs::NodeControlRequest& req,
-      ohm_srvs::NodeControlResponse& res)
+bool PathControl::srvCntrlEndrotate_callback(ohm_apps_msgs::NodeControlRequest& req,
+      ohm_apps_msgs::NodeControlResponse& res)
 {
    res.accepted = true;
 

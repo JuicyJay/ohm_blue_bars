@@ -9,8 +9,8 @@
 #include <std_msgs/Bool.h>
 #include <tf/transform_listener.h>
 
-#include <ohm_autonomy/PathControlInfo.h>
-#include <ohm_srvs/NodeControl.h>
+#include <ohm_autonomy_msgs/PathControlInfo.h>
+#include <ohm_apps_msgs/NodeControl.h>
 
 #include <string>
 #include <vector>
@@ -114,8 +114,8 @@ private:    //functions
      */
     void subPause_callback(const std_msgs::Bool& msg);
 
-    bool srvCntrlEndrotate_callback(ohm_srvs::NodeControlRequest& req,
-                                    ohm_srvs::NodeControlResponse& res);
+    bool srvCntrlEndrotate_callback(ohm_apps_msgs::NodeControlRequest& req,
+                                    ohm_apps_msgs::NodeControlResponse& res);
 };
 
 #endif /* TEMPLATE_H_ */
