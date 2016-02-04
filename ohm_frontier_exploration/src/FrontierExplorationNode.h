@@ -23,7 +23,7 @@
 #include "ohm_autonomy_msgs/GetFrontierTarget.h"
 
 //trigger service
-#include "ohm_srvs/NodeControl.h"
+#include "ohm_apps_msgs/NodeControl.h"
 
 
 /**
@@ -120,8 +120,8 @@ private:
     * @param res
     * @return
     */
-   bool callback_srv_transmittTargets(ohm_srvs::NodeControl::Request&  req,
-                                      ohm_srvs::NodeControl::Response& res);
+   bool callback_srv_transmittTargets(ohm_apps_msgs::NodeControl::Request&  req,
+                                      ohm_apps_msgs::NodeControl::Response& res);
 
    // MEMBERS
    static FrontierExplorationNode* _instance;

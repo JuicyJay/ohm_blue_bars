@@ -193,8 +193,8 @@ void FrontierExplorationNode::publishMarkers(void)
 }
 
 bool FrontierExplorationNode::callback_srv_transmittTargets(
-      ohm_srvs::NodeControl::Request& req,
-      ohm_srvs::NodeControl::Response& res)
+      ohm_apps_msgs::NodeControl::Request& req,
+      ohm_apps_msgs::NodeControl::Response& res)
 {
    res.accepted = true;
 
