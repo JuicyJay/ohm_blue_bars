@@ -222,8 +222,15 @@ void PathControl::pubState(void)
    _pub_state.publish(msg_state);
 }
 
-void PathControl::subPath_callback(const nav_msgs::Path& msg)
+void PathControl::subPath_callback(const nav_msgs::Path& msg_)
 {
+   nav_msgs::Path msg = msg_;
+   //path with length 1 is invalid, if invalid then clear
+   if(msg.poses.size() <= 1)
+   {
+      msg.poses.clear();
+   }
+
    std::vector<analyser::pose> path_comp;
    std::vector<analyser::pose> path_trunc;
 
