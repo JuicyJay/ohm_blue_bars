@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
                              std_msgs
                              tf
                              dynamic_reconfigure
+                             ohm_autonomy_msgs
+                             ohm_apps_msgs
                              )
 
 ## System dependencies are found with CMake's conventions

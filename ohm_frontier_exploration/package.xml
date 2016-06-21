@@ -38,12 +38,17 @@
   <!-- Use run_depend for packages you need at runtime: -->
   <run_depend>nav_msgs</run_depend> 
   <run_depend>geometry_msgs</run_depend>
-  
+  <run_depend>ohm_autonomy_msgs</run_depend>
+  <run_depend>ohm_apps_msgs</run_depend>
+                               
+                             
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>nav_msgs     </build_depend>
   <build_depend>geometry_msgs</build_depend>
+  <build_depend>ohm_autonomy_msgs</build_depend>
+  <build_depend>ohm_apps_msgs</build_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
