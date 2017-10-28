@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<launch>
+	<node pkg="ohm_pcl_filters" type="filter_stat_outliers" name="filter_stat_outliers">
+		<param name="topic_input" type="string" value="cloud2"/>
+		<param name="topic_output" type="string" value="outlier_filter/output"/>
+	</node>
+	<node pkg="ohm_pcl_filters" type="cloud_transformer" name="cloud_transformers">
+		<param name="input_topic"  type="string" value="cloud2"/>
+		<param name="output_topic" type="string" value="transformed_cloud"/>
+	</node>
+
+</launch>

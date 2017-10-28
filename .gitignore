@@ -3,4 +3,6 @@ build/
 devel/
 install/
 src/CMakeLists.txt
+.cproject
+.project
 
