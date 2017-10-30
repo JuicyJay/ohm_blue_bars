@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 	<node pkg="ohm_pcl_filters" type="filter_stat_outliers" name="filter_stat_outliers">
-		<param name="topic_input" type="string" value="cloud2"/>
+		<param name="topic_input" type="string" value="height_filter/output"/>
 		<param name="topic_output" type="string" value="outlier_filter/output"/>
 	</node>
 	<node pkg="ohm_pcl_filters" type="cloud_transformer" name="cloud_transformers">
@@ -9,4 +9,28 @@
 		<param name="output_topic" type="string" value="transformed_cloud"/>
 	</node>
 
+	<node pkg="nodelet" type="nodelet" name="pcl_manager" args="manager"/>
+  	
+  <node pkg="nodelet" type="nodelet" name="voxel_grid" args="load pcl/VoxelGrid pcl_manager" output="screen">
+    <remap from="~input" to="transformed_cloud" />
+    <rosparam>
+      filter_field_name: y
+      filter_limit_min: -7000.5
+      filter_limit_max: 7000.5
+      filter_limit_negative: False
+      leaf_size: 0.05
+    </rosparam>
+  </node>
+  
+
+ <node pkg="nodelet" type="nodelet" name="height_filter" args="load pcl/PassThrough pcl_manager" output="screen">
+    <remap from="~input" to="voxel_grid/output" />
+    <rosparam>
+      filter_field_name: z
+      filter_limit_min: 0.04
+      filter_limit_max: 0.1
+      filter_limit_negative: False
+    </rosparam>
+  </node>
+	
 </launch>
