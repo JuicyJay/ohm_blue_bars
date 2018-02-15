@@ -43,8 +43,8 @@
   <run_depend>ohm_autonomy_msgs</run_depend>
   <run_depend>ohm_cat</run_depend>
   <run_depend>ohm_cortex</run_depend>
-  <run_depend>ohm_exploration</run_depend>
-  <run_depend>ohm_frontier_exploration</run_depend>
+<!--  <run_depend>ohm_exploration</run_depend> -->
+<!--  <run_depend>ohm_frontier_exploration</run_depend> -->
 <!--  <run_depend>ohm_path_control</run_depend> -->
 <!--  <run_depend>ohm_path_plan</run_depend> -->
 
