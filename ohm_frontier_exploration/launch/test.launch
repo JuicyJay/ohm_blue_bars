@@ -1,0 +1,7 @@
+<launch>
+<!--	<node pkg="tf" type="static_transform_publisher" name="map" args="0 0 0 0 0 0 /map /laser 100"/> -->
+	
+	<node pkg="ohm_frontier_exploration"  type="ohm_frontier_exploration_node" name="frontier_explorer" output="screen">
+	  <param name = "map_topic" type = "string" value = "slam_map"/>
+	</node>
+</launch>

@@ -167,7 +167,7 @@ void FrontierExplorationNode::mapCallback(const nav_msgs::OccupancyGrid& map)
    ROS_DEBUG_STREAM("received new map. ");
    _frontierFinder->setMap(map);
 
-   if(_mode == frontier::RUN)
+   if(1)//_mode == frontier::RUN)
    {
       this->findFrontiers();
       this->publishFrontiers();
