@@ -27,5 +27,4 @@ private:
 };
 
 
-
 #endif /* TESTPRGS_EIGEN_GEOMETRIC_STRAIGHT2D_H_ */

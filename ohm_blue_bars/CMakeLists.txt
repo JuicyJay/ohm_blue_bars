@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(ohm_blue_bars)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+ add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -15,9 +15,12 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   cv_bridge
   dynamic_reconfigure
+  pcl_ros
 )
 
 find_package(OpenCV REQUIRED)
+find_package(Eigen3 REQUIRED)
+#find_package(cmake_modules REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -124,6 +127,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+  ${EIGEN3_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -139,7 +143,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(blue_bar_node src/blue_bar_node.cpp)
+add_executable(blue_bar_node src/blue_bar_node.cpp src/Straight2D.cpp)
+add_executable(hough_blue_bars src/hough_blue_bars.cpp src/Straight2D.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -156,6 +161,12 @@ add_executable(blue_bar_node src/blue_bar_node.cpp)
    ${catkin_LIBRARIES}
    ${OpenCV_LIBS}
  )
+ 
+  target_link_libraries(hough_blue_bars
+   ${catkin_LIBRARIES}
+   ${OpenCV_LIBS}
+ )
+ 
 
 #############
 ## Install ##
