@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+
+<node pkg="tf"  type="static_transform_publisher" name = "tf_table_cam" args = "0.0 0.0 0.24 0.0 0.0 0.0 base_link camera_pitch_base 10"/>
+<node pkg="tf"  type="static_transform_publisher" name = "tf_cam_pitch" args = "0.0 0.0 0.0 0.0 0.52 0.0 camera_pitch_base camera_link 10"/> 
+
+</launch>
