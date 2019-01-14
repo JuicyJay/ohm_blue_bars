@@ -13,8 +13,8 @@
 //dynamic reconfigure? wie aktualisieren
 
 
-#include <opencv-3.3.1-dev/opencv2/opencv.hpp>
-#include <opencv-3.3.1-dev/opencv2/ximgproc.hpp>
+#include <opencv2/opencv.hpp>
+#include <opencv2/ximgproc.hpp>
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/Image.h>
