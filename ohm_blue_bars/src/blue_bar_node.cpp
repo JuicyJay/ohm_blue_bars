@@ -32,11 +32,11 @@ static image_transport::Publisher _pubCanny;
 static image_transport::Publisher _pubThinned;
 static image_transport::Publisher _pubLines;
 
-double alpha_ = 50.0;
-double beta_ = 90.0;
-double gamma_ = 90.0;
-double f_ = 500.0;
-double dist_ = 2000.0;  //zoom
+//double alpha_ = 50.0;
+//double beta_ = 90.0;
+//double gamma_ = 90.0;
+//double f_ = 500.0;
+//double dist_ = 2000.0;  //zoom
 //double dist;
 
 int thresh_ = 0;
@@ -45,12 +45,12 @@ int distPoint_ = 4;  //max Abstand von Punkten um Teil der Linie zu sein
 int distLine_ = 0;  //max Abstand zw Linien um als gleich zu gelten
 int threshPxlDetect_ = 0;
 
-int Bmax = 255;
-int Bmin = 100;
-int Rmax = 200;
-int Rmin = 0;
-int Gmax = 100;
-int Gmin = 0;
+//int Bmax = 255;
+//int Bmin = 100;
+//int Rmax = 200;
+//int Rmin = 0;
+//int Gmax = 100;
+//int Gmin = 0;
 
 int sizeA = 0;
 int sizeB = 0;
@@ -85,18 +85,18 @@ const unsigned int RAN_TRIALS = 30;
 
 void callback(ohm_blue_bars::BlueBarsCfgConfig& config, uint32_t level)
 {
-  alpha_ = config.alpha;
-  beta_ = config.beta;
-  gamma_ = config.gamma;
-  dist_ = config.dist;
+//  alpha_ = config.alpha;
+//  beta_ = config.beta;
+//  gamma_ = config.gamma;
+//  dist_ = config.dist;
   // std::cout << __PRETTY_FUNCTION__ << alpha_ << " " << beta_ << " " << gamma_ << " " << dist_ << std::endl;
 
-  Bmax = config.Bmax;
-  Bmin = config.Bmin;
-  Rmax = config.Rmax;
-  Rmin = config.Rmin;
-  Gmax = config.Gmax;
-  Gmin = config.Gmin;
+//  Bmax = config.Bmax;
+//  Bmin = config.Bmin;
+//  Rmax = config.Rmax;
+//  Rmin = config.Rmin;
+//  Gmax = config.Gmax;
+//  Gmin = config.Gmin;
 
   sizeA = config.sizeA;
   sizeB = config.sizeB;
@@ -109,46 +109,46 @@ void callback(ohm_blue_bars::BlueBarsCfgConfig& config, uint32_t level)
 
 void warpImage(const cv::Mat& input, cv::Mat& warped)
 {
-  double f = 0.0;
-  double dist = 0.0;
-  double alpha, beta, gamma;
-  alpha = ((double)alpha_ - 90.) * M_PI / 180;
-  beta = ((double)beta_ - 90.) * M_PI / 180;
-  gamma = ((double)gamma_ - 90.) * M_PI / 180;
-  f = (double)f_;
-  dist = (double)dist_;
-  cv::Size taille = input.size();
-  double w = (double)taille.width, h = (double)taille.height;
-  cv::Mat A1 = (cv::Mat_<float>(4, 3) << 1, 0, -w / 2, 0, 1, -h / 2, 0, 0, 0, 0, 0, 1);
-
-  // Rotation matrices around the X,Y,Z axis
-  cv::Mat RX = (cv::Mat_<float>(4, 4) << 1, 0, 0, 0, 0, std::cos(alpha), -std::sin(alpha), 0, 0, std::sin(alpha), std::cos(alpha), 0, 0, 0, 0, 1);
-
-  cv::Mat RY = (cv::Mat_<float>(4, 4) << std::cos(beta), 0, -std::sin(beta), 0, 0, 1, 0, 0, std::sin(beta), 0, std::cos(beta), 0, 0, 0, 0, 1);
-
-  cv::Mat RZ = (cv::Mat_<float>(4, 4) << std::cos(gamma), -std::sin(gamma), 0, 0, std::sin(gamma), std::cos(gamma), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-
-  // Composed Rotationsmatrix mit (RX,RY,RZ)
-  cv::Mat R = RX * RY * RZ;
-
-  // Translation matrix on the Z axis change dist will change the height
-  cv::Mat T = (cv::Mat_<float>(4, 4) << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, dist, 0, 0, 0, 1);  // Camera Intrisecs matrix 3D -> 2D
-  cv::Mat A2 = (cv::Mat_<float>(3, 4) << f, 0, w / 2, 0, 0, f, h / 2, 0, 0, 0, 1, 0);
-
-  // Final and overall transformation matrix
-  cv::Mat transfo = A2 * (T * (R * A1));
-
-  // Apply matrix transformation
-  warpPerspective(input, warped, transfo, taille, cv::INTER_CUBIC | cv::WARP_INVERSE_MAP);
-
-  //std::cout << "Fehler 1" << std::endl;
+//  double f = 0.0;
+//  double dist = 0.0;
+//  double alpha, beta, gamma;
+//  alpha = ((double)alpha_ - 90.) * M_PI / 180;
+//  beta = ((double)beta_ - 90.) * M_PI / 180;
+//  gamma = ((double)gamma_ - 90.) * M_PI / 180;
+//  f = (double)f_;
+//  dist = (double)dist_;
+//  cv::Size taille = input.size();
+//  double w = (double)taille.width, h = (double)taille.height;
+//  cv::Mat A1 = (cv::Mat_<float>(4, 3) << 1, 0, -w / 2, 0, 1, -h / 2, 0, 0, 0, 0, 0, 1);
+//
+//  // Rotation matrices around the X,Y,Z axis
+//  cv::Mat RX = (cv::Mat_<float>(4, 4) << 1, 0, 0, 0, 0, std::cos(alpha), -std::sin(alpha), 0, 0, std::sin(alpha), std::cos(alpha), 0, 0, 0, 0, 1);
+//
+//  cv::Mat RY = (cv::Mat_<float>(4, 4) << std::cos(beta), 0, -std::sin(beta), 0, 0, 1, 0, 0, std::sin(beta), 0, std::cos(beta), 0, 0, 0, 0, 1);
+//
+//  cv::Mat RZ = (cv::Mat_<float>(4, 4) << std::cos(gamma), -std::sin(gamma), 0, 0, std::sin(gamma), std::cos(gamma), 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+//
+//  // Composed Rotationsmatrix mit (RX,RY,RZ)
+//  cv::Mat R = RX * RY * RZ;
+//
+//  // Translation matrix on the Z axis change dist will change the height
+//  cv::Mat T = (cv::Mat_<float>(4, 4) << 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, dist, 0, 0, 0, 1);  // Camera Intrisecs matrix 3D -> 2D
+//  cv::Mat A2 = (cv::Mat_<float>(3, 4) << f, 0, w / 2, 0, 0, f, h / 2, 0, 0, 0, 1, 0);
+//
+//  // Final and overall transformation matrix
+//  cv::Mat transfo = A2 * (T * (R * A1));
+//
+//  // Apply matrix transformation
+//  warpPerspective(input, warped, transfo, taille, cv::INTER_CUBIC | cv::WARP_INVERSE_MAP);
+//
+//  //std::cout << "Fehler 1" << std::endl;
 }
 
 void ColorDetection(const cv::Mat& warped, cv::Mat& blueFilter)
 {
 //  cv::Mat blueFilter (blueFilter.size(), CV_8U); -> fail
 //  cv::cvtColor(warped, warped, CV_BGR2HSV); -> fail
-  inRange(warped, cv::Scalar(Bmin, Rmin, Gmin), cv::Scalar(Bmax, Rmax, Gmax), blueFilter);  // BRG
+//  inRange(warped, cv::Scalar(Bmin, Rmin, Gmin), cv::Scalar(Bmax, Rmax, Gmax), blueFilter);  // BRG
 
 
   std::cout << "blueFilter Type" << blueFilter.type() << std::endl;
