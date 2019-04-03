@@ -1,0 +1,20 @@
+<library path="lib/libpath_repeat">
+  <class name="GuiPathRepeat" type="ohm_autonomy::GuiPathRepeat" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      An example CPP GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Path Repeater</label>
+      <icon type="theme">clock</icon>
+      <statustip>Great user interface to provide real value.</statustip>
+    </qtgui>
+  </class>
+</library>
