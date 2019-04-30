@@ -1,0 +1,20 @@
+<library path="lib/libautonomy_switch">
+  <class name="AutonomySwitch" type="ohm_autonomy::AutonomySwitch" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      An example CPP GUI plugin to create a great user interface.
+    </description>
+    <qtgui>
+      <!-- optional grouping...
+      <group>
+        <label>Group</label>
+      </group>
+      <group>
+        <label>Subgroup</label>
+      </group>
+      -->
+      <label>Autonomy Switch</label>
+      <icon type="theme">clock</icon>
+      <statustip>Great user interface to provide real value.</statustip>
+    </qtgui>
+  </class>
+</library>
